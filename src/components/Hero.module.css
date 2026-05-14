@@ -1,0 +1,84 @@
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+  padding-top: 80px;
+}
+
+.greeting {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+.name {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--text-bright);
+  line-height: 1.05;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: clamp(1.8rem, 6vw, 3.5rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--text-muted);
+  line-height: 1.1;
+  margin-bottom: 28px;
+}
+
+.bio {
+  max-width: 540px;
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  line-height: 1.75;
+  margin-bottom: 48px;
+}
+
+.ctas {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ctaPrimary,
+.ctaSecondary {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 14px 28px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ctaPrimary {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.ctaPrimary:hover {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.ctaSecondary {
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.ctaSecondary:hover {
+  border-color: var(--text-muted);
+  color: var(--text-bright);
+}
