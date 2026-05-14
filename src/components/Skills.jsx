@@ -2,20 +2,20 @@ import styles from './Skills.module.css'
 
 const categories = [
   {
-    name: 'Languages',
-    items: ['JavaScript', 'TypeScript', 'Python', 'HTML / CSS'],
+    name: 'Security Tools',
+    items: ['Wireshark', 'Nmap', 'Burp Suite', 'Metasploit'],
   },
   {
-    name: 'Frameworks & Libraries',
-    items: ['React', 'Node.js', 'Express', 'Next.js'],
+    name: 'SIEM & Monitoring',
+    items: ['Splunk', 'Microsoft Sentinel', 'ELK Stack', 'Chronicle'],
   },
   {
-    name: 'Tools & Platforms',
-    items: ['Git', 'Docker', 'Linux', 'GitHub Actions'],
+    name: 'Frameworks',
+    items: ['NIST CSF', 'MITRE ATT&CK', 'ISO 27001', 'OWASP'],
   },
   {
-    name: 'Databases',
-    items: ['PostgreSQL', 'MongoDB', 'Redis', 'SQLite'],
+    name: 'Scripting & OS',
+    items: ['Python', 'PowerShell', 'Bash', 'Linux / Windows'],
   },
 ]
 
@@ -24,7 +24,7 @@ export default function Skills() {
     <section id="skills">
       <div className="container">
         <p className="section-eyebrow">Stack</p>
-        <h2 className="section-heading">Technologies I work with</h2>
+        <h2 className="section-heading">Tools &amp; Technologies</h2>
         <div className={styles.grid}>
           {categories.map((cat) => (
             <div key={cat.name} className={styles.category}>

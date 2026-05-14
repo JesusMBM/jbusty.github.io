@@ -6,11 +6,11 @@ export default function Hero() {
       <div className={styles.content}>
         <p className={styles.greeting}>Hi, my name is</p>
         <h1 className={styles.name}>Jesus Bustillos-Molina.</h1>
-        <h2 className={styles.title}>I build things for the web.</h2>
+        <h2 className={styles.title}>I secure systems and hunt threats.</h2>
         <p className={styles.bio}>
-          I&rsquo;m a software engineer passionate about creating clean, efficient,
-          and user-friendly digital experiences. Currently focused on building
-          impactful products and exploring new technologies.
+          Cybersecurity analyst with a BS in MIS from Kansas State University and
+          an MS in Cybersecurity &amp; Information Assurance from WGU. ISC&sup2; CC
+          certified, pursuing CompTIA CySA+ and PenTest+.
         </p>
         <div className={styles.ctas}>
           <a href="#projects" className={styles.ctaPrimary}>View my work</a>
