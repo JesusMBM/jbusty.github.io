@@ -2,26 +2,26 @@ import styles from './Projects.module.css'
 
 const projects = [
   {
-    title: 'Project One',
+    title: 'Home SOC Lab',
     description:
-      'A brief description of what this project does and the problem it solves. Highlight the impact or scale if applicable.',
-    tags: ['React', 'Node.js', 'PostgreSQL'],
+      'Personal security operations lab for practicing threat detection, log analysis, and incident response using a SIEM and intentionally vulnerable machines.',
+    tags: ['Splunk', 'VirtualBox', 'Kali Linux'],
     github: '#',
-    live: '#',
+    live: null,
   },
   {
-    title: 'Project Two',
+    title: 'Vulnerability Assessment Report',
     description:
-      'Another interesting project — what makes it unique, the technical challenges you overcame, and what you learned.',
-    tags: ['TypeScript', 'Next.js', 'Tailwind'],
+      'Conducted a full vulnerability assessment on a target environment — enumeration, scanning, risk scoring, and a written remediation report following NIST guidelines.',
+    tags: ['Nmap', 'Nessus', 'NIST CSF'],
     github: '#',
-    live: '#',
+    live: null,
   },
   {
-    title: 'Project Three',
+    title: 'Threat Hunting Playbook',
     description:
-      'A third project to showcase your range. Could be a CLI tool, API, mobile app, open-source contribution, or anything else.',
-    tags: ['Python', 'FastAPI', 'Docker'],
+      'Developed detection rules and a structured playbook for hunting common adversary techniques mapped to MITRE ATT&CK, implemented in a SIEM environment.',
+    tags: ['MITRE ATT&CK', 'Splunk', 'Python'],
     github: '#',
     live: null,
   },
