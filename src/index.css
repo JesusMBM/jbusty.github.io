@@ -1,15 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
 :root {
-  --bg: #0a0a0a;
-  --bg-2: #111111;
-  --bg-3: #1a1a1a;
+  --bg: #1e1e2e;
+  --bg-2: #181825;
+  --bg-3: #313244;
+  --text: #cdd6f4;
+  --text-bright: #bac2de;
+  --text-muted: #6c7086;
+  --accent: #cba6f7;
+  --accent-2: #89b4fa;
+  --accent-3: #94e2d5;
+  --pink: #f38ba8;
+  --accent-dim: rgba(203, 166, 247, 0.1);
   --border: rgba(255, 255, 255, 0.08);
-  --text: #d1d5db;
-  --text-bright: #f9fafb;
-  --text-muted: #6b7280;
-  --accent: #64ffda;
-  --accent-dim: rgba(100, 255, 218, 0.1);
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: 'JetBrains Mono', monospace;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 *, *::before, *::after {
@@ -29,6 +34,35 @@ body {
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(203, 166, 247, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
 }
 
 a {
@@ -43,17 +77,19 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   max-width: 960px;
   margin: 0 auto;
   padding: 0 24px;
+  position: relative;
+  z-index: 1;
 }
 
-section { padding: 96px 0; }
+section { padding: 112px 0; }
 
 .section-eyebrow {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--accent);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 10px;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  opacity: 0.85;
 }
 
 .section-heading {
@@ -61,9 +97,9 @@ section { padding: 96px 0; }
   font-weight: 600;
   letter-spacing: -0.025em;
   color: var(--text-bright);
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
 
 @media (max-width: 640px) {
-  section { padding: 72px 0; }
+  section { padding: 80px 0; }
 }
