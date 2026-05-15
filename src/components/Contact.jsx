@@ -1,3 +1,7 @@
+import { useRef } from 'react'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import styles from './Contact.module.css'
 
 function GitHubIcon() {
@@ -26,32 +30,48 @@ function EmailIcon() {
 }
 
 export default function Contact() {
+  const sectionRef = useRef(null)
+
+  useGSAP(() => {
+    gsap.from(sectionRef.current.querySelectorAll('[data-reveal]'), {
+      opacity: 0,
+      y: 32,
+      stagger: 0.15,
+      duration: 0.7,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: 'top 80%',
+      },
+    })
+  }, { scope: sectionRef })
+
   return (
-    <section id="contact">
+    <section id="contact" ref={sectionRef}>
       <div className="container">
-        <p className="section-eyebrow">Contact</p>
+        <p className="section-eyebrow" data-reveal>// contact</p>
         <div className={styles.content}>
-          <h2 className={styles.heading}>Get in touch</h2>
-          <p className={styles.body}>
+          <h2 className={styles.heading} data-reveal>Get in touch</h2>
+          <p className={styles.body} data-reveal>
             I&rsquo;m currently open to new opportunities. Whether you have a question,
             a project idea, or just want to say hi — my inbox is always open.
           </p>
-          <a href="mailto:your.email@example.com" className={styles.emailBtn}>
+          <a href="mailto:jesusd18292@gmail.com" className={styles.emailBtn} data-reveal>
             Say hello
           </a>
-          <div className={styles.socials}>
-            <a href="https://github.com/jbusty" className={styles.socialLink} aria-label="GitHub" target="_blank" rel="noopener noreferrer">
+          <div className={styles.socials} data-reveal>
+            <a href="https://github.com/JesusMBM" className={styles.socialLink} aria-label="GitHub" target="_blank" rel="noopener noreferrer">
               <GitHubIcon />
             </a>
             <a href="https://linkedin.com/in/your-profile" className={styles.socialLink} aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
               <LinkedInIcon />
             </a>
-            <a href="mailto:your.email@example.com" className={styles.socialLink} aria-label="Email">
+            <a href="mailto:jesusd18292@gmail.com" className={styles.socialLink} aria-label="Email">
               <EmailIcon />
             </a>
           </div>
         </div>
-        <footer className={styles.footer}>
+        <footer className={styles.footer} data-reveal>
           <p>Designed &amp; built by Jesus Bustillos-Molina</p>
         </footer>
       </div>
