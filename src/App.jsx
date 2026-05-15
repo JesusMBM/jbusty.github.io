@@ -1,6 +1,7 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Cursor from './components/Cursor'
+import SpotifyPlayer from './components/SpotifyPlayer'
 import Nav from './components/Nav'
 import Hero from './components/Hero'
 import About from './components/About'
@@ -14,6 +15,7 @@ export default function App() {
   return (
     <>
       <Cursor />
+      <SpotifyPlayer />
       <Nav />
       <main>
         <Hero />
