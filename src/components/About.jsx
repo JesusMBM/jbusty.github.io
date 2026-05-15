@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, Fragment } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import styles from './About.module.css'
@@ -10,12 +10,14 @@ const paragraphs = [
 ]
 
 function WordSplit({ text }) {
+  const words = text.split(' ')
   return (
     <>
-      {text.split(' ').map((word, i, arr) => (
-        <span key={i} className={styles.word}>
-          {word}{i < arr.length - 1 ? ' ' : ''}
-        </span>
+      {words.map((word, i) => (
+        <Fragment key={i}>
+          <span className={styles.word}>{word}</span>
+          {i < words.length - 1 && ' '}
+        </Fragment>
       ))}
     </>
   )
