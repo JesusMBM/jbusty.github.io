@@ -1,4 +1,3 @@
-import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -9,10 +8,11 @@ import Projects from './components/Projects'
 import Skills from './components/Skills'
 import Contact from './components/Contact'
 
-gsap.registerPlugin(useGSAP, ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger)
 
 export default function App() {
   useGSAP(() => {
+    gsap.set('body', { opacity: 0 })
     gsap.from('body', { opacity: 0, duration: 0.8, ease: 'power2.out' })
   })
 
