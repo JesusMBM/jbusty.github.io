@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger)
 export default function App() {
   useGSAP(() => {
     gsap.set('body', { opacity: 0 })
-    gsap.from('body', { opacity: 0, duration: 0.8, ease: 'power2.out' })
+    gsap.to('body', { opacity: 1, duration: 0.8, ease: 'power2.out' })
   })
 
   return (
