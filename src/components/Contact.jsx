@@ -56,17 +56,17 @@ export default function Contact() {
             I&rsquo;m currently open to new opportunities. Whether you have a question,
             a project idea, or just want to say hi — my inbox is always open.
           </p>
-          <a href="mailto:jesusd18292@gmail.com" className={styles.emailBtn} data-reveal>
+          <a href="mailto:jbustillosmolina@gmail.com" className={styles.emailBtn} data-reveal>
             Say hello
           </a>
           <div className={styles.socials} data-reveal>
             <a href="https://github.com/JesusMBM" className={styles.socialLink} aria-label="GitHub" target="_blank" rel="noopener noreferrer">
               <GitHubIcon />
             </a>
-            <a href="https://linkedin.com/in/your-profile" className={styles.socialLink} aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.linkedin.com/in/jesus-bm/" className={styles.socialLink} aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
               <LinkedInIcon />
             </a>
-            <a href="mailto:jesusd18292@gmail.com" className={styles.socialLink} aria-label="Email">
+            <a href="mailto:jbustillosmolina@gmail.com" className={styles.socialLink} aria-label="Email">
               <EmailIcon />
             </a>
           </div>
