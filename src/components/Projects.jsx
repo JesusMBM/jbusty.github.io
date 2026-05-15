@@ -1,3 +1,7 @@
+import { useRef } from 'react'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import styles from './Projects.module.css'
 
 const projects = [
@@ -46,10 +50,37 @@ function ExternalIcon() {
 }
 
 export default function Projects() {
+  const sectionRef = useRef(null)
+
+  useGSAP(() => {
+    gsap.from(sectionRef.current.querySelector('.section-eyebrow'), {
+      opacity: 0,
+      y: 20,
+      duration: 0.5,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: sectionRef.current, start: 'top 80%' },
+    })
+    gsap.from(sectionRef.current.querySelector('.section-heading'), {
+      opacity: 0,
+      y: 24,
+      duration: 0.5,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: sectionRef.current, start: 'top 75%' },
+    })
+    gsap.from(sectionRef.current.querySelectorAll('article'), {
+      opacity: 0,
+      y: 48,
+      stagger: 0.15,
+      duration: 0.7,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: sectionRef.current, start: 'top 70%' },
+    })
+  }, { scope: sectionRef })
+
   return (
-    <section id="projects">
+    <section id="projects" ref={sectionRef}>
       <div className="container">
-        <p className="section-eyebrow">Work</p>
+        <p className="section-eyebrow">// projects</p>
         <h2 className="section-heading">Things I&rsquo;ve built</h2>
         <div className={styles.grid}>
           {projects.map((p) => (
