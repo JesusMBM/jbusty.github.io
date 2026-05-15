@@ -9,8 +9,8 @@
 }
 
 .nav.scrolled {
-  background: rgba(10, 10, 10, 0.85);
-  backdrop-filter: blur(12px);
+  background: rgba(30, 30, 46, 0.85);
+  backdrop-filter: blur(16px);
   border-bottom-color: var(--border);
 }
 
@@ -21,12 +21,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+  z-index: 1;
 }
 
 .logo {
   font-family: var(--font-mono);
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-bright);
   letter-spacing: -0.02em;
 }
@@ -42,18 +44,23 @@
 }
 
 .link {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
   transition: color 0.2s;
   font-weight: 400;
 }
 
-.link:hover {
+.linkNum {
+  color: var(--accent);
+  margin-right: 2px;
+}
+
+.link:hover,
+.link.active {
   color: var(--accent);
 }
 
 @media (max-width: 480px) {
-  .links {
-    gap: 20px;
-  }
+  .links { gap: 16px; }
+  .linkNum { display: none; }
 }
