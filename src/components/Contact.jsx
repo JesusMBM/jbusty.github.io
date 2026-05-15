@@ -1,7 +1,6 @@
 import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import styles from './Contact.module.css'
 
 function GitHubIcon() {
@@ -31,35 +30,82 @@ function EmailIcon() {
 
 export default function Contact() {
   const sectionRef = useRef(null)
+  const bgTextRef = useRef(null)
+  const btnRef = useRef(null)
 
   useGSAP(() => {
-    gsap.from(sectionRef.current.querySelectorAll('[data-reveal]'), {
-      opacity: 0,
-      y: 32,
-      stagger: 0.15,
-      duration: 0.7,
-      ease: 'power3.out',
+    gsap.to(bgTextRef.current, {
+      y: -60,
+      ease: 'none',
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: 'top 80%',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 1,
       },
     })
+
+    const tl = gsap.timeline({
+      scrollTrigger: { trigger: sectionRef.current, start: 'top 75%' },
+    })
+    tl.from(sectionRef.current.querySelector('.section-eyebrow'), {
+      opacity: 0, y: 20, duration: 0.5, ease: 'power3.out',
+    })
+    .from(sectionRef.current.querySelector(`.${styles.heading}`), {
+      clipPath: 'inset(0 0 100% 0)',
+      y: 20,
+      duration: 0.8,
+      ease: 'power3.out',
+    }, '-=0.2')
+    .from(sectionRef.current.querySelector(`.${styles.body}`), {
+      opacity: 0, y: 24, duration: 0.6, ease: 'power3.out',
+    }, '-=0.4')
+    .from(btnRef.current, {
+      opacity: 0, y: 20, scale: 0.9, duration: 0.5, ease: 'back.out(1.7)',
+    }, '-=0.3')
+    .from(sectionRef.current.querySelector(`.${styles.socials}`), {
+      opacity: 0, y: 16, duration: 0.5, ease: 'power3.out',
+    }, '-=0.2')
+    .from(sectionRef.current.querySelector(`.${styles.footer}`), {
+      opacity: 0, duration: 0.4, ease: 'power2.out',
+    }, '-=0.1')
   }, { scope: sectionRef })
 
+  const handleBtnMove = (e) => {
+    const el = btnRef.current
+    const { left, top, width, height } = el.getBoundingClientRect()
+    gsap.to(el, {
+      x: (e.clientX - left - width / 2) * 0.4,
+      y: (e.clientY - top - height / 2) * 0.4,
+      duration: 0.4,
+      ease: 'power2.out',
+    })
+  }
+  const handleBtnLeave = () => {
+    gsap.to(btnRef.current, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.4)' })
+  }
+
   return (
-    <section id="contact" ref={sectionRef}>
+    <section id="contact" ref={sectionRef} className={styles.section}>
+      <div ref={bgTextRef} className={styles.bgText} aria-hidden="true">LET&rsquo;S TALK</div>
       <div className="container">
-        <p className="section-eyebrow" data-reveal>// contact</p>
+        <p className="section-eyebrow">// contact</p>
         <div className={styles.content}>
-          <h2 className={styles.heading} data-reveal>Get in touch</h2>
-          <p className={styles.body} data-reveal>
+          <h2 className={styles.heading}>Get in touch</h2>
+          <p className={styles.body}>
             I&rsquo;m currently open to new opportunities. Whether you have a question,
             a project idea, or just want to say hi — my inbox is always open.
           </p>
-          <a href="mailto:jbustillosmolina@gmail.com" className={styles.emailBtn} data-reveal>
+          <a
+            ref={btnRef}
+            href="mailto:jbustillosmolina@gmail.com"
+            className={styles.emailBtn}
+            onMouseMove={handleBtnMove}
+            onMouseLeave={handleBtnLeave}
+          >
             Say hello
           </a>
-          <div className={styles.socials} data-reveal>
+          <div className={styles.socials}>
             <a href="https://github.com/JesusMBM" className={styles.socialLink} aria-label="GitHub" target="_blank" rel="noopener noreferrer">
               <GitHubIcon />
             </a>
@@ -71,7 +117,7 @@ export default function Contact() {
             </a>
           </div>
         </div>
-        <footer className={styles.footer} data-reveal>
+        <footer className={styles.footer}>
           <p>Designed &amp; built by Jesus Bustillos-Molina</p>
         </footer>
       </div>

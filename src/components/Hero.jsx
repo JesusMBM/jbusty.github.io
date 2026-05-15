@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import styles from './Hero.module.css'
 
 const SCRAMBLE_CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ!@#$%^&*'
@@ -40,11 +41,31 @@ function SplitChars({ text, className }) {
   )
 }
 
+function useMagnetic(ref) {
+  return {
+    onMouseMove(e) {
+      const el = ref.current
+      const { left, top, width, height } = el.getBoundingClientRect()
+      gsap.to(el, {
+        x: (e.clientX - left - width / 2) * 0.38,
+        y: (e.clientY - top - height / 2) * 0.38,
+        duration: 0.4,
+        ease: 'power2.out',
+      })
+    },
+    onMouseLeave() {
+      gsap.to(ref.current, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.4)' })
+    },
+  }
+}
+
 export default function Hero() {
   const containerRef = useRef(null)
   const orbRef = useRef(null)
   const orb2Ref = useRef(null)
   const greetingRef = useRef(null)
+  const cta1Ref = useRef(null)
+  const cta2Ref = useRef(null)
 
   useEffect(() => {
     if (!greetingRef.current) return
@@ -54,6 +75,7 @@ export default function Hero() {
   useGSAP(() => {
     const tl = gsap.timeline({ delay: 0.6 })
 
+    // Idle float animations
     gsap.to(orbRef.current, {
       x: 80, y: 50, duration: 7, repeat: -1, yoyo: true, ease: 'sine.inOut',
     })
@@ -61,6 +83,25 @@ export default function Hero() {
       x: -60, y: 80, duration: 9, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 2,
     })
 
+    // Scroll parallax — orbs drift up faster than content
+    gsap.to(orbRef.current, {
+      y: -180,
+      ease: 'none',
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1.5 },
+    })
+    gsap.to(orb2Ref.current, {
+      y: -100,
+      ease: 'none',
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1.5 },
+    })
+    gsap.to(containerRef.current, {
+      y: -70,
+      opacity: 0.2,
+      ease: 'none',
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 },
+    })
+
+    // Entrance animations
     tl.from(containerRef.current.querySelector(`.${styles.greeting}`), {
       opacity: 0, y: 20, duration: 0.5, ease: 'power3.out',
     })
@@ -89,6 +130,9 @@ export default function Hero() {
     })
   }
 
+  const mag1 = useMagnetic(cta1Ref)
+  const mag2 = useMagnetic(cta2Ref)
+
   return (
     <section id="hero" className={styles.hero}>
       <div ref={orbRef} className={styles.orb} aria-hidden="true" />
@@ -110,8 +154,8 @@ export default function Hero() {
           certified, pursuing CompTIA CySA+ and PenTest+.
         </p>
         <div className={styles.ctas}>
-          <a href="#projects" className={styles.ctaPrimary}>View my work</a>
-          <a href="#contact" className={styles.ctaSecondary}>Get in touch</a>
+          <a ref={cta1Ref} href="#projects" className={styles.ctaPrimary} {...mag1}>View my work</a>
+          <a ref={cta2Ref} href="#contact" className={styles.ctaSecondary} {...mag2}>Get in touch</a>
         </div>
       </div>
     </section>

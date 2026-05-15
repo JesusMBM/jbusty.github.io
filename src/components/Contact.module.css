@@ -1,15 +1,47 @@
+.section {
+  position: relative;
+  overflow: hidden;
+}
+
+.bgText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(5rem, 16vw, 13rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: rgba(203, 166, 247, 0.045);
+  pointer-events: none;
+  white-space: nowrap;
+  user-select: none;
+  z-index: 0;
+}
+
 .content {
   text-align: center;
   max-width: 560px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .heading {
   font-size: clamp(1.8rem, 5vw, 3rem);
   font-weight: 600;
   letter-spacing: -0.03em;
-  color: var(--text-bright);
   margin-bottom: 20px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 50%, var(--accent-3) 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 5s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
 }
 
 .body {
@@ -21,27 +53,29 @@
 
 .emailBtn {
   display: inline-block;
-  padding: 16px 36px;
+  padding: 16px 40px;
   border: 1px solid var(--accent);
   border-radius: 6px;
   color: var(--accent);
   font-family: var(--font-mono);
   font-size: 0.875rem;
   font-weight: 500;
-  transition: all 0.25s;
+  transition: background 0.25s, color 0.25s, box-shadow 0.25s;
   margin-bottom: 48px;
 }
 
 .emailBtn:hover {
   background: var(--accent);
   color: var(--bg);
-  box-shadow: 0 0 32px rgba(203, 166, 247, 0.4);
+  box-shadow: 0 0 40px rgba(203, 166, 247, 0.45);
 }
 
 .socials {
   display: flex;
   justify-content: center;
   gap: 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .socialLink {
@@ -64,4 +98,6 @@
   font-size: 0.75rem;
   font-family: var(--font-mono);
   color: var(--text-muted);
+  position: relative;
+  z-index: 1;
 }

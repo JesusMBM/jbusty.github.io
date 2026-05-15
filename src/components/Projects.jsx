@@ -83,10 +83,13 @@ export default function Projects() {
     })
     gsap.from(sectionRef.current.querySelectorAll('article'), {
       opacity: 0,
-      y: 48,
-      stagger: 0.15,
-      duration: 0.7,
-      ease: 'power3.out',
+      y: 70,
+      rotateX: 12,
+      scale: 0.94,
+      transformPerspective: 900,
+      stagger: 0.18,
+      duration: 1,
+      ease: 'power4.out',
       scrollTrigger: { trigger: sectionRef.current, start: 'top 70%' },
     })
   }, { scope: sectionRef })
