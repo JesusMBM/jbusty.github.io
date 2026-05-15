@@ -32,22 +32,27 @@ export default function Nav() {
       delay: 0.5,
     })
 
-    links.forEach(({ href }) => {
-      const id = href.replace('#', '')
-      const el = document.getElementById(id)
-      if (!el) return
-      ScrollTrigger.create({
-        trigger: el,
-        start: 'top center',
-        end: 'bottom center',
-        onEnter: () => setActive(href),
-        onEnterBack: () => setActive(href),
+    const triggers = links
+      .map(({ href }) => {
+        const el = document.getElementById(href.slice(1))
+        if (!el) return null
+        return ScrollTrigger.create({
+          trigger: el,
+          start: 'top center',
+          end: 'bottom center',
+          onEnter: () => setActive(href),
+          onEnterBack: () => setActive(href),
+        })
       })
-    })
+      .filter(Boolean)
+
+    ScrollTrigger.refresh()
+
+    return () => triggers.forEach(t => t.kill())
   }, { scope: navRef })
 
   return (
-    <nav ref={navRef} className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>
+    <nav ref={navRef} aria-label="Primary navigation" className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>
       <div className={styles.inner}>
         <a href="#hero" className={styles.logo} data-nav-item>
           <span className={styles.logoAccent}>[</span>JBM<span className={styles.logoAccent}>]</span>
@@ -57,6 +62,7 @@ export default function Nav() {
             <li key={href} data-nav-item>
               <a
                 href={href}
+                aria-current={active === href ? 'page' : undefined}
                 className={`${styles.link} ${active === href ? styles.active : ''}`}
               >
                 <span className={styles.linkNum}>{num}.</span> {label}
