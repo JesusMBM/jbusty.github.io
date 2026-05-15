@@ -1,4 +1,3 @@
-import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Nav from './components/Nav'
@@ -11,11 +10,6 @@ import Contact from './components/Contact'
 gsap.registerPlugin(ScrollTrigger)
 
 export default function App() {
-  useGSAP(() => {
-    gsap.set('body', { opacity: 0 })
-    gsap.to('body', { opacity: 1, duration: 0.8, ease: 'power2.out' })
-  })
-
   return (
     <>
       <Nav />
