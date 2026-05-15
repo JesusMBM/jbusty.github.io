@@ -1,13 +1,35 @@
+import { useRef } from 'react'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import styles from './About.module.css'
 
 export default function About() {
+  const sectionRef = useRef(null)
+
+  useGSAP(() => {
+    gsap.from(sectionRef.current.querySelectorAll('[data-reveal]'), {
+      opacity: 0,
+      y: 40,
+      stagger: 0.12,
+      duration: 0.7,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: 'top 80%',
+      },
+    })
+  }, { scope: sectionRef })
+
   return (
-    <section id="about">
+    <section id="about" ref={sectionRef}>
       <div className="container">
-        <p className="section-eyebrow">About me</p>
-        <h2 className="section-heading">Who I am</h2>
+        <p className="section-eyebrow" data-reveal>// about me</p>
+        <h2 className="section-heading" data-reveal>
+          Who I am<span className={styles.cursor} aria-hidden="true" />
+        </h2>
         <div className={styles.grid}>
-          <div className={styles.text}>
+          <div className={styles.text} data-reveal>
             <p>
               Hello! I&rsquo;m Jesus, a cybersecurity analyst passionate about
               protecting systems, investigating threats, and making digital environments
@@ -26,7 +48,7 @@ export default function About() {
               exploring emerging threats in the security landscape.
             </p>
           </div>
-          <div className={styles.avatarWrap}>
+          <div className={styles.avatarWrap} data-reveal>
             <div className={styles.avatar}>
               <span className={styles.avatarInitials}>JBM</span>
             </div>

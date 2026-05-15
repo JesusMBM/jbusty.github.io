@@ -8,14 +8,25 @@
 .text {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  font-size: 1rem;
+  gap: 20px;
+  font-size: 0.95rem;
   color: var(--text-muted);
-  line-height: 1.8;
+  line-height: 1.9;
 }
 
-.text p strong {
-  color: var(--text);
+.cursor {
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  background: var(--accent);
+  margin-left: 6px;
+  vertical-align: middle;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 .avatarWrap {
@@ -27,34 +38,29 @@
   width: 200px;
   height: 200px;
   border-radius: 12px;
-  border: 2px solid var(--accent);
-  background: var(--bg-3);
+  border: 1px solid var(--accent);
+  background: var(--bg-2);
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 0 32px rgba(203, 166, 247, 0.12);
+  transition: box-shadow 0.3s;
+}
+
+.avatar:hover {
+  box-shadow: 0 0 48px rgba(203, 166, 247, 0.25);
 }
 
 .avatarInitials {
   font-family: var(--font-mono);
   font-size: 2rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--accent);
   letter-spacing: 0.05em;
 }
 
 @media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .avatarWrap {
-    order: -1;
-  }
-
-  .avatar {
-    width: 140px;
-    height: 140px;
-  }
+  .grid { grid-template-columns: 1fr; }
+  .avatarWrap { order: -1; }
+  .avatar { width: 140px; height: 140px; }
 }
