@@ -1,5 +1,6 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Cursor from './components/Cursor'
 import Nav from './components/Nav'
 import Hero from './components/Hero'
 import About from './components/About'
@@ -12,6 +13,7 @@ gsap.registerPlugin(ScrollTrigger)
 export default function App() {
   return (
     <>
+      <Cursor />
       <Nav />
       <main>
         <Hero />

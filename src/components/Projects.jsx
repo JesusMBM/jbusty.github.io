@@ -49,6 +49,20 @@ function ExternalIcon() {
   )
 }
 
+function tilt(e) {
+  const card = e.currentTarget
+  const rect = card.getBoundingClientRect()
+  const x = e.clientX - rect.left
+  const y = e.clientY - rect.top
+  const rotateX = -((y - rect.height / 2) / rect.height) * 14
+  const rotateY = ((x - rect.width / 2) / rect.width) * 14
+  gsap.to(card, { rotateX, rotateY, transformPerspective: 800, duration: 0.3, ease: 'power2.out' })
+}
+
+function resetTilt(e) {
+  gsap.to(e.currentTarget, { rotateX: 0, rotateY: 0, duration: 0.5, ease: 'power3.out' })
+}
+
 export default function Projects() {
   const sectionRef = useRef(null)
 
@@ -84,7 +98,7 @@ export default function Projects() {
         <h2 className="section-heading">Things I&rsquo;ve built</h2>
         <div className={styles.grid}>
           {projects.map((p) => (
-            <article key={p.title} className={styles.card}>
+            <article key={p.title} className={styles.card} onMouseMove={tilt} onMouseLeave={resetTilt}>
               <div className={styles.cardTop}>
                 <h3 className={styles.cardTitle}>{p.title}</h3>
                 <div className={styles.cardLinks}>
