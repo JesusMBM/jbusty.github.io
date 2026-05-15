@@ -3,6 +3,27 @@
   display: flex;
   align-items: center;
   padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(203, 166, 247, 0.18) 0%,
+    rgba(137, 180, 250, 0.1) 45%,
+    transparent 70%
+  );
+  top: 50%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  filter: blur(70px);
+  pointer-events: none;
+  will-change: transform;
 }
 
 .content {
@@ -10,6 +31,8 @@
   margin: 0 auto;
   padding: 0 24px;
   padding-top: 80px;
+  position: relative;
+  z-index: 1;
 }
 
 .greeting {
@@ -20,12 +43,17 @@
 }
 
 .name {
+  display: block;
   font-size: clamp(2.5rem, 8vw, 5rem);
   font-weight: 700;
   letter-spacing: -0.04em;
   color: var(--text-bright);
   line-height: 1.05;
   margin-bottom: 8px;
+}
+
+.char {
+  display: inline-block;
 }
 
 .title {
@@ -39,9 +67,9 @@
 
 .bio {
   max-width: 540px;
-  font-size: 1.05rem;
+  font-size: 1rem;
   color: var(--text-muted);
-  line-height: 1.75;
+  line-height: 1.85;
   margin-bottom: 48px;
 }
 
@@ -53,7 +81,8 @@
 
 .ctaPrimary,
 .ctaSecondary {
-  font-size: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
   font-weight: 500;
   padding: 14px 28px;
   border-radius: 6px;
@@ -71,6 +100,7 @@
 .ctaPrimary:hover {
   background: var(--accent);
   color: var(--bg);
+  box-shadow: 0 0 24px rgba(203, 166, 247, 0.4);
 }
 
 .ctaSecondary {
