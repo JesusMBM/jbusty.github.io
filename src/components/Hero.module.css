@@ -1,84 +1,160 @@
 .hero {
   min-height: 100vh;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
   align-items: center;
-  padding: 0;
+  gap: 56px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 120px 24px 80px;
 }
 
 .content {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 24px;
-  padding-top: 80px;
+  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .greeting {
-  font-family: var(--font-mono);
   font-size: 0.95rem;
-  color: var(--accent);
-  margin-bottom: 20px;
+  color: var(--accent-3);
+  margin-bottom: 22px;
+  letter-spacing: 0.02em;
 }
 
+.prompt { color: var(--accent); font-weight: 700; margin-right: 6px; }
+
 .name {
-  font-size: clamp(2.5rem, 8vw, 5rem);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  color: var(--text-bright);
+  font-size: clamp(2.2rem, 6vw, 3.8rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  color: var(--text);
   line-height: 1.05;
-  margin-bottom: 8px;
+  margin-bottom: 14px;
 }
 
 .title {
-  font-size: clamp(1.8rem, 6vw, 3.5rem);
+  font-size: clamp(1.2rem, 3vw, 1.9rem);
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   color: var(--text-muted);
-  line-height: 1.1;
-  margin-bottom: 28px;
+  line-height: 1.2;
+  margin-bottom: 26px;
 }
 
 .bio {
-  max-width: 540px;
-  font-size: 1.05rem;
-  color: var(--text-muted);
-  line-height: 1.75;
-  margin-bottom: 48px;
+  max-width: 520px;
+  font-size: 0.92rem;
+  color: var(--text-dim);
+  line-height: 1.85;
+  margin-bottom: 40px;
 }
 
-.ctas {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
+.ctas { display: flex; gap: 14px; flex-wrap: wrap; }
 
 .ctaPrimary,
 .ctaSecondary {
-  font-size: 0.9rem;
-  font-weight: 500;
-  padding: 14px 28px;
-  border-radius: 6px;
-  transition: all 0.2s;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 14px 26px;
+  border-radius: 8px;
+  transition: all 0.22s;
   display: inline-flex;
   align-items: center;
+  gap: 8px;
 }
 
 .ctaPrimary {
-  background: var(--accent-dim);
-  color: var(--accent);
-  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--ctp-crust);
+  box-shadow: 0 8px 24px -8px rgba(203, 166, 247, 0.6);
 }
 
 .ctaPrimary:hover {
-  background: var(--accent);
-  color: var(--bg);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -8px rgba(203, 166, 247, 0.75);
 }
+
+.ctaPrimary span { transition: transform 0.22s; }
+.ctaPrimary:hover span { transform: translateX(4px); }
 
 .ctaSecondary {
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
 }
 
 .ctaSecondary:hover {
-  border-color: var(--text-muted);
-  color: var(--text-bright);
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(203, 166, 247, 0.06);
+}
+
+/* Terminal card */
+.terminal {
+  background: rgba(17, 17, 27, 0.85);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(203, 166, 247, 0.06);
+  backdrop-filter: blur(6px);
+  animation: fadeUp 0.8s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.termBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px;
+  background: var(--ctp-mantle);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.dotR { background: var(--ctp-red); }
+.dotY { background: var(--ctp-yellow); }
+.dotG { background: var(--ctp-green); }
+
+.termTitle {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.termBody {
+  padding: 18px 18px 20px;
+  font-size: 0.8rem;
+  line-height: 1.85;
+}
+
+.termBody p { white-space: nowrap; }
+
+.tPrompt { color: var(--ctp-green); font-weight: 600; }
+.tPath { color: var(--ctp-blue); }
+.tOut { color: var(--text-muted); padding-left: 2px; }
+.tOk { color: var(--ctp-green); }
+.tWip { color: var(--ctp-yellow); }
+
+.blink { color: var(--accent); animation: blink 1.1s steps(1) infinite; }
+
+@keyframes blink { 50% { opacity: 0; } }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 860px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 44px;
+    padding-top: 110px;
+  }
+  .terminal { order: 2; }
+  .termBody { font-size: 0.74rem; }
+}
+
+@media (max-width: 420px) {
+  .termBody { font-size: 0.66rem; }
 }

@@ -1,7 +1,7 @@
 .grid {
   display: grid;
-  grid-template-columns: 3fr 2fr;
-  gap: 60px;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 56px;
   align-items: start;
 }
 
@@ -9,52 +9,117 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  font-size: 1rem;
-  color: var(--text-muted);
-  line-height: 1.8;
+  font-size: 0.92rem;
+  color: var(--text-dim);
+  line-height: 1.9;
 }
 
-.text p strong {
+.subhead {
+  font-size: 0.82rem;
+  color: var(--accent-3);
+  font-weight: 600;
+  margin-bottom: 18px;
+  letter-spacing: 0.02em;
+}
+
+/* Certs */
+.certs { margin-top: 14px; }
+
+.certs ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+
+.cert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.88rem;
   color: var(--text);
 }
 
-.avatarWrap {
-  display: flex;
-  justify-content: center;
+.badge {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
-.avatar {
-  width: 200px;
-  height: 200px;
-  border-radius: 12px;
-  border: 2px solid var(--accent);
-  background: var(--bg-3);
+.earned {
+  background: rgba(166, 227, 161, 0.16);
+  color: var(--ctp-green);
+  border: 1px solid rgba(166, 227, 161, 0.4);
+}
+
+.progress {
+  background: rgba(249, 226, 175, 0.14);
+  color: var(--ctp-yellow);
+  border: 1px solid rgba(249, 226, 175, 0.35);
+}
+
+.certName { color: var(--text-muted); }
+
+.wip {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--ctp-yellow);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* Education side panel */
+.side {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 26px;
+  position: sticky;
+  top: 100px;
+}
+
+.timeline {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 28px;
   position: relative;
-  overflow: hidden;
+  padding-left: 22px;
 }
 
-.avatarInitials {
-  font-family: var(--font-mono);
-  font-size: 2rem;
-  font-weight: 500;
-  color: var(--accent);
-  letter-spacing: 0.05em;
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: linear-gradient(var(--ctp-mauve), var(--ctp-blue));
+  opacity: 0.4;
 }
 
-@media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+.eduItem { position: relative; }
 
-  .avatarWrap {
-    order: -1;
-  }
+.eduDot {
+  position: absolute;
+  left: -22px;
+  top: 6px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-alt);
+}
 
-  .avatar {
-    width: 140px;
-    height: 140px;
-  }
+.degree {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.school { font-size: 0.82rem; color: var(--text-dim); }
+
+@media (max-width: 800px) {
+  .grid { grid-template-columns: 1fr; gap: 40px; }
+  .side { position: static; }
 }

@@ -1,4 +1,9 @@
 import styles from './Contact.module.css'
+import useReveal from '../hooks/useReveal'
+
+const EMAIL = 'jesusd18292@gmail.com'
+const GITHUB = 'https://github.com/JesusMBM'
+const LINKEDIN = 'https://linkedin.com/in/your-profile'
 
 function GitHubIcon() {
   return (
@@ -26,33 +31,46 @@ function EmailIcon() {
 }
 
 export default function Contact() {
+  const ref = useReveal()
+
   return (
-    <section id="contact">
+    <section id="contact" ref={ref}>
       <div className="container">
-        <p className="section-eyebrow">Contact</p>
         <div className={styles.content}>
-          <h2 className={styles.heading}>Get in touch</h2>
-          <p className={styles.body}>
-            I&rsquo;m currently open to new opportunities. Whether you have a question,
-            a project idea, or just want to say hi — my inbox is always open.
+          <p className={`section-eyebrow ${styles.centerEyebrow} reveal`}>./contact</p>
+          <h2 className={`${styles.heading} reveal`}>
+            Let&rsquo;s <span className="grad-text">connect</span>
+          </h2>
+          <p className={`${styles.body} reveal`}>
+            I&rsquo;m currently open to new opportunities in cybersecurity. Whether you
+            have a question, a role in mind, or just want to talk security — my inbox
+            is always open.
           </p>
-          <a href="mailto:your.email@example.com" className={styles.emailBtn}>
-            Say hello
+
+          <a href={`mailto:${EMAIL}`} className={`${styles.emailBtn} reveal`}>
+            say hello <span aria-hidden="true">→</span>
           </a>
-          <div className={styles.socials}>
-            <a href="https://github.com/jbusty" className={styles.socialLink} aria-label="GitHub" target="_blank" rel="noopener noreferrer">
+
+          <div className={`${styles.socials} reveal`}>
+            <a href={GITHUB} className={styles.socialLink} aria-label="GitHub" target="_blank" rel="noopener noreferrer">
               <GitHubIcon />
             </a>
-            <a href="https://linkedin.com/in/your-profile" className={styles.socialLink} aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+            <a href={LINKEDIN} className={styles.socialLink} aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
               <LinkedInIcon />
             </a>
-            <a href="mailto:your.email@example.com" className={styles.socialLink} aria-label="Email">
+            <a href={`mailto:${EMAIL}`} className={styles.socialLink} aria-label="Email">
               <EmailIcon />
             </a>
           </div>
         </div>
+
         <footer className={styles.footer}>
-          <p>Designed &amp; built by Jesus Bustillos-Molina</p>
+          <p>
+            <span className={styles.foot}>built with React + Vite</span>
+            <span className={styles.sep}>·</span>
+            <span className={styles.foot}>Catppuccin Mocha</span>
+          </p>
+          <p className={styles.copy}>© {new Date().getFullYear()} Jesus Bustillos-Molina</p>
         </footer>
       </div>
     </section>

@@ -1,27 +1,31 @@
 import styles from './Projects.module.css'
+import useReveal from '../hooks/useReveal'
 
 const projects = [
   {
     title: 'Home SOC Lab',
     description:
-      'Personal security operations lab for practicing threat detection, log analysis, and incident response using a SIEM and intentionally vulnerable machines.',
+      'A personal security operations lab for practicing threat detection, log analysis, and incident response using a SIEM and intentionally vulnerable machines.',
     tags: ['Splunk', 'VirtualBox', 'Kali Linux'],
+    accent: 'var(--ctp-mauve)',
     github: '#',
     live: null,
   },
   {
-    title: 'Vulnerability Assessment Report',
+    title: 'Vulnerability Assessment',
     description:
-      'Conducted a full vulnerability assessment on a target environment — enumeration, scanning, risk scoring, and a written remediation report following NIST guidelines.',
+      'Full vulnerability assessment of a target environment — enumeration, scanning, risk scoring, and a written remediation report following NIST guidelines.',
     tags: ['Nmap', 'Nessus', 'NIST CSF'],
+    accent: 'var(--ctp-blue)',
     github: '#',
     live: null,
   },
   {
     title: 'Threat Hunting Playbook',
     description:
-      'Developed detection rules and a structured playbook for hunting common adversary techniques mapped to MITRE ATT&CK, implemented in a SIEM environment.',
+      'Detection rules and a structured playbook for hunting common adversary techniques mapped to MITRE ATT&CK, implemented in a SIEM environment.',
     tags: ['MITRE ATT&CK', 'Splunk', 'Python'],
+    accent: 'var(--ctp-teal)',
     github: '#',
     live: null,
   },
@@ -35,42 +39,39 @@ function GitHubIcon() {
   )
 }
 
-function ExternalIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-      <polyline points="15 3 21 3 21 9" />
-      <line x1="10" y1="14" x2="21" y2="3" />
-    </svg>
-  )
-}
-
 export default function Projects() {
+  const ref = useReveal()
+
   return (
-    <section id="projects">
+    <section id="projects" ref={ref}>
       <div className="container">
-        <p className="section-eyebrow">Work</p>
-        <h2 className="section-heading">Things I&rsquo;ve built</h2>
+        <p className="section-eyebrow reveal">ls ./projects</p>
+        <h2 className="section-heading reveal">Things I&rsquo;ve built</h2>
+
         <div className={styles.grid}>
-          {projects.map((p) => (
-            <article key={p.title} className={styles.card}>
+          {projects.map((p, i) => (
+            <article
+              key={p.title}
+              className={`${styles.card} reveal`}
+              style={{ '--card-accent': p.accent, transitionDelay: `${i * 80}ms` }}
+            >
               <div className={styles.cardTop}>
-                <h3 className={styles.cardTitle}>{p.title}</h3>
-                <div className={styles.cardLinks}>
-                  <a href={p.github} className={styles.iconLink} aria-label="GitHub repo">
-                    <GitHubIcon />
-                  </a>
-                  {p.live && (
-                    <a href={p.live} className={styles.iconLink} aria-label="Live demo">
-                      <ExternalIcon />
-                    </a>
-                  )}
-                </div>
+                <span className={styles.folder} aria-hidden="true">
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+                  </svg>
+                </span>
+                <a href={p.github} className={styles.iconLink} aria-label="GitHub repo">
+                  <GitHubIcon />
+                </a>
               </div>
+
+              <h3 className={styles.cardTitle}>{p.title}</h3>
               <p className={styles.cardDesc}>{p.description}</p>
+
               <ul className={styles.tags}>
-                {p.tags.map((tag) => (
-                  <li key={tag} className={styles.tag}>{tag}</li>
+                {p.tags.map((t) => (
+                  <li key={t} className={styles.tag}>{t}</li>
                 ))}
               </ul>
             </article>
