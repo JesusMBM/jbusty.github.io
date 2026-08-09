@@ -24,11 +24,12 @@ const projects = [
   },
   {
     number: '02',
-    title: 'Vulnerability Assessment',
-    type: 'Offensive security',
-    description: 'An end-to-end assessment—from enumeration and risk scoring to an executive-ready remediation report grounded in practical security guidance.',
-    tools: ['Nmap', 'Nessus', 'NIST'],
-    status: 'Case study',
+    title: 'Hacking a Satellite—Safely Explained',
+    type: 'Space systems security',
+    description: 'A visual investigation of how ground stations, radio links, software updates, supply chains, and credentials shape the security of satellites.',
+    tools: ['Space Systems', 'Threat Modeling', 'NIST'],
+    status: 'Visual investigation',
+    url: 'https://jbm-satellite-cyber.netlify.app',
   },
   {
     number: '03',
