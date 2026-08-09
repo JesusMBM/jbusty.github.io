@@ -16,11 +16,12 @@ const springs = {
 const projects = [
   {
     number: '01',
-    title: 'Home SOC Lab',
-    type: 'Detection engineering',
-    description: 'A living security operations environment for collecting telemetry, investigating alerts, and practicing incident response across intentionally vulnerable systems.',
-    tools: ['Splunk', 'Kali Linux', 'VirtualBox'],
-    status: 'In development',
+    title: 'Building Security In',
+    type: 'Secure software engineering',
+    description: 'My applied-learning study of the Secure SDLC, STRIDE, PASTA, data-flow diagrams, security gates, and NIST SSDF.',
+    tools: ['Secure SDLC', 'STRIDE', 'PASTA'],
+    status: 'Research note',
+    url: 'https://jbm-secure-sdlc.netlify.app',
   },
   {
     number: '02',
@@ -141,8 +142,8 @@ function App() {
 
         <section id="work" className="work section-shell">
           <div className="section-heading reveal" data-reveal>
-            <p className="section-index">02 / Selected work</p>
-            <h2>Projects built to<br /><em>learn by doing.</em></h2>
+            <p className="section-index">02 / Personal research</p>
+            <h2>Ideas studied deeply.<br /><em>Lessons applied visually.</em></h2>
           </div>
           <div className="project-list">
             {projects.map(project => (
