@@ -32,11 +32,12 @@ const projects = [
   },
   {
     number: '03',
-    title: 'Threat Hunting Playbook',
-    type: 'Threat intelligence',
-    description: 'A repeatable hunting workflow that turns adversary behavior into focused hypotheses, detection logic, and evidence-driven investigations.',
-    tools: ['MITRE ATT&CK', 'Splunk', 'Python'],
-    status: 'Researching',
+    title: 'AI Agents Escaping Sandboxes',
+    type: 'AI security review',
+    description: 'My review of how agentic systems cross intended boundaries—and why permissions, tool mediation, and observability matter more than trusting model behavior.',
+    tools: ['AI Security', 'Sandboxing', 'Threat Modeling'],
+    status: 'Field note',
+    url: 'https://jbm-agent-sandbox-review.netlify.app',
   },
 ]
 
@@ -148,13 +149,13 @@ function App() {
                 <div className="project-number">{project.number}</div>
                 <div className="project-main">
                   <p className="project-type">{project.type}</p>
-                  <h3>{project.title}</h3>
+                  <h3>{project.url ? <a href={project.url} target="_blank" rel="noreferrer">{project.title}</a> : project.title}</h3>
                   <p className="project-description">{project.description}</p>
                   <ul>{project.tools.map(tool => <li key={tool}>{tool}</li>)}</ul>
                 </div>
                 <div className="project-side">
                   <span className="project-status"><i /> {project.status}</span>
-                  <span className="project-arrow"><Arrow diagonal /></span>
+                  {project.url ? <a className="project-arrow" href={project.url} target="_blank" rel="noreferrer" aria-label={`Open ${project.title}`}><Arrow diagonal /></a> : <span className="project-arrow"><Arrow diagonal /></span>}
                 </div>
               </motion.article>
             ))}
