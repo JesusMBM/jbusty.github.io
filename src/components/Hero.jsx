@@ -1,7 +1,6 @@
 import { useRef, useEffect } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import styles from './Hero.module.css'
 
 const SCRAMBLE_CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ!@#$%^&*'
