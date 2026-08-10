@@ -41,6 +41,15 @@ const projects = [
     status: 'Field note',
     url: 'https://jbm-agent-sandbox-review.netlify.app',
   },
+  {
+    number: '04',
+    title: 'AI Agent Architecture',
+    type: 'AI systems research',
+    description: 'A long-form visual guide to the loops, context, tools, memory, harnesses, graph execution, evaluation, and production controls behind AI agents.',
+    tools: ['Agent Architecture', 'Graph Engineering', 'LLM Operations'],
+    status: 'Visual research',
+    url: 'https://jbm-agent-architecture.netlify.app',
+  },
 ]
 
 const capabilities = [
