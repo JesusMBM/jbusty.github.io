@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
 
 const motionTokens = {
@@ -16,11 +16,11 @@ const springs = {
 const projects = [
   {
     number: '01',
-    title: 'Building Security In',
-    type: 'Secure software engineering',
-    description: 'My applied-learning study of the Secure SDLC, STRIDE, PASTA, data-flow diagrams, security gates, and NIST SSDF.',
-    tools: ['Secure SDLC', 'STRIDE', 'PASTA'],
-    status: 'Research note',
+    title: 'Secure SDLC: STRIDE, PASTA & SSDF',
+    type: 'Software security research',
+    description: 'An original, plain-language visual guide to building security into the software lifecycle and using threat models to make risk visible before release.',
+    tools: ['Secure SDLC', 'STRIDE', 'PASTA', 'NIST SSDF'],
+    status: 'Visual research',
     url: 'https://jbm-secure-sdlc.netlify.app',
   },
   {
@@ -45,8 +45,8 @@ const projects = [
     number: '04',
     title: 'AI Agent Architecture',
     type: 'AI systems research',
-    description: 'A long-form visual guide to the loops, context, tools, memory, harnesses, graph execution, evaluation, and production controls behind AI agents.',
-    tools: ['Agent Architecture', 'Graph Engineering', 'LLM Operations'],
+    description: 'A dense visual guide to the loops, tools, context, graph workflows, evaluation, and safety layers that turn a language model into an agent system.',
+    tools: ['Agent Loops', 'Graph Workflows', 'Evaluation', 'Safety'],
     status: 'Visual research',
     url: 'https://jbm-agent-architecture.netlify.app',
   },
@@ -80,12 +80,21 @@ function AnimatedText({ children, className = '', delay = 0 }) {
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const menuButtonRef = useRef(null)
+  const navRef = useRef(null)
   const reduce = useReducedMotion()
+  const lowEnd = typeof navigator !== 'undefined' && ((navigator.hardwareConcurrency || 8) <= 4 || navigator.connection?.saveData)
+  const canAnimate = !reduce && !lowEnd
   const { scrollYProgress } = useScroll()
   const progress = useSpring(scrollYProgress, springs.snappy)
-  const heroY = useTransform(scrollYProgress, [0, 0.18], [0, reduce ? 0 : -110])
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.14], [1, 0.18])
-  const orbitRotate = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 270])
+  const heroY = useTransform(scrollYProgress, [0, 0.18], [0, canAnimate ? -110 : 0])
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.14], [1, canAnimate ? 0.18 : 1])
+  const orbitRotate = useTransform(scrollYProgress, [0, 1], [0, canAnimate ? 270 : 0])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('motion-lite', lowEnd)
+    return () => document.documentElement.classList.remove('motion-lite')
+  }, [lowEnd])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -99,36 +108,72 @@ function App() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!menuOpen) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    const focusable = [...navRef.current.querySelectorAll('a[href]')]
+    document.body.style.overflow = 'hidden'
+    focusable[0]?.focus()
+
+    const handleKeyDown = event => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setMenuOpen(false)
+        requestAnimationFrame(() => menuButtonRef.current?.focus())
+        return
+      }
+
+      if (event.key !== 'Tab' || focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [menuOpen])
+
   const closeMenu = () => setMenuOpen(false)
 
   return (
     <>
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       <motion.div className="progress" style={{ scaleX: progress }} aria-hidden="true" />
-      <motion.header className="nav" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: motionTokens.duration.slow, ease: motionTokens.easing.smooth }}>
+      <motion.header className="nav" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? motionTokens.duration.fast : motionTokens.duration.slow, ease: motionTokens.easing.smooth }}>
         <a className="brand" href="#top" aria-label="Jesus Bustillos-Molina, home">JBM<span>°</span></a>
-        <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="nav-links">
+        <button ref={menuButtonRef} className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="nav-links" aria-label={`${menuOpen ? 'Close' : 'Open'} navigation menu`}>
           {menuOpen ? 'Close' : 'Menu'}
         </button>
-        <nav id="nav-links" className={menuOpen ? 'nav-links open' : 'nav-links'} aria-label="Primary navigation">
+        <nav ref={navRef} id="nav-links" className={menuOpen ? 'nav-links open' : 'nav-links'} aria-label="Primary navigation">
           <a href="#work" onClick={closeMenu}>Work</a>
           <a href="#about" onClick={closeMenu}>About</a>
           <a href="#contact" onClick={closeMenu}>Contact</a>
         </nav>
       </motion.header>
 
-      <main id="top">
-        <section className="hero section-shell">
+      <main id="main-content" tabIndex="-1">
+        <section id="top" className="hero section-shell">
           <motion.div
             className="ambient-scan"
-            animate={reduce ? undefined : { x: ['-15vw', '115vw'] }}
+            animate={canAnimate ? { x: ['-15vw', '115vw'] } : { x: 0 }}
             transition={{ duration: motionTokens.duration.ambient, ease: motionTokens.easing.linear, repeat: Infinity }}
             aria-hidden="true"
           />
           <div className="hero-meta reveal" data-reveal>
             <span className="availability"><i /> Available for security opportunities</span>
-            <span>39.1836° N / 96.5717° W</span>
+            <span>CYBERSECURITY / AI SYSTEMS</span>
           </div>
-          <motion.div className="hero-copy" style={{ y: heroY, opacity: heroOpacity }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: motionTokens.duration.crawl, ease: motionTokens.easing.smooth }}>
+          <motion.div className="hero-copy" style={canAnimate ? { y: heroY, opacity: heroOpacity } : undefined} initial={false}>
             <p className="kicker">Cybersecurity analyst</p>
             <h1>I find the signal<br />inside the <em>noise.</em></h1>
           </motion.div>
@@ -136,7 +181,7 @@ function App() {
             <p>I investigate threats, build resilient systems, and turn technical findings into clear action.</p>
             <a className="circle-link" href="#work" aria-label="Explore selected work"><Arrow /></a>
           </div>
-          <motion.div className="hero-orbit" style={{ rotate: orbitRotate }} aria-hidden="true">
+          <motion.div className="hero-orbit" style={canAnimate ? { rotate: orbitRotate } : undefined} aria-hidden="true">
             <span className="orbit-ring ring-one" />
             <span className="orbit-ring ring-two" />
             <span className="orbit-dot" />
@@ -152,30 +197,30 @@ function App() {
         <section id="work" className="work section-shell">
           <div className="section-heading reveal" data-reveal>
             <p className="section-index">02 / Personal research</p>
-            <h2>Ideas studied deeply.<br /><em>Lessons applied visually.</em></h2>
+            <h2>Questions explored<br /><em>through visual research.</em></h2>
           </div>
           <div className="project-list">
             {projects.map(project => (
-              <motion.article className="project reveal" data-reveal key={project.number} whileHover={reduce ? undefined : { x: 12, scale: 1.003 }} transition={springs.snappy}>
+              <motion.a className="project reveal" data-reveal key={project.number} href={project.url} target="_blank" rel="noreferrer" whileHover={canAnimate ? { x: 12, scale: 1.003 } : undefined} transition={springs.snappy}>
                 <div className="project-number">{project.number}</div>
                 <div className="project-main">
                   <p className="project-type">{project.type}</p>
-                  <h3>{project.url ? <a href={project.url} target="_blank" rel="noreferrer">{project.title}</a> : project.title}</h3>
+                  <h3>{project.title}<span className="sr-only"> (opens in a new tab)</span></h3>
                   <p className="project-description">{project.description}</p>
                   <ul>{project.tools.map(tool => <li key={tool}>{tool}</li>)}</ul>
                 </div>
                 <div className="project-side">
                   <span className="project-status"><i /> {project.status}</span>
-                  {project.url ? <a className="project-arrow" href={project.url} target="_blank" rel="noreferrer" aria-label={`Open ${project.title}`}><Arrow diagonal /></a> : <span className="project-arrow"><Arrow diagonal /></span>}
+                  <span className="project-arrow" aria-hidden="true"><Arrow diagonal /></span>
                 </div>
-              </motion.article>
+              </motion.a>
             ))}
           </div>
         </section>
 
         <div className="signal-strip" aria-hidden="true">
           <motion.div
-            animate={reduce ? undefined : { x: ['0%', '-50%'] }}
+            animate={canAnimate ? { x: ['0%', '-50%'] } : { x: 0 }}
             transition={{ duration: motionTokens.duration.marquee, ease: motionTokens.easing.linear, repeat: Infinity }}
           >
             <span>Observe · Investigate · Understand · Respond ·</span>
@@ -200,7 +245,7 @@ function App() {
           </div>
           <div className="capabilities">
             {capabilities.map(([title, body], index) => (
-              <motion.div className="capability reveal" data-reveal key={title} whileHover={reduce ? undefined : { x: 10 }} transition={springs.snappy}>
+            <motion.div className="capability reveal" data-reveal key={title} whileHover={canAnimate ? { x: 10 } : undefined} transition={springs.snappy}>
                 <span>0{index + 1}</span><h3>{title}</h3><p>{body}</p>
               </motion.div>
             ))}
@@ -211,11 +256,11 @@ function App() {
           <div className="contact-label reveal" data-reveal><i /> Open to what’s next</div>
           <div className="contact-copy reveal" data-reveal>
             <p>Have a problem worth investigating?</p>
-            <motion.a href="mailto:jbustillosmolina@gmail.com" whileHover={reduce ? undefined : { x: 8 }} whileTap={reduce ? undefined : { scale: motionTokens.scale.press }} transition={springs.snappy}>Let’s talk.<Arrow diagonal /></motion.a>
+          <motion.a href="mailto:jbustillosmolina@gmail.com" whileHover={canAnimate ? { x: 8 } : undefined} whileTap={canAnimate ? { scale: motionTokens.scale.press } : undefined} transition={springs.snappy}>Let’s talk.<Arrow diagonal /></motion.a>
           </div>
           <footer>
             <span>© {new Date().getFullYear()} Jesus Bustillos-Molina</span>
-            <div><a href="https://github.com/JesusMBM" target="_blank" rel="noreferrer">GitHub</a><a href="https://www.linkedin.com/in/jesus-bm/" target="_blank" rel="noreferrer">LinkedIn</a></div>
+          <div><a href="https://github.com/JesusMBM" target="_blank" rel="noreferrer">GitHub<span className="sr-only"> (opens in a new tab)</span></a><a href="https://www.linkedin.com/in/jesus-bm/" target="_blank" rel="noreferrer">LinkedIn<span className="sr-only"> (opens in a new tab)</span></a></div>
             <a href="#top">Back to top ↑</a>
           </footer>
         </section>
