@@ -83,8 +83,8 @@ function App() {
   const menuButtonRef = useRef(null)
   const navRef = useRef(null)
   const reduce = useReducedMotion()
-  const lowEnd = typeof navigator !== 'undefined' && ((navigator.hardwareConcurrency || 8) <= 4 || navigator.connection?.saveData)
-  const canAnimate = !reduce && !lowEnd
+  const [pageVisible, setPageVisible] = useState(true)
+  const canAnimate = !reduce && pageVisible
   const { scrollYProgress } = useScroll()
   const progress = useSpring(scrollYProgress, springs.snappy)
   const heroY = useTransform(scrollYProgress, [0, 0.18], [0, canAnimate ? -110 : 0])
@@ -92,9 +92,18 @@ function App() {
   const orbitRotate = useTransform(scrollYProgress, [0, 1], [0, canAnimate ? 270 : 0])
 
   useEffect(() => {
-    document.documentElement.classList.toggle('motion-lite', lowEnd)
-    return () => document.documentElement.classList.remove('motion-lite')
-  }, [lowEnd])
+    const updateVisibility = () => {
+      const visible = document.visibilityState !== 'hidden'
+      setPageVisible(visible)
+      document.documentElement.classList.toggle('motion-paused', !visible)
+    }
+    updateVisibility()
+    document.addEventListener('visibilitychange', updateVisibility)
+    return () => {
+      document.removeEventListener('visibilitychange', updateVisibility)
+      document.documentElement.classList.remove('motion-paused')
+    }
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(

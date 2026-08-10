@@ -193,6 +193,12 @@ footer a:hover { opacity: .55; transform: translateY(-2px); }
   animation: none;
 }
 
+.motion-paused *,
+.motion-paused *::before,
+.motion-paused *::after {
+  animation-play-state: paused !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .progress { display: none; }
