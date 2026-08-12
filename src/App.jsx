@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.8 seconds
-Output:
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
 
@@ -28,7 +25,7 @@ const projects = [
   },
   {
     number: '02',
-    title: 'Hacking a Satelliteâ€”Safely Explained',
+    title: 'Hacking a Satellite—Safely Explained',
     type: 'Space systems security',
     description: 'A visual investigation of how ground stations, radio links, software updates, supply chains, and credentials shape the security of satellites.',
     tools: ['Space Systems', 'Threat Modeling', 'NIST'],
@@ -39,7 +36,7 @@ const projects = [
     number: '03',
     title: 'AI Agents Escaping Sandboxes',
     type: 'AI security review',
-    description: 'My review of how agentic systems cross intended boundariesâ€”and why permissions, tool mediation, and observability matter more than trusting model behavior.',
+    description: 'My review of how agentic systems cross intended boundaries—and why permissions, tool mediation, and observability matter more than trusting model behavior.',
     tools: ['AI Security', 'Sandboxing', 'Threat Modeling'],
     status: 'Field note',
     url: 'https://jbm-agent-sandbox-review.netlify.app',
@@ -57,7 +54,7 @@ const projects = [
     number: '05',
     title: 'Open, But How Open?',
     type: 'AI ecosystem research',
-    description: 'A visual, plain-language guide to the real differences between open-weight, open-source, and closed AIâ€”using models from OpenAI, Anthropic, NVIDIA, and Moonshot AI.',
+    description: 'A visual, plain-language guide to the real differences between open-weight, open-source, and closed AI—using models from OpenAI, Anthropic, NVIDIA, and Moonshot AI.',
     tools: ['Open Weights', 'Open Source AI', 'Model Policy', 'AI Infrastructure'],
     status: 'Visual explainer',
     url: 'https://jbm-open-models-explained.netlify.app',
@@ -72,7 +69,7 @@ const capabilities = [
 ]
 
 function Arrow({ diagonal = false }) {
-  return <span aria-hidden="true">{diagonal ? 'â†—' : 'â†’'}</span>
+  return <span aria-hidden="true">{diagonal ? '↗' : '→'}</span>
 }
 
 function AnimatedText({ children, className = '', delay = 0 }) {
@@ -171,7 +168,7 @@ function App() {
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <motion.div className="progress" style={{ scaleX: progress }} aria-hidden="true" />
       <motion.header className="nav" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? motionTokens.duration.fast : motionTokens.duration.slow, ease: motionTokens.easing.smooth }}>
-        <a className="brand" href="#top" aria-label="Jesus Bustillos-Molina, home">JBM<span>Â°</span></a>
+        <a className="brand" href="#top" aria-label="Jesus Bustillos-Molina, home">JBM<span>°</span></a>
         <button ref={menuButtonRef} className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="nav-links" aria-label={`${menuOpen ? 'Close' : 'Open'} navigation menu`}>
           {menuOpen ? 'Close' : 'Menu'}
         </button>
@@ -212,7 +209,7 @@ function App() {
 
         <section className="statement section-shell">
           <p className="section-index reveal" data-reveal>01 / Approach</p>
-          <AnimatedText className="statement-copy"><p>Security is not a checklist. It is the practice of <span>paying close attention</span>â€”to systems, people, and the details others overlook.</p></AnimatedText>
+          <AnimatedText className="statement-copy"><p>Security is not a checklist. It is the practice of <span>paying close attention</span>—to systems, people, and the details others overlook.</p></AnimatedText>
         </section>
 
         <section id="work" className="work section-shell">
@@ -244,8 +241,8 @@ function App() {
             animate={canAnimate ? { x: ['0%', '-50%'] } : { x: 0 }}
             transition={{ duration: motionTokens.duration.marquee, ease: motionTokens.easing.linear, repeat: Infinity }}
           >
-            <span>Observe Â· Investigate Â· Understand Â· Respond Â·</span>
-            <span>Observe Â· Investigate Â· Understand Â· Respond Â·</span>
+            <span>Observe · Investigate · Understand · Respond ·</span>
+            <span>Observe · Investigate · Understand · Respond ·</span>
           </motion.div>
         </div>
 
@@ -259,8 +256,8 @@ function App() {
               <span>J</span><span>B</span><span>M</span>
             </div>
             <div className="about-copy reveal" data-reveal>
-              <p>Iâ€™m Jesus Bustillos-Molina, a cybersecurity analyst with a foundation in both business systems and information security.</p>
-              <p>With a BS in Management Information Systems, an MS in Cybersecurity &amp; Information Assurance, and an ISCÂ² CC certification, I bring technical curiosity and practical communication to every investigation.</p>
+              <p>I’m Jesus Bustillos-Molina, a cybersecurity analyst with a foundation in both business systems and information security.</p>
+              <p>With a BS in Management Information Systems, an MS in Cybersecurity &amp; Information Assurance, and an ISC² CC certification, I bring technical curiosity and practical communication to every investigation.</p>
               <a className="text-link" href="mailto:jbustillosmolina@gmail.com">Start a conversation <Arrow /></a>
             </div>
           </div>
@@ -274,15 +271,15 @@ function App() {
         </section>
 
         <section id="contact" className="contact section-shell">
-          <div className="contact-label reveal" data-reveal><i /> Open to whatâ€™s next</div>
+          <div className="contact-label reveal" data-reveal><i /> Open to what’s next</div>
           <div className="contact-copy reveal" data-reveal>
             <p>Have a problem worth investigating?</p>
-          <motion.a href="mailto:jbustillosmolina@gmail.com" whileHover={canAnimate ? { x: 8 } : undefined} whileTap={canAnimate ? { scale: motionTokens.scale.press } : undefined} transition={springs.snappy}>Letâ€™s talk.<Arrow diagonal /></motion.a>
+          <motion.a href="mailto:jbustillosmolina@gmail.com" whileHover={canAnimate ? { x: 8 } : undefined} whileTap={canAnimate ? { scale: motionTokens.scale.press } : undefined} transition={springs.snappy}>Let’s talk.<Arrow diagonal /></motion.a>
           </div>
           <footer>
-            <span>Â© {new Date().getFullYear()} Jesus Bustillos-Molina</span>
+            <span>© {new Date().getFullYear()} Jesus Bustillos-Molina</span>
           <div><a href="https://github.com/JesusMBM" target="_blank" rel="noreferrer">GitHub<span className="sr-only"> (opens in a new tab)</span></a><a href="https://www.linkedin.com/in/jesus-bm/" target="_blank" rel="noreferrer">LinkedIn<span className="sr-only"> (opens in a new tab)</span></a></div>
-            <a href="#top">Back to top â†‘</a>
+            <a href="#top">Back to top ↑</a>
           </footer>
         </section>
       </main>
@@ -291,4 +288,3 @@ function App() {
 }
 
 export default App
-
