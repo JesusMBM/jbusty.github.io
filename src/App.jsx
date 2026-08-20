@@ -59,6 +59,15 @@ const projects = [
     status: 'Visual explainer',
     url: 'https://jbm-open-models-explained.netlify.app',
   },
+  {
+    number: '06',
+    title: 'The Hidden Cost of AI Agents',
+    type: 'Agent economics research',
+    description: 'A visual investigation of why the harness around an AI model can consume more tokens than expected—and how loops, context, tools, caching, and orchestration shape the real bill.',
+    tools: ['Agent Harnesses', 'Token Economics', 'Prompt Caching', 'Context Engineering'],
+    status: 'Interactive explainer',
+    url: 'https://jbm-harness-economics.netlify.app',
+  },
 ]
 
 const capabilities = [
@@ -288,3 +297,4 @@ function App() {
 }
 
 export default App
+
