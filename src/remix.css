@@ -1,0 +1,25 @@
+/* SV Animations-inspired portfolio: an expressive motion-component gallery. */
+:root{--ground:#fffdf8;--surface:#fff;--ink:#17131e;--muted:#655f6d;--dim:#756c7e;--line:rgba(23,19,30,.16);--acid:#a50bb5;--blue:#485cff;--teal:#008f68;--pink:#ff4ba0;--peach:#df5d00}
+html,body{background:var(--ground)}
+body::before{opacity:.018;background-size:120px 120px}
+.nav{background:rgba(255,253,248,.88);border-color:var(--line);backdrop-filter:blur(18px)}
+.progress{height:4px;background:linear-gradient(90deg,#00ad7c,#ffad00,#d918ed)}
+.brand{font-weight:600}.brand span{color:#a50bb5}.nav-links a::after{height:3px;background:#00a979}
+.hero{background-image:linear-gradient(rgba(23,19,30,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(23,19,30,.055) 1px,transparent 1px);background-size:64px 64px}
+.hero::after{content:'MOTION / RESEARCH / SYSTEMS';position:absolute;right:-6rem;bottom:7rem;transform:rotate(-90deg);font:500 10px var(--mono);letter-spacing:.28em;color:var(--muted)}
+.ambient-scan{width:3px;background:linear-gradient(transparent,#00ad7c,#d918ed,transparent);box-shadow:0 0 30px rgba(217,24,237,.35)}
+.hero h1{font-weight:600;color:var(--ink)}.hero h1 em{color:#a50bb5;text-shadow:5px 5px 0 #ffcf4a}
+.hero-orbit{opacity:.9}.orbit-ring{border:2px dashed rgba(72,92,255,.38)}.ring-one::after{width:16px;height:16px;background:#00ad7c;box-shadow:0 0 0 8px rgba(0,173,124,.13)}.ring-two{border-color:rgba(217,24,237,.45)}.orbit-dot{background:linear-gradient(135deg,#ffcf4a,#d918ed);border:0}.crosshair{color:#485cff;font-size:56px}
+.circle-link{border:2px solid var(--ink);background:#fff;box-shadow:6px 6px 0 var(--ink)}.circle-link:hover{background:#d918ed;border-color:var(--ink);transform:translate(-2px,-2px) rotate(90deg);box-shadow:10px 10px 0 var(--ink)}
+.statement{background:#f8f3ff}.statement-copy span{color:#008f68;text-decoration:underline;text-decoration-thickness:.08em;text-underline-offset:.12em}
+.work{background:#13111a}.work::before{color:rgba(255,255,255,.025);content:'PROJECT / COMPONENTS'}.section-heading em{color:#ff64d8}.project{position:relative;margin:14px 0;border:1px solid rgba(255,255,255,.18);background:#1b1824;padding-inline:clamp(18px,3vw,40px);overflow:hidden;box-shadow:0 0 0 transparent;transition:background .35s,color .35s,box-shadow .35s}.project::before{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.08),transparent 70%);transform:translateX(-110%);animation:portfolioShimmer 7s ease-in-out infinite}.project:nth-child(3n+1){--card:#00b783}.project:nth-child(3n+2){--card:#ffad00}.project:nth-child(3n){--card:#dc31ee}.project:hover{background:var(--card);color:#111;box-shadow:10px 10px 0 rgba(255,255,255,.16)}.project:hover :is(.project-description,.project-type,.project-status){color:#111}.project-number{font-size:14px;border:1px solid currentColor;border-radius:50%;width:42px;height:42px;display:grid;place-items:center}.project-main ul li{border-radius:99px;background:rgba(255,255,255,.04)}
+.work{color:#fff}.work .section-index{color:#b8afc0}.project h3,.project-number,.project-arrow{color:#fff}.project-description,.project-status{color:#c4bccb}.project-type{color:#ff76e0}.project li{color:#eee8f2}
+@keyframes portfolioShimmer{0%,68%,100%{transform:translateX(-110%)}82%{transform:translateX(110%)}}
+.signal-strip{background:#ffcf4a;color:#17131e;border-block:2px solid #17131e}.signal-strip span{font-weight:600}
+.about{background:#fffdf8}.profile-mark{background:#485cff;color:white;box-shadow:14px 14px 0 #ffcf4a}.profile-mark span{animation:profilePop 3.2s ease-in-out infinite}.profile-mark span:nth-child(2){animation-delay:.22s}.profile-mark span:nth-child(3){animation-delay:.44s}@keyframes profilePop{50%{transform:translateY(-8px) rotate(3deg)}}
+.capability{border-bottom:2px solid var(--ink)}.capability:hover{background:#eff1ff}.capability span{color:#d918ed}
+.capability span{color:#a50bb5}
+.contact{background:#17131e;color:#fff}.contact-copy>a{color:#ffcf4a}.contact-label i{background:#00d59a}.contact footer{border-color:rgba(255,255,255,.2)}
+@media(max-width:700px){.hero{background-size:38px 38px}.hero::after{display:none}.hero h1 em{text-shadow:3px 3px 0 #ffcf4a}.project{margin:9px 0}.project::before{animation-duration:9s}.profile-mark{box-shadow:8px 8px 0 #ffcf4a}}
+@media(prefers-reduced-motion:reduce){.project::before,.profile-mark span{animation:none!important}}
+
