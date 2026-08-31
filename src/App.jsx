@@ -16,33 +16,6 @@ const springs = {
 const projects = [
   {
     number: '01',
-    title: 'Secure SDLC: STRIDE, PASTA & SSDF',
-    type: 'Software security research',
-    description: 'An original, plain-language visual guide to building security into the software lifecycle and using threat models to make risk visible before release.',
-    tools: ['Secure SDLC', 'STRIDE', 'PASTA', 'NIST SSDF'],
-    status: 'Visual research',
-    url: 'https://jbm-secure-sdlc.netlify.app',
-  },
-  {
-    number: '02',
-    title: 'Hacking a Satellite—Safely Explained',
-    type: 'Space systems security',
-    description: 'A visual investigation of how ground stations, radio links, software updates, supply chains, and credentials shape the security of satellites.',
-    tools: ['Space Systems', 'Threat Modeling', 'NIST'],
-    status: 'Visual investigation',
-    url: 'https://jbm-satellite-cyber.netlify.app',
-  },
-  {
-    number: '03',
-    title: 'AI Agents Escaping Sandboxes',
-    type: 'AI security review',
-    description: 'My review of how agentic systems cross intended boundaries—and why permissions, tool mediation, and observability matter more than trusting model behavior.',
-    tools: ['AI Security', 'Sandboxing', 'Threat Modeling'],
-    status: 'Field note',
-    url: 'https://jbm-agent-sandbox-review.netlify.app',
-  },
-  {
-    number: '04',
     title: 'AI Agent Architecture',
     type: 'AI systems research',
     description: 'A dense visual guide to the loops, tools, context, graph workflows, evaluation, and safety layers that turn a language model into an agent system.',
@@ -51,7 +24,16 @@ const projects = [
     url: 'https://jbm-agent-architecture.netlify.app',
   },
   {
-    number: '05',
+    number: '02',
+    title: 'AI Agents Escaping Sandboxes',
+    type: 'AI security review',
+    description: 'My review of how agentic systems cross intended boundaries—and why permissions, tool mediation, and observability matter more than trusting model behavior.',
+    tools: ['AI Security', 'Sandboxing', 'Threat Modeling'],
+    status: 'Field note',
+    url: 'https://jbm-agent-sandbox-review.netlify.app',
+  },
+  {
+    number: '03',
     title: 'Open, But How Open?',
     type: 'AI ecosystem research',
     description: 'A visual, plain-language guide to the real differences between open-weight, open-source, and closed AI—using models from OpenAI, Anthropic, NVIDIA, and Moonshot AI.',
@@ -60,7 +42,7 @@ const projects = [
     url: 'https://jbm-open-models-explained.netlify.app',
   },
   {
-    number: '06',
+    number: '04',
     title: 'The Hidden Cost of AI Agents',
     type: 'Agent economics research',
     description: 'A visual investigation of why the harness around an AI model can consume more tokens than expected—and how loops, context, tools, caching, and orchestration shape the real bill.',
@@ -68,13 +50,31 @@ const projects = [
     status: 'Interactive explainer',
     url: 'https://jbm-harness-economics.netlify.app',
   },
+  {
+    number: '05',
+    title: 'Secure SDLC: STRIDE, PASTA & SSDF',
+    type: 'Software security research',
+    description: 'An original, plain-language visual guide to building security into the software lifecycle and using threat models to make risk visible before release.',
+    tools: ['Secure SDLC', 'STRIDE', 'PASTA', 'NIST SSDF'],
+    status: 'Visual research',
+    url: 'https://jbm-secure-sdlc.netlify.app',
+  },
+  {
+    number: '06',
+    title: 'Hacking a Satellite—Safely Explained',
+    type: 'Space systems security',
+    description: 'A visual investigation of how ground stations, radio links, software updates, supply chains, and credentials shape the security of satellites.',
+    tools: ['Space Systems', 'Threat Modeling', 'NIST'],
+    status: 'Visual investigation',
+    url: 'https://jbm-satellite-cyber.netlify.app',
+  },
 ]
 
 const capabilities = [
-  ['Observe', 'SIEM operations, packet analysis, log collection'],
-  ['Investigate', 'Threat hunting, incident triage, vulnerability analysis'],
-  ['Build', 'Python, PowerShell, detection rules, security labs'],
-  ['Communicate', 'Risk reporting, remediation guidance, documentation'],
+  ['Build', 'Agent loops, tools, GitHub Actions, Azure OpenAI, Python'],
+  ['Evaluate', 'Harness cost, context, caching, and whether the system actually works'],
+  ['Secure', 'Sandboxing, tool mediation, observability, secure SDLC for AI'],
+  ['Investigate', 'SIEM, threat hunting, vulnerability analysis, risk reporting'],
 ]
 
 function Arrow({ diagonal = false }) {
@@ -197,15 +197,15 @@ function App() {
             aria-hidden="true"
           />
           <div className="hero-meta reveal" data-reveal>
-            <span className="availability"><i /> Available for security opportunities</span>
-            <span>CYBERSECURITY / AI SYSTEMS</span>
+            <span className="availability"><i /> Available for AI systems and AI security work</span>
+            <span>AI SYSTEMS / CYBERSECURITY</span>
           </div>
           <motion.div className="hero-copy" style={canAnimate ? { y: heroY, opacity: heroOpacity } : undefined} initial={false}>
-            <p className="kicker">Cybersecurity analyst</p>
+            <p className="kicker">AI systems · cybersecurity</p>
             <h1>I find the signal<br />inside the <em>noise.</em></h1>
           </motion.div>
           <div className="hero-footer reveal" data-reveal>
-            <p>I investigate threats, build resilient systems, and turn technical findings into clear action.</p>
+            <p>I design agent systems, study how they fail, and use security practice to keep the 25% that still has to hold under pressure.</p>
             <a className="circle-link" href="#work" aria-label="Explore selected work"><Arrow /></a>
           </div>
           <motion.div className="hero-orbit" style={canAnimate ? { rotate: orbitRotate } : undefined} aria-hidden="true">
@@ -218,7 +218,7 @@ function App() {
 
         <section className="statement section-shell">
           <p className="section-index reveal" data-reveal>01 / Approach</p>
-          <AnimatedText className="statement-copy"><p>Security is not a checklist. It is the practice of <span>paying close attention</span>—to systems, people, and the details others overlook.</p></AnimatedText>
+          <AnimatedText className="statement-copy"><p>An agent is not a model. It is a loop of tools, context, and permissions—and <span>paying close attention</span> to those details is how you keep it from quietly going off the rails.</p></AnimatedText>
         </section>
 
         <section id="work" className="work section-shell">
@@ -250,8 +250,8 @@ function App() {
             animate={canAnimate ? { x: ['0%', '-50%'] } : { x: 0 }}
             transition={{ duration: motionTokens.duration.marquee, ease: motionTokens.easing.linear, repeat: Infinity }}
           >
-            <span>Observe · Investigate · Understand · Respond ·</span>
-            <span>Observe · Investigate · Understand · Respond ·</span>
+            <span>Build · Evaluate · Secure · Investigate ·</span>
+            <span>Build · Evaluate · Secure · Investigate ·</span>
           </motion.div>
         </div>
 
@@ -265,8 +265,8 @@ function App() {
               <span>J</span><span>B</span><span>M</span>
             </div>
             <div className="about-copy reveal" data-reveal>
-              <p>I’m Jesus Bustillos-Molina, a cybersecurity analyst with a foundation in both business systems and information security.</p>
-              <p>With a BS in Management Information Systems, an MS in Cybersecurity &amp; Information Assurance, and an ISC² CC certification, I bring technical curiosity and practical communication to every investigation.</p>
+              <p>I’m Jesus Bustillos-Molina. I build and study AI agent systems, with a cybersecurity practice underneath so the tooling, permissions, and failure modes stay visible.</p>
+              <p>Cyber Security Analyst at Textron Aviation in Wichita. KSU MIS, ISC² CC, WGU MS in Cybersecurity &amp; Information Assurance in progress. The work is mostly agents, architecture, and AI security—security operations is the rest of the stack, not the headline.</p>
               <a className="text-link" href="mailto:jbustillosmolina@gmail.com">Start a conversation <Arrow /></a>
             </div>
           </div>
@@ -280,9 +280,9 @@ function App() {
         </section>
 
         <section id="contact" className="contact section-shell">
-          <div className="contact-label reveal" data-reveal><i /> Open to what’s next</div>
+          <div className="contact-label reveal" data-reveal><i /> Open to AI systems work</div>
           <div className="contact-copy reveal" data-reveal>
-            <p>Have a problem worth investigating?</p>
+            <p>Have an agent system, a messy harness, or a security problem worth taking apart?</p>
           <motion.a href="mailto:jbustillosmolina@gmail.com" whileHover={canAnimate ? { x: 8 } : undefined} whileTap={canAnimate ? { scale: motionTokens.scale.press } : undefined} transition={springs.snappy}>Let’s talk.<Arrow diagonal /></motion.a>
           </div>
           <footer>
