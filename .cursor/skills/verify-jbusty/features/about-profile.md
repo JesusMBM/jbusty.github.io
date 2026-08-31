@@ -1,34 +1,35 @@
 # About / profile
 
-About is the #about section: heading "Curious by nature. Methodical by practice.", a short profile of Jesus Bustillos-Molina, mailto jbustillosmolina@gmail.com, and capabilities Build / Evaluate / Secure / Investigate.
+About is the profile section at `#about`: name, practice summary, a mailto conversation link, and four capabilities (Build, Evaluate, Secure, Investigate).
 
 ## Sub-features
 
-- `about-heading` h2 Curious by nature. Methodical by practice.
-- `about-bio` name, AI agent systems, cybersecurity practice, Textron / KSU / ISC2 / WGU copy.
-- `about-mail` Start a conversation mailto:jbustillosmolina@gmail.com
-- `capabilities` Build, Evaluate, Secure, Investigate.
+- `about-heading` shows `03 / Profile` and `Curious by nature. Methodical by practice.`
+- `about-copy` identifies Jesus Bustillos-Molina and the AI-systems / cybersecurity practice.
+- `about-mailto` offers `Start a conversation` to `mailto:jbustillosmolina@gmail.com`.
+- `about-capabilities` lists Build, Evaluate, Secure, Investigate.
 
 ## How to get to it (user POV)
 
-- Choose About in the primary nav.
-- Open https://jesusmbm.github.io/jbusty.github.io/#about
-- Scroll past Work and the signal strip.
+- Choose `About` in `#nav-links`.
+- Scroll past Work and the `Build · Evaluate · Secure · Investigate` signal strip.
+- Choose `Start a conversation` in the about copy (mailto).
 
 ## Driving it with control-jbusty
 
 Preconditions:
 
-- doctor reports ok true on the target URL.
-- You are proving the live recruiter path unless JBUSTY_MODE=local was launched by this CLI.
+- `node control-jbusty.mjs doctor` exits 0 against live Pages.
+- Do not send email. Mailto is asserted as an href only.
 
-- **Jump to About.** Run `node .cursor/skills/verify-jbusty/control-jbusty.mjs goto #about /tmp/jbusty-verify-evidence-$RUN_ID/about.png`. JSON found includes "Curious by nature"; PNG shows the profile heading.
-- **Read copy and mail.** Run `node .cursor/skills/verify-jbusty/control-jbusty.mjs snapshot`. links include mailto:jbustillosmolina@gmail.com; headings or body include Build, Evaluate, Secure, Investigate.
-- **Do not send mail.** Choosing Start a conversation would open a mail client. Use snapshot href assertions; do not click the mailto on live.
-- **Proof.** about.png plus snapshot.json show the heading and the mailto href.
+- **Open About.** Run `node control-jbusty.mjs goto about`. JSON `hash` is `#about` and `sectionPresent` is true.
+- **Heading.** Snapshot/DOM contains `Curious by nature` and `Methodical by`.
+- **Mailto.** Snapshot/DOM contains `mailto:jbustillosmolina@gmail.com` on `a.text-link` (`Start a conversation`).
+- **Capabilities.** Snapshot/DOM contains headings `Build`, `Evaluate`, `Secure`, and `Investigate` inside `.capabilities` / `.capability`.
+- **Proof.** Screenshot from goto is `$JBUSTY_EVIDENCE_DIR/about.png`. Confirm it still exists after the CLI returns. Optional copy to `/workspace/jbusty-verify-proof/about.png`.
 
 ## Gotchas
 
-- Apostrophes may be curly in dump-dom (I am / Im). Assert "Curious by nature" and the mailto href, which are stable.
-- Capabilities are h3s inside .capability, not nav links.
-- Mailto is a user-agent handoff; proving the href is the user-path proof, not sending email.
+- The marquee `Build · Evaluate · Secure · Investigate` is aria-hidden. Prove the four `.capability` headings, not only the marquee string.
+- `click` of mailto on live is refused. Assert the href.
+- Ampersand in `Cybersecurity & Information Assurance` may appear as `&amp;` in dump-dom. Match either.
