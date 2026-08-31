@@ -1,95 +1,128 @@
 ---
 name: verify-jbusty
-description: Drive Jesus Bustillos-Molina's portfolio (jbusty.github.io) the way a visitor does: live GitHub Pages or local Vite, via control-jbusty.mjs. Use to prove homepage, nav, work cards, about, and contact actually render.
+description: Drive and prove the jbusty.github.io portfolio (React 19 + Vite 8 SPA on GitHub Pages) the way a user does — skip link, nav, hero, work, about, contact — via control-jbusty.mjs against live Pages or a local vite preview.
 ---
 
-# Verify jbusty
+# Verify jbusty.github.io
 
-Agent-facing control skill for the live portfolio at https://jesusmbm.github.io/jbusty.github.io/ (Vite base `/jbusty.github.io/`). The page is a React 19 SPA: index.html is a shell; the real UI hydrates in the browser. Drive the rendered DOM, not the shell.
+Project-local verification skill for [https://jesusmbm.github.io/jbusty.github.io/](https://jesusmbm.github.io/jbusty.github.io/). The site is a single-page React 19 + Vite 8 app (`base: /jbusty.github.io/`). Agents read this cold: drive the real UI, do not edit `src/` product code, do not click live production.
 
-Default verification target is LIVE GitHub Pages (what recruiters see). Use launch / JBUSTY_MODE=local only when proving an unreleased branch.
-
-Helper binary (executable): `.cursor/skills/verify-jbusty/control-jbusty.mjs`
-
-JSON on stdout. Errors on stderr with the next action. Never kill chrome or node by process name.
+Default mode is **live Pages**. Local preview is optional.
 
 ## Launch
 
-Live (default — no server to start):
+Live (default, no server to start):
 
 ```bash
-node .cursor/skills/verify-jbusty/control-jbusty.mjs info
-node .cursor/skills/verify-jbusty/control-jbusty.mjs doctor
+export JBUSTY_MODE=live
+export JBUSTY_URL=https://jesusmbm.github.io/jbusty.github.io/
+# Ready when: node control-jbusty.mjs doctor exits 0
 ```
 
-Ready when doctor JSON has ok true, httpStatus 200, and checks for title, hero h1, work card, and nav Work/About/Contact.
+Local preview (only from a jbusty-portfolio checkout; this skill must not git clone):
 
-Local (unreleased branch only). Set JBUSTY_MODE=local and run control-jbusty.mjs launch, then wait-settle.
-launch installs deps and starts Vite on 127.0.0.1 port 4173 with --strictPort from the jbusty-portfolio package root.
-Local URL is http://127.0.0.1:4173/jbusty.github.io/
-Pid and port are written to /tmp/jbusty-verify-$RUN_ID.
+```bash
+export JBUSTY_MODE=local
+export JBUSTY_ROOT=/path/to/jbusty.github.io   # optional if cwd is the repo
+node .cursor/skills/verify-jbusty/control-jbusty.mjs launch
+# Serves http://127.0.0.1:4173/jbusty.github.io/  (vite preview, pid file)
+# Ready when: doctor against that URL exits 0
+```
 
-Teardown: JBUSTY_MODE=local control-jbusty.mjs stop
-stop kills only the recorded pid. Evidence in /tmp/jbusty-verify-evidence-$RUN_ID/ is left in place.
+Teardown local only:
+
+```bash
+node .cursor/skills/verify-jbusty/control-jbusty.mjs stop
+# kills ONLY the pid written by launch; never pkill chrome/vite by name
+```
+
+`--dry-run` on `launch` / `stop` / `click` prints JSON of what would happen and does not start or kill anything.
 
 ## Doctor
 
-Read-only health check. Run this first whenever anything looks off.
+Read-only. Run first whenever anything looks off.
 
-    node .cursor/skills/verify-jbusty/control-jbusty.mjs doctor
+```bash
+cd .cursor/skills/verify-jbusty
+node control-jbusty.mjs doctor
+```
 
-Requires HTTP 200, title containing Jesus Bustillos-Molina, rendered DOM containing "I find the signal" AND "AI Agent Architecture" AND nav Work/About/Contact.
-Reports url, mode (live|local), httpStatus, title, checks[]. Non-zero exit if any check fails.
+Pass means:
 
-    node .cursor/skills/verify-jbusty/control-jbusty.mjs wait-settle
+- HTTP 200 on `JBUSTY_URL`
+- `<title>` contains `Jesus Bustillos-Molina`
+- headless dump-dom contains `I find the signal` AND `AI Agent Architecture` AND `Work` / `About` / `Contact`
 
-Retries until dump-dom contains the hero h1 text.
+JSON on stdout. Failures go to stderr with what to do instead, non-zero exit.
+
+Chrome must use an isolated `--user-data-dir` (the CLI does). Reusing a logged-in desktop profile hangs dump-dom.
 
 ## Drive
 
-Stable handles: a.skip-link (#main-content), a.brand (#top, aria-label Jesus Bustillos-Molina, home), button.menu-toggle (aria-controls nav-links), nav#nav-links (Work #work, About #about, Contact #contact), section#top hero, a.project work cards (six, new tabs), section#about, section#contact.
+Harness: `control-jbusty.mjs` (Node, JSON default). Chrome: `/usr/bin/google-chrome`.
 
-Read-only against live Pages (preferred):
+Stable handles (prefer these over coordinates):
 
-    node .cursor/skills/verify-jbusty/control-jbusty.mjs snapshot
-    node .cursor/skills/verify-jbusty/control-jbusty.mjs screenshot /tmp/jbusty-verify-evidence-$RUN_ID/home.png
-    node .cursor/skills/verify-jbusty/control-jbusty.mjs goto #work /tmp/jbusty-verify-evidence-$RUN_ID/work.png
-    node .cursor/skills/verify-jbusty/control-jbusty.mjs goto #about /tmp/jbusty-verify-evidence-$RUN_ID/about.png
-    node .cursor/skills/verify-jbusty/control-jbusty.mjs goto #contact /tmp/jbusty-verify-evidence-$RUN_ID/contact.png
-    node .cursor/skills/verify-jbusty/control-jbusty.mjs goto #top /tmp/jbusty-verify-evidence-$RUN_ID/top.png
+| Handle | Selector / target |
+| --- | --- |
+| Skip link | `a.skip-link` `href=#main-content` |
+| Brand | `a.brand` `href=#top` aria-label `Jesus Bustillos-Molina, home` |
+| Menu | `button.menu-toggle` `aria-controls=nav-links` |
+| Nav | `#nav-links` links Work `#work`, About `#about`, Contact `#contact` |
+| Hero | `#top` — "Available for AI systems and AI security work", kicker `AI SYSTEMS / CYBERSECURITY`, h1 `I find the signal inside the noise.` |
+| Work | `#work` — six `a.project` cards (see features/work-research.md) |
+| About | `#about` — "Curious by nature. Methodical by practice.", mailto `jbustillosmolina@gmail.com`, capabilities Build / Evaluate / Secure / Investigate |
+| Contact | `#contact` — mailto, GitHub `https://github.com/JesusMBM`, LinkedIn `https://www.linkedin.com/in/jesus-bm/`, Back to top `#top` |
 
-Mutating actions (click, eval) are refused on live production. They only run against a local instance this CLI launched:
+Commands:
 
-    JBUSTY_MODE=local node .cursor/skills/verify-jbusty/control-jbusty.mjs --dry-run click .menu-toggle
-    JBUSTY_MODE=local node .cursor/skills/verify-jbusty/control-jbusty.mjs click .menu-toggle
-    JBUSTY_MODE=local node .cursor/skills/verify-jbusty/control-jbusty.mjs snapshot
+```bash
+node control-jbusty.mjs info
+node control-jbusty.mjs snapshot
+node control-jbusty.mjs screenshot /tmp/jbusty-verify-evidence-proof/home.png
+node control-jbusty.mjs goto work          # also #work, about, contact, top
+node control-jbusty.mjs wait-settle
+node control-jbusty.mjs click 'button.menu-toggle' --dry-run
+```
 
---dry-run prints side-effecting actions (click, eval, launch, stop) without doing them.
-Hashes a visitor uses: #top #work #about #contact (skip target #main-content).
+`click` **refuses** when `JBUSTY_MODE=live` or the URL is GitHub Pages. Use `goto HASH` for in-page nav on production.
 
 ## Evidence
 
-Directory: /tmp/jbusty-verify-evidence-$RUN_ID/ (env JBUSTY_RUN_ID, default proof). This directory MUST survive cleanup.
+Proof lives **outside** chrome user-data dirs so it survives child-process cleanup:
 
-Proof standards: real user path (Pages or local Vite), not internal setters; capture the action AND the resulting state; screenshots (1280x800 PNG) plus snapshot JSON (headings, links, aria-labels, landmarks). No mocks — public static SPA.
+- Requested screenshot PATH (caller-owned)
+- Copy: `/tmp/jbusty-verify-evidence-proof/` (`JBUSTY_EVIDENCE_DIR`)
+- Optional durable copy: `/workspace/jbusty-verify-proof/`
 
-Homepage proof artifacts: home.png (live hero), work.png (after goto #work; dump-dom or snapshot must include AI Agent Architecture), snapshot.json.
+Standards:
+
+- Exercise the real user path (hash nav, rendered DOM), not internal React setters.
+- Capture the action and the resulting state (`goto work` + screenshot + snapshot landmarks).
+- Title is `Jesus Bustillos-Molina — AI Systems / Cybersecurity`.
+- Mocks are not used; live Pages or local preview is the app.
+- `--dry-run` must not spawn chrome, vite, or kill a pid — confirm by observing no new pid file / no new PNG.
 
 ## Cleanup
 
-    JBUSTY_MODE=local JBUSTY_RUN_ID=$RUN_ID node .cursor/skills/verify-jbusty/control-jbusty.mjs stop
-
-Kills only the pid in /tmp/jbusty-verify-$RUN_ID. Headless Chrome children used for dump-dom/screenshot exit when the command finishes. If one is stranded, kill that pid from the command output — never pkill chrome or pkill node.
-Do not delete /tmp/jbusty-verify-evidence-$RUN_ID/.
+- `stop` kills only the launch pid file process.
+- Chrome invocations use a temp `--user-data-dir` that is deleted after the shot/dump. That cleanup must not touch evidence paths.
+- After cleanup, confirm PNGs still exist at the named PATH and under `/tmp/jbusty-verify-evidence-proof/`.
 
 ## Helpers
 
-    node .cursor/skills/verify-jbusty/control-jbusty.mjs --help
-    node .cursor/skills/verify-jbusty/control-jbusty.mjs doctor --help
-    node .cursor/skills/verify-jbusty/control-jbusty.mjs info
+`control-jbusty.mjs` is executable via `node` (run from this directory):
 
-Env: JBUSTY_URL overrides target (default live https://jesusmbm.github.io/jbusty.github.io/). JBUSTY_MODE=live|local (default live). CHROME_PATH defaults to /usr/bin/google-chrome. JBUSTY_ROOT is the checkout for launch.
+```bash
+cd .cursor/skills/verify-jbusty
+node control-jbusty.mjs --help
+node control-jbusty.mjs doctor
+node control-jbusty.mjs snapshot
+node control-jbusty.mjs screenshot /workspace/jbusty-verify-proof/home.png
+node control-jbusty.mjs goto work
+# then copy evidence: cp "$JBUSTY_EVIDENCE_DIR/work.png" /workspace/jbusty-verify-proof/work.png
+```
 
-Chrome recipes used by the helper (no extra browser deps): dump-dom with --headless --disable-gpu --no-sandbox --virtual-time-budget=8000; screenshot with --window-size=1280,800.
+JSON stdout is the default. Keep `JBUSTY_MODE=live` unless you are on a local checkout.
 
-Feature map: .cursor/skills/verify-jbusty/features/ (hero-nav, work-research, about-profile, contact-footer). Keep it honest with /maintain-verification-skill.
+Maintenance: `/maintain-verification-skill` when the map drifts.
