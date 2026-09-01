@@ -1,38 +1,35 @@
-# jbusty.github.io verification map
+# jbusty verification map
 
-This directory is the maintained source for verifying the user-facing behavior of the jbusty portfolio SPA. Read the index before driving the app, then use the matching feature file as the recipe.
-
-Live URL: `https://jesusmbm.github.io/jbusty.github.io/`
-Title: `Jesus Bustillos-Molina — AI Systems / Cybersecurity`
+This directory is the maintained source for verifying the user-facing behavior of the live jbusty portfolio. Read the index before driving the app, then use the matching feature file as the recipe.
 
 ## Baseline preconditions
 
-- Default `JBUSTY_MODE=live` and `JBUSTY_URL=https://jesusmbm.github.io/jbusty.github.io/`.
-- Chrome is `/usr/bin/google-chrome`. The CLI isolates `--user-data-dir`; do not reuse a desktop profile.
-- Put `control-jbusty.mjs` on PATH or run it from `.cursor/skills/verify-jbusty`.
-- Run `node control-jbusty.mjs doctor` and require HTTP 200, title `Jesus Bustillos-Molina`, dump-dom with `I find the signal`, `AI Agent Architecture`, and Work/About/Contact.
-- Never `click` live production. Use `goto` for hash navigation.
-- Never edit `src/` product code from a verification run.
-- Do not git clone to satisfy live doctor.
+- Target the live URL https://jesusmbm.github.io/jbusty.github.io/ (trailing slash). Do not start a local Vite server.
+- Run node control-jbusty.mjs doctor from .cursor/skills/verify-jbusty/ and require ok true (HTTP 200 plus App.jsx identity: skip-link, #main-content, #top, #work, #about, #contact, brand aria-label, h1 contains "I find the signal").
+- Never activate controls on live Pages. Menu, mailto, and outbound project tabs are shared public surface.
+- Drive only through control-jbusty.mjs (headless /usr/bin/google-chrome dump-dom / screenshot).
+- Evidence lands in /tmp/verify-jbusty-evidence/ (or $VERIFY_JBUSTY_EVIDENCE). Cleanup must not delete it.
+- Unused files in src/components/ describe an old id-hero / projects / skills design. They are not the live UI.
 
 ## Driving conventions
 
-- Start every recipe from the live home URL unless its preconditions say local preview.
-- Prefer ARIA labels, ids, and accessible names (`a.brand`, `#nav-links`, `#work`) over coordinates.
+- Start every recipe from a passing doctor unless the feature file says otherwise.
+- Prefer the live handles in each feature file (ids, aria-labels, hrefs) over coordinates or leftover component selectors.
 - Treat every command as literal. Keep quoted names and flags unchanged.
-- Run browser actions through `control-jbusty.mjs` (`snapshot`, `screenshot`, `goto`, `wait-settle`).
-- `--dry-run` on `click` / `launch` / `stop` must not spawn chrome or vite.
-- Restore nothing: the site is a public static SPA. Do not remove proof artifacts during cleanup.
+- Run browser actions through node control-jbusty.mjs (doctor, snapshot, screenshot, goto).
+- Resolve in-page movement with `goto --url '#work'` (or `goto work`) and the same for #top, #about, #contact, #main-content. Quote hashes; unquoted # is a shell comment. Do not goto Netlify project URLs. The Approach block has no id — snapshot it.
+- Restore nothing: the live site is static. Do not remove proof artifacts during cleanup.
 
 ## Proof and skip reporting
 
 - Capture the user action and the resulting state, not only the final screen.
-- UI proof includes a JSON snapshot (landmarks) and a screenshot with the identity visible (title / brand / heading).
-- Screenshot PATH must survive chrome child cleanup — confirm the file still exists after the CLI returns.
-- Copies also land in `/tmp/jbusty-verify-evidence-proof/` (`JBUSTY_EVIDENCE_DIR`).
-- Record the feature ID and entry point used with every artifact.
+- UI proof includes a dump-dom/snapshot extract and a screenshot with portfolio identity visible.
+- Hash navigation proof includes JSON found true for the target id plus the dump-dom file.
+- Work-card proof is the DOM containing all six titles and hrefs. Opening those hrefs is out of scope.
+- Record the feature file used with every artifact (--path names under the evidence dir).
 - Report an unreachable path with the attempted command and the unmet precondition.
 - Do not report a skipped entry point as verified through a different path.
+- A click command that returns "click refused on live" is expected, not a feature pass.
 
 ## Feature entry contract
 
@@ -47,7 +44,8 @@ Keep implementation details out of the map. Name only user paths, stable handles
 
 ## Features
 
-- [Hero and navigation](./hero-nav.md) covers skip link, brand, menu, primary nav, and the hero at `#top`.
-- [Work / personal research](./work-research.md) covers the six project cards at `#work`.
-- [About / profile](./about-profile.md) covers profile copy, mailto, and capabilities.
-- [Contact and footer](./contact-footer.md) covers the talk CTA, GitHub, LinkedIn, and back to top.
+- [Hero and primary navigation](./hero-nav.md) covers skip link, brand home, menu toggle, Work/About/Contact, hero copy, hero-footer, and the explore-work circle link.
+- [Approach / statement](./approach-statement.md) covers the no-id 01 / Approach block between hero and Work.
+- [Work / visual research](./work-research.md) covers 02 / Personal research, the six research cards, titles, and new-tab URLs, proven from dump-dom without following outbound links.
+- [About / profile](./about-profile.md) covers 03 / Profile, bio, Textron Aviation, capabilities, and Start a conversation mailto.
+- [Contact and footer](./contact-footer.md) covers Let's talk mailto, GitHub, LinkedIn, Back to top, and copyright year.
