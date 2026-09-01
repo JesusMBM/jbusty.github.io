@@ -18,7 +18,7 @@ const projects = [
     number: '01',
     title: 'AI Agent Architecture',
     type: 'AI systems research',
-    description: 'A dense visual guide to the loops, tools, context, graph workflows, evaluation, and safety layers that turn a language model into an agent system.',
+    description: 'An agent is loops, tools, context, and permissions, not a model by itself. This visual guide walks those layers, including evaluation and safety.',
     tools: ['Agent Loops', 'Graph Workflows', 'Evaluation', 'Safety'],
     status: 'Visual research',
     url: 'https://jbm-agent-architecture.netlify.app',
@@ -27,7 +27,7 @@ const projects = [
     number: '02',
     title: 'AI Agents Escaping Sandboxes',
     type: 'AI security review',
-    description: 'My review of how agentic systems cross intended boundaries—and why permissions, tool mediation, and observability matter more than trusting model behavior.',
+    description: 'Agents leave intended boundaries when tools and permissions are the real attack surface. Trusting model behavior is not a control.',
     tools: ['AI Security', 'Sandboxing', 'Threat Modeling'],
     status: 'Field note',
     url: 'https://jbm-agent-sandbox-review.netlify.app',
@@ -36,7 +36,7 @@ const projects = [
     number: '03',
     title: 'Open, But How Open?',
     type: 'AI ecosystem research',
-    description: 'A visual, plain-language guide to the real differences between open-weight, open-source, and closed AI—using models from OpenAI, Anthropic, NVIDIA, and Moonshot AI.',
+    description: 'Open-weight, open-source, and closed are different. The labels get mixed on purpose and by accident.',
     tools: ['Open Weights', 'Open Source AI', 'Model Policy', 'AI Infrastructure'],
     status: 'Visual explainer',
     url: 'https://jbm-open-models-explained.netlify.app',
@@ -45,7 +45,7 @@ const projects = [
     number: '04',
     title: 'The Hidden Cost of AI Agents',
     type: 'Agent economics research',
-    description: 'A visual investigation of why the harness around an AI model can consume more tokens than expected—and how loops, context, tools, caching, and orchestration shape the real bill.',
+    description: 'The harness around the model often spends more tokens than the prompt. Loops, context, tools, and caching set the real bill.',
     tools: ['Agent Harnesses', 'Token Economics', 'Prompt Caching', 'Context Engineering'],
     status: 'Interactive explainer',
     url: 'https://jbm-harness-economics.netlify.app',
@@ -54,7 +54,7 @@ const projects = [
     number: '05',
     title: 'Secure SDLC: STRIDE, PASTA & SSDF',
     type: 'Software security research',
-    description: 'An original, plain-language visual guide to building security into the software lifecycle and using threat models to make risk visible before release.',
+    description: 'STRIDE, PASTA, and NIST SSDF make software risk visible before release. Security has to enter the lifecycle, not the postmortem.',
     tools: ['Secure SDLC', 'STRIDE', 'PASTA', 'NIST SSDF'],
     status: 'Visual research',
     url: 'https://jbm-secure-sdlc.netlify.app',
@@ -63,7 +63,7 @@ const projects = [
     number: '06',
     title: 'Hacking a Satellite—Safely Explained',
     type: 'Space systems security',
-    description: 'A visual investigation of how ground stations, radio links, software updates, supply chains, and credentials shape the security of satellites.',
+    description: 'Satellite security is ground stations, radio links, updates, and credentials, not movie hacking.',
     tools: ['Space Systems', 'Threat Modeling', 'NIST'],
     status: 'Visual investigation',
     url: 'https://jbm-satellite-cyber.netlify.app',
@@ -72,7 +72,7 @@ const projects = [
     number: '07',
     title: 'Honeyquest for LLMs',
     type: 'AI security review',
-    description: 'My visual walkthrough of Horizon3.ai\'s finding that human cyber-deception assumptions do not transfer to LLM attackers — they fall for bait more, don\'t get diverted, and still exploit traps they named.',
+    description: 'Human cyber-deception assumptions do not transfer to LLM attackers. They take bait more, do not get diverted, and still exploit traps they named.',
     tools: ['AI Security', 'Cyber Deception', 'LLM Evaluation'],
     status: 'Visual research',
     url: 'https://jesusmbm.github.io/jbusty.github.io/honeyquest/',
@@ -90,21 +90,6 @@ function Arrow({ diagonal = false }) {
   return <span aria-hidden="true">{diagonal ? '↗' : '→'}</span>
 }
 
-function AnimatedText({ children, className = '', delay = 0 }) {
-  const reduce = useReducedMotion()
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: reduce ? 0 : motionTokens.distance.xl }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: reduce ? motionTokens.duration.fast : motionTokens.duration.crawl, ease: motionTokens.easing.smooth, delay }}
-    >
-      {children}
-    </motion.div>
-  )
-}
-
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuButtonRef = useRef(null)
@@ -115,7 +100,6 @@ function App() {
   const { scrollYProgress } = useScroll()
   const progress = useSpring(scrollYProgress, springs.snappy)
   const heroY = useTransform(scrollYProgress, [0, 0.18], [0, canAnimate ? -110 : 0])
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.14], [1, canAnimate ? 0.18 : 1])
   const orbitRotate = useTransform(scrollYProgress, [0, 1], [0, canAnimate ? 270 : 0])
 
   useEffect(() => {
@@ -209,12 +193,12 @@ function App() {
             <span className="availability"><i /> Available for AI systems and AI security work</span>
             <span>AI SYSTEMS / CYBERSECURITY</span>
           </div>
-          <motion.div className="hero-copy" style={canAnimate ? { y: heroY, opacity: heroOpacity } : undefined} initial={false}>
+          <motion.div className="hero-copy" style={canAnimate ? { y: heroY } : undefined} initial={false}>
             <p className="kicker">AI systems · cybersecurity</p>
             <h1>I find the signal<br />inside the <em>noise.</em></h1>
           </motion.div>
           <div className="hero-footer reveal" data-reveal>
-            <p>I design agent systems, study how they fail, and use security practice to keep the 25% that still has to hold under pressure.</p>
+            <p>I design agent systems and study how they fail. Security practice is for the part that still has to hold under pressure.</p>
             <a className="circle-link" href="#work" aria-label="Explore selected work"><Arrow /></a>
           </div>
           <motion.div className="hero-orbit" style={canAnimate ? { rotate: orbitRotate } : undefined} aria-hidden="true">
@@ -225,15 +209,17 @@ function App() {
           </motion.div>
         </section>
 
-        <section className="statement section-shell">
+        <section id="approach" className="statement section-shell">
           <p className="section-index reveal" data-reveal>01 / Approach</p>
-          <AnimatedText className="statement-copy"><p>An agent is not a model. It is a loop of tools, context, and permissions—and <span>paying close attention</span> to those details is how you keep it from quietly going off the rails.</p></AnimatedText>
+          <div className="statement-copy reveal" data-reveal>
+            <p>An agent is not a model. It is a loop of tools, context, and permissions. Miss those details and the loop goes off the rails.</p>
+          </div>
         </section>
 
         <section id="work" className="work section-shell">
           <div className="section-heading reveal" data-reveal>
             <p className="section-index">02 / Personal research</p>
-            <h2>Questions explored<br /><em>through visual research.</em></h2>
+            <h2>Visual research on agents<br />and how they <em>fail.</em></h2>
           </div>
           <div className="project-list">
             {projects.map(project => (
@@ -274,8 +260,8 @@ function App() {
               <span>J</span><span>B</span><span>M</span>
             </div>
             <div className="about-copy reveal" data-reveal>
-              <p>I’m Jesus Bustillos-Molina. I build and study AI agent systems, with a cybersecurity practice underneath so the tooling, permissions, and failure modes stay visible.</p>
-              <p>Cyber Security Analyst at Textron Aviation in Wichita. KSU MIS, ISC² CC, WGU MS in Cybersecurity &amp; Information Assurance in progress. The work is mostly agents, architecture, and AI security—security operations is the rest of the stack, not the headline.</p>
+              <p>I’m Jesus Bustillos-Molina. I build and study AI agent systems. Agents and AI security are the headline. Security ops is supporting practice.</p>
+              <p>Cyber Security Analyst at Textron Aviation in Wichita. KSU MIS. ISC² CC. WGU MS in Cybersecurity &amp; Information Assurance in progress.</p>
               <a className="text-link" href="mailto:jbustillosmolina@gmail.com">Start a conversation <Arrow /></a>
             </div>
           </div>
@@ -306,4 +292,3 @@ function App() {
 }
 
 export default App
-
