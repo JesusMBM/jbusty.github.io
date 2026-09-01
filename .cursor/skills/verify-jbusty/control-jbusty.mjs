@@ -1,474 +1,689 @@
-import { spawn, spawnSync } from "node:child_process";
-import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
+#!/usr/bin/env node
+/**
+ * Drive the live jbusty portfolio on GitHub Pages.
+ * One JSON object on stdout. Exit 0 on success, non-zero on failure.
+ * Click is always refused on jesusmbm.github.io. Never follow outbound project origins.
+ */
+import { spawn } from "node:child_process"
+import fs from "node:fs"
+import path from "node:path"
+import { fileURLToPath } from "node:url"
 
-const PRODUCTION_URL = "https://jesusmbm.github.io/jbusty.github.io/";
-const DEFAULT_CHROME = "/usr/bin/google-chrome";
-const DEFAULT_HOST = "127.0.0.1";
-const DEFAULT_PORT = "4173";
-const BASE_PATH = "/jbusty.github.io/";
-const EVIDENCE_DIR = process.env.JBUSTY_EVIDENCE_DIR || "/tmp/jbusty-verify-evidence-proof";
-const PID_FILE = process.env.JBUSTY_PID_FILE || "/tmp/jbusty-verify-local.pid";
-const STATE_FILE = process.env.JBUSTY_STATE_FILE || "/tmp/jbusty-verify-local.json";
-const CHROME_TIMEOUT_MS = Number(process.env.JBUSTY_CHROME_TIMEOUT_MS || 25000);
-const VIRTUAL_TIME_MS = Number(process.env.JBUSTY_VIRTUAL_TIME_MS || 8000);
+const LIVE_URL = "https://jesusmbm.github.io/jbusty.github.io/"
+const LIVE_HOST = "jesusmbm.github.io"
+const CHROME_BIN = process.env.CHROME_PATH || "/usr/bin/google-chrome"
+const DEFAULT_EVIDENCE = process.env.VERIFY_JBUSTY_EVIDENCE || "/tmp/verify-jbusty-evidence"
+const WINDOW = "1280,800"
+const CHROME_TIMEOUT_MS = 30000
+const VIRTUAL_TIME_MS = 8000
+const NODE_WATCHDOG_MS = 40000
 
-const HASHES = {
-  top: "#top",
-  work: "#work",
-  about: "#about",
-  contact: "#contact",
-  "main-content": "#main-content",
-  home: "#top",
-  hero: "#top",
-};
+const REQUIRED_MARKERS = [
+  { id: "skip-link", test: (html) => /class=["'][^"']*\bskip-link\b/i.test(html) && /href=["']#main-content["']/i.test(html) && /Skip to main content/i.test(html) },
+  { id: "#main-content", test: (html) => hasElemId(html, "main-content") },
+  { id: "#top", test: (html) => hasElemId(html, "top") },
+  { id: "#work", test: (html) => hasElemId(html, "work") },
+  { id: "#about", test: (html) => hasElemId(html, "about") },
+  { id: "#contact", test: (html) => hasElemId(html, "contact") },
+  { id: "brand-aria-label", test: (html) => /aria-label=["']Jesus Bustillos-Molina, home["']/i.test(html) },
+  { id: "h1-signal", test: (html) => /I find the signal/i.test(html) },
+]
 
-function envMode() {
-  return String(process.env.JBUSTY_MODE || "live").toLowerCase();
+const OLD_IDENTITY = [
+  { id: "old-#hero-id", test: (html) => hasElemId(html, "hero") },
+  { id: "old-#projects", test: (html) => hasElemId(html, "projects") },
+  { id: "old-#skills", test: (html) => hasElemId(html, "skills") },
+  { id: "old-threat-hunt-copy", test: (html) => /I secure systems and hunt threats/i.test(html) },
+]
+
+const HELP = `control-jbusty — drive the live jbusty portfolio GitHub Pages UI.
+
+USAGE
+  node control-jbusty.mjs [--help] [--dry-run] [--url BASE] <command> [flags]
+
+COMMANDS
+  doctor                 GET live URL + chrome dump-dom; assert App.jsx identity
+  snapshot [--path FILE] dump-dom HTML + compact headings/links/ids extract
+  screenshot [--path FILE]
+                         chrome --screenshot at 1280x800
+  goto --url HASH_OR_URL resolve hash against live base, dump-dom, confirm id
+  click ...              ALWAYS refused on jesusmbm.github.io (exit 2)
+  cleanup                kill chrome pids this run started; never deletes evidence
+
+FLAGS
+  --help, -h             this text
+  --dry-run              print planned chrome argv / URL; do not launch chrome
+  --url                  override live base, or goto destination after the command
+  --path FILE            snapshot / screenshot / optional goto screenshot path
+
+DEFAULTS
+  base     ${LIVE_URL}
+  evidence ${DEFAULT_EVIDENCE}  (or $VERIFY_JBUSTY_EVIDENCE)
+  chrome   ${CHROME_BIN}
+
+Chrome is always invoked with --headless=new --no-sandbox --disable-gpu
+--disable-dev-shm-usage --timeout=30000 --virtual-time-budget=8000.
+Stderr is written to the evidence dir. Never click live. Never follow
+outbound project (netlify) origins.
+
+EXAMPLES
+  node control-jbusty.mjs --help
+  node control-jbusty.mjs --dry-run doctor
+  node control-jbusty.mjs doctor
+  node control-jbusty.mjs snapshot --path /tmp/verify-jbusty-evidence/hero.html
+  node control-jbusty.mjs screenshot --path /tmp/verify-jbusty-evidence/hero.png
+  node control-jbusty.mjs goto --url '#work'
+  node control-jbusty.mjs goto work
+  node control-jbusty.mjs click .menu-toggle
+  node control-jbusty.mjs cleanup
+`
+
+function emit(obj) {
+  process.stdout.write(JSON.stringify(obj) + "\n")
 }
 
-function envUrl() {
-  if (process.env.JBUSTY_URL) return withSlash(process.env.JBUSTY_URL);
-  if (envMode() === "local") return "http://" + DEFAULT_HOST + ":" + DEFAULT_PORT + BASE_PATH;
-  return PRODUCTION_URL;
+function fail(obj, code = 1) {
+  emit({ ok: false, ...obj })
+  process.exit(code)
 }
 
-function withSlash(url) {
-  const u = String(url).trim();
-  if (!u) return PRODUCTION_URL;
-  if (u.includes("#")) return u;
-  return u.endsWith("/") ? u : u + "/";
+function hasElemId(html, id) {
+  const re = new RegExp(`\\sid=["']${id}["']`, "i")
+  return re.test(html)
 }
 
-function chromePath() {
-  return process.env.JBUSTY_CHROME || DEFAULT_CHROME;
+function evidenceDir() {
+  const dir = DEFAULT_EVIDENCE
+  fs.mkdirSync(dir, { recursive: true })
+  return dir
 }
 
-function isProductionUrl(url) {
-  try {
-    const u = new URL(url);
-    return u.hostname === "jesusmbm.github.io" || u.hostname.endsWith(".github.io");
-  } catch {
-    return false;
-  }
+function pidFile() {
+  return path.join(evidenceDir(), ".chrome-pids.json")
 }
 
-function ensureDir(dir) {
-  fs.mkdirSync(dir, { recursive: true });
-}
-
-function writeJson(obj) {
-  process.stdout.write(JSON.stringify(obj, null, 2) + "\n");
-}
-
-function fail(exitCode, message, instead, extra) {
-  extra = extra || {};
-  process.stderr.write(message + "\n");
-  if (instead) process.stderr.write("Instead: " + instead + "\n");
-  writeJson(Object.assign({ ok: false, error: message, instead: instead || null }, extra));
-  process.exit(exitCode);
-}
-
-function ok(obj) {
-  writeJson(Object.assign({ ok: true }, obj));
-}
-
-function helpText() {
-  return [
-    "control-jbusty - drive the jbusty.github.io portfolio for verification",
-    "",
-    "Usage:",
-    "  node control-jbusty.mjs [--json] [--dry-run] [--help] <command> [args]",
-    "",
-    "Commands:",
-    "  doctor              Read-only health check (HTTP 200, title, live DOM)",
-    "  info                Print mode, URL, chrome, pid file",
-    "  snapshot            Dump rendered DOM landmarks as JSON",
-    "  screenshot PATH     Capture a 1280x800 PNG of the current URL",
-    "  goto HASH           Open #top|#work|#about|#contact|#main-content and screenshot",
-    "  click SELECTOR      Click a selector (REFUSED on live production)",
-    "  launch              Start local vite preview on 127.0.0.1:4173 (pid file)",
-    "  stop                Kill ONLY the pid recorded by launch",
-    "  wait-settle         Wait for the SPA to render (virtual-time-budget)",
-    "",
-    "Flags:",
-    "  --help              Show this help",
-    "  --json              JSON on stdout (default)",
-    "  --dry-run           Print click/launch/stop without doing them",
-    "",
-    "Env:",
-    "  JBUSTY_MODE=live (default) | local",
-    "  JBUSTY_URL=" + PRODUCTION_URL,
-    "  JBUSTY_CHROME=" + DEFAULT_CHROME,
-    "  JBUSTY_PID_FILE=" + PID_FILE,
-    "  JBUSTY_EVIDENCE_DIR=" + EVIDENCE_DIR,
-    "  JBUSTY_ROOT checkout root for launch",
-    "",
-    "Default target is LIVE GitHub Pages. click is refused there.",
-    "Evidence screenshots are copied to JBUSTY_EVIDENCE_DIR so they survive chrome profile cleanup.",
-    "",
-  ].join("\n");
+function recordPid(pid) {
+  const file = pidFile()
+  let list = []
+  try { list = JSON.parse(fs.readFileSync(file, "utf8")) } catch { list = [] }
+  if (!Array.isArray(list)) list = []
+  list.push({ pid, at: new Date().toISOString() })
+  fs.writeFileSync(file, JSON.stringify(list))
 }
 
 function parseArgs(argv) {
-  const flags = { json: true, dryRun: false, help: false };
-  const rest = [];
-  for (const arg of argv) {
-    if (arg === "--help" || arg === "-h") flags.help = true;
-    else if (arg === "--json") flags.json = true;
-    else if (arg === "--no-json") flags.json = false;
-    else if (arg === "--dry-run") flags.dryRun = true;
-    else if (arg.startsWith("--")) fail(2, "Unknown flag " + arg, "Run --help for supported flags and commands.");
-    else rest.push(arg);
+  const opts = {
+    help: false,
+    dryRun: false,
+    baseUrl: LIVE_URL,
+    command: null,
+    dest: null,
+    path: null,
+    rest: [],
   }
-  return { flags: flags, command: rest[0] || (flags.help ? "help" : null), args: rest.slice(1) };
-}
-
-function persistFile(src, extraName) {
-  ensureDir(EVIDENCE_DIR);
-  if (!src || !fs.existsSync(src)) return null;
-  const dest = path.join(EVIDENCE_DIR, extraName || path.basename(src));
-  fs.copyFileSync(src, dest);
-  const fd = fs.openSync(dest, "r+");
-  try { fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
-  return dest;
-}
-
-function runChrome(chromeArgs) {
-  const timeoutMs = CHROME_TIMEOUT_MS;
-  const profile = fs.mkdtempSync(path.join(os.tmpdir(), "jbusty-chrome-"));
-  const chrome = chromePath();
-  if (!fs.existsSync(chrome)) {
-    fs.rmSync(profile, { recursive: true, force: true });
-    fail(1, "Chrome not found at " + chrome, "Set JBUSTY_CHROME to the google-chrome binary.");
-  }
-  const args = [
-    "--headless",
-    "--disable-gpu",
-    "--no-sandbox",
-    "--disable-dev-shm-usage",
-    "--user-data-dir=" + profile,
-    "--virtual-time-budget=" + VIRTUAL_TIME_MS,
-    "--hide-scrollbars",
-    "--window-size=1280,800",
-  ].concat(chromeArgs);
-  const result = spawnSync(chrome, args, {
-    encoding: "utf8",
-    maxBuffer: 32 * 1024 * 1024,
-    timeout: timeoutMs,
-  });
-  try { fs.rmSync(profile, { recursive: true, force: true }); } catch (e) {}
-  return result;
-}
-
-function dumpDom(url) {
-  const result = runChrome(["--dump-dom", url]);
-  if (result.error && result.error.code === "ETIMEDOUT") {
-    fail(1, "Chrome dump-dom timed out after " + CHROME_TIMEOUT_MS + "ms", "Retry doctor; chrome must use an isolated --user-data-dir (this CLI does).");
-  }
-  if (result.status !== 0 && !result.stdout) {
-    fail(1, "Chrome dump-dom exited " + result.status + ": " + String(result.stderr || result.error || "").slice(0, 400), "Check JBUSTY_URL is reachable and JBUSTY_CHROME works.");
-  }
-  return result.stdout || "";
-}
-
-async function httpStatus(url) {
-  try {
-    const res = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(15000) });
-    return { status: res.status, ok: res.ok, finalUrl: res.url };
-  } catch (err) {
-    return { status: 0, ok: false, error: String(err) };
-  }
-}
-
-function titleOf(dom) {
-  const m = String(dom).match(/<title>([\s\S]*?)<\/title>/i);
-  return m ? m[1].replace(/\s+/g, " ").trim() : "";
-}
-
-function normalizeHash(raw) {
-  if (!raw) return null;
-  let h = String(raw).trim();
-  if (h.startsWith("#")) h = h.slice(1);
-  h = h.replace(/^\/+/, "");
-  const mapped = HASHES[h.toLowerCase()] || HASHES[h];
-  if (mapped) return mapped;
-  if (/^[a-z0-9-]+$/i.test(h)) return "#" + h;
-  return null;
-}
-
-function urlWithHash(base, hash) {
-  const u = new URL(base);
-  u.hash = hash.startsWith("#") ? hash : "#" + hash;
-  return u.toString();
-}
-
-function takeScreenshot(url, destPath) {
-  const abs = path.resolve(destPath);
-  ensureDir(path.dirname(abs));
-  const result = runChrome(["--screenshot=" + abs, "--window-size=1280,800", url]);
-  if (result.error && result.error.code === "ETIMEDOUT") {
-    fail(1, "Chrome screenshot timed out after " + CHROME_TIMEOUT_MS + "ms", "Retry screenshot; evidence dir is outside the chrome profile.");
-  }
-  if (!fs.existsSync(abs) || fs.statSync(abs).size < 100) {
-    fail(1, "Screenshot missing or empty at " + abs + " (chrome status " + result.status + ")", "Pass an absolute PATH outside the chrome profile. Proof files must survive chrome child cleanup.", { stderr: String(result.stderr || "").slice(0, 400) });
-  }
-  const fd = fs.openSync(abs, "r+");
-  try { fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
-  const evidence = persistFile(abs, path.basename(abs));
-  return { path: abs, bytes: fs.statSync(abs).size, evidence: evidence };
-}
-
-function findRepoRoot() {
-  if (process.env.JBUSTY_ROOT && fs.existsSync(path.join(process.env.JBUSTY_ROOT, "package.json"))) {
-    return process.env.JBUSTY_ROOT;
-  }
-  let dir = process.cwd();
-  for (let i = 0; i < 12; i += 1) {
-    const pkgPath = path.join(dir, "package.json");
-    if (fs.existsSync(pkgPath)) {
-      try {
-        const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
-        if (pkg.name === "jbusty-portfolio" || fs.existsSync(path.join(dir, "vite.config.js"))) return dir;
-      } catch (e) {}
+  const args = [...argv]
+  while (args.length) {
+    const a = args.shift()
+    if (a === "--help" || a === "-h") {
+      opts.help = true
+    } else if (a === "--dry-run") {
+      opts.dryRun = true
+    } else if (a === "--url" || a.startsWith("--url=")) {
+      const v = a.startsWith("--url=") ? a.slice(6) : args.shift()
+      if (v == null) fail({ error: "--url requires a value", hint: "quote hashes in the shell: --url '#work' (unquoted # starts a comment). Or pass a bare name: goto work" })
+      if (opts.command === "goto") opts.dest = v
+      else opts.baseUrl = v
+    } else if (a === "--path" || a.startsWith("--path=")) {
+      const v = a.startsWith("--path=") ? a.slice(7) : args.shift()
+      if (v == null) fail({ error: "--path requires a value" })
+      opts.path = v
+    } else if (!a.startsWith("-") && !opts.command) {
+      opts.command = a
+    } else if (!a.startsWith("-")) {
+      opts.rest.push(a)
+      if (opts.command === "goto" && !opts.dest) opts.dest = a
+      if ((opts.command === "snapshot" || opts.command === "screenshot") && !opts.path) opts.path = a
+    } else {
+      opts.rest.push(a)
     }
-    const parent = path.dirname(dir);
-    if (parent === dir) break;
-    dir = parent;
   }
-  return null;
+  return opts
 }
 
-function readPid() {
-  if (!fs.existsSync(PID_FILE)) return null;
-  const pid = Number(fs.readFileSync(PID_FILE, "utf8").trim());
-  return Number.isInteger(pid) && pid > 0 ? pid : null;
+function normalizeBase(url) {
+  try {
+    const u = new URL(url)
+    if (!u.pathname.endsWith("/")) u.pathname += "/"
+    u.hash = ""
+    u.search = ""
+    return u.toString()
+  } catch {
+    fail({ error: "invalid base url", url })
+  }
+}
+
+function hostnameOf(url) {
+  try { return new URL(url).hostname } catch { return "" }
+}
+
+function isLiveHost(url) {
+  return hostnameOf(url) === LIVE_HOST
+}
+
+function chromeProfileDir() {
+  const dir = path.join("/tmp", "verify-jbusty-chrome-" + process.pid + "-" + Date.now())
+  fs.mkdirSync(dir, { recursive: true })
+  return dir
+}
+
+function chromeCommonArgs({ createProfile = false } = {}) {
+  const profile = createProfile ? chromeProfileDir() : "/tmp/verify-jbusty-chrome-profile"
+  return [
+    "--headless=new",
+    "--no-sandbox",
+    "--disable-gpu",
+    "--disable-dev-shm-usage",
+    `--timeout=${CHROME_TIMEOUT_MS}`,
+    `--virtual-time-budget=${VIRTUAL_TIME_MS}`,
+    `--window-size=${WINDOW}`,
+    `--user-data-dir=${profile}`,
+  ]
+}
+
+function extractHtml(stdout) {
+  const text = String(stdout || "")
+  const doctype = text.search(/<!DOCTYPE html/i)
+  const htmlTag = text.search(/<html[\s>]/i)
+  const idx = doctype >= 0 ? doctype : htmlTag
+  return idx >= 0 ? text.slice(idx) : text
+}
+
+function extractTitle(html) {
+  const m = String(html).match(/<title[^>]*>([\s\S]*?)<\/title>/i)
+  return m ? stripTags(m[1]) : ""
+}
+
+function stripTags(s) {
+  return String(s)
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
+function listIds(html) {
+  const ids = []
+  const re = /\sid=["']([^"']+)["']/gi
+  let m
+  while ((m = re.exec(html))) ids.push(m[1])
+  return [...new Set(ids)]
+}
+
+function compactExtract(html) {
+  const lines = []
+  lines.push("TITLE: " + extractTitle(html))
+  lines.push("IDS: " + listIds(html).join(", "))
+  lines.push("HEADINGS:")
+  const headingRe = /<(h[1-6])\b([^>]*)>([\s\S]*?)<\/\1>/gi
+  let m
+  while ((m = headingRe.exec(html))) {
+    lines.push(`  ${m[1]}: ${stripTags(m[3])}`)
+  }
+  lines.push("SECTION INDEX:")
+  const indexRe = /<p\b[^>]*class=["'][^"']*\bsection-index\b[^"']*["'][^>]*>([\s\S]*?)<\/p>/gi
+  let indexFound = false
+  while ((m = indexRe.exec(html))) {
+    indexFound = true
+    lines.push(`  ${stripTags(m[1])}`)
+  }
+  if (!indexFound) lines.push("  (none)")
+  lines.push("STATEMENT:")
+  const stmt = html.match(/<div\b[^>]*class=["'][^"']*\bstatement-copy\b[^"']*["'][^>]*>([\s\S]*?)<\/div>/i)
+  lines.push(stmt ? `  ${stripTags(stmt[1])}` : "  (none)")
+  lines.push("LINKS:")
+  const linkRe = /<a\b([^>]*)>([\s\S]*?)<\/a>/gi
+  while ((m = linkRe.exec(html))) {
+    const href = attr(m[1], "href")
+    const label = attr(m[1], "aria-label")
+    const text = stripTags(m[2])
+    lines.push(`  ${text || label || "(empty)"} -> ${href}${label ? ` [${label}]` : ""}`)
+  }
+  return lines.join("\n") + "\n"
+}
+
+function attr(tag, name) {
+  const re = new RegExp(name + "\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)'|([^\\s>]+))", "i")
+  const m = String(tag).match(re)
+  return m ? (m[1] ?? m[2] ?? m[3] ?? "") : ""
+}
+
+function stamp(kind) {
+  return `${kind}-${new Date().toISOString().replace(/[:.]/g, "-")}`
+}
+
+function runChrome({ extraArgs, url, stderrName, dryRun }) {
+  const args = [...chromeCommonArgs({ createProfile: !dryRun }), ...extraArgs, url]
+  if (dryRun) {
+    return { dryRun: true, chrome: CHROME_BIN, argv: args, url }
+  }
+  const dir = evidenceDir()
+  const stderrPath = path.join(dir, stderrName)
+  const stderrFd = fs.openSync(stderrPath, "w")
+  return new Promise((resolve, reject) => {
+    const child = spawn(CHROME_BIN, args, {
+      stdio: ["ignore", "pipe", stderrFd],
+    })
+    recordPid(child.pid)
+    let stdout = ""
+    child.stdout.on("data", (buf) => { stdout += buf.toString("utf8") })
+    const watchdog = setTimeout(() => {
+      try { child.kill("SIGKILL") } catch { /* already gone */ }
+      reject(new Error(`chrome watchdog ${NODE_WATCHDOG_MS}ms pid=${child.pid}`))
+    }, NODE_WATCHDOG_MS)
+    child.on("error", (err) => {
+      clearTimeout(watchdog)
+      try { fs.closeSync(stderrFd) } catch { /* */ }
+      reject(err)
+    })
+    child.on("close", (code) => {
+      clearTimeout(watchdog)
+      try { fs.closeSync(stderrFd) } catch { /* */ }
+      resolve({
+        code,
+        stdout,
+        html: extractHtml(stdout),
+        stderrPath,
+        pid: child.pid,
+        argv: args,
+        url,
+      })
+    })
+  })
+}
+
+async function chromeVersion() {
+  return new Promise((resolve) => {
+    const child = spawn(CHROME_BIN, ["--version"], { stdio: ["ignore", "pipe", "pipe"] })
+    let out = ""
+    child.stdout.on("data", (b) => { out += b.toString("utf8") })
+    child.stderr.on("data", () => {})
+    const t = setTimeout(() => { try { child.kill("SIGKILL") } catch {} resolve("unknown") }, 5000)
+    child.on("close", () => { clearTimeout(t); resolve(out.trim() || "unknown") })
+    child.on("error", () => { clearTimeout(t); resolve("unknown") })
+  })
+}
+
+async function httpGet(url) {
+  const ac = new AbortController()
+  const t = setTimeout(() => ac.abort(), 20000)
+  try {
+    const res = await fetch(url, {
+      redirect: "follow",
+      signal: ac.signal,
+      headers: { "User-Agent": "control-jbusty/1.0" },
+    })
+    return { status: res.status, finalUrl: res.url }
+  } catch (err) {
+    return { status: 0, error: err.message }
+  } finally {
+    clearTimeout(t)
+  }
+}
+
+function markerReport(html) {
+  const found = []
+  const missing = []
+  for (const m of REQUIRED_MARKERS) {
+    if (m.test(html)) found.push(m.id)
+    else missing.push(m.id)
+  }
+  const oldFound = OLD_IDENTITY.filter((m) => m.test(html)).map((m) => m.id)
+  return { found, missing, oldFound }
+}
+
+function refuseOutbound(url, base) {
+  let target
+  let origin
+  try {
+    target = new URL(url)
+    origin = new URL(base)
+  } catch {
+    fail({ error: "invalid url", url })
+  }
+  if (target.origin !== origin.origin) {
+    fail({
+      error: "refusing outbound navigation",
+      url,
+      origin: target.origin,
+      reason: "verification stays on live Pages; project cards open other origins and must not be followed",
+    })
+  }
+}
+
+function resolveGoto(dest, baseUrl) {
+  if (!dest) fail({ error: "goto requires --url HASH_OR_URL", usage: "node control-jbusty.mjs goto --url '#work'  (or: goto work)" })
+  const base = normalizeBase(baseUrl)
+  if (dest.startsWith("#")) return new URL(dest, base).toString()
+  try {
+    const u = new URL(dest)
+    return u.toString()
+  } catch {
+    return new URL("#" + dest.replace(/^#/, ""), base).toString()
+  }
+}
+
+function targetIdFromUrl(url) {
+  try {
+    const hash = new URL(url).hash.replace(/^#/, "")
+    return hash || null
+  } catch {
+    return null
+  }
+}
+
+async function cmdDoctor(opts) {
+  const url = normalizeBase(opts.baseUrl)
+  const argv = [...chromeCommonArgs(), "--dump-dom", url]
+  if (opts.dryRun) {
+    emit({ ok: true, dryRun: true, command: "doctor", url, chrome: CHROME_BIN, argv })
+    return
+  }
+  const version = await chromeVersion()
+  const httpInfo = await httpGet(url)
+  let dumped
+  try {
+    dumped = await runChrome({
+      extraArgs: ["--dump-dom"],
+      url,
+      stderrName: "chrome-doctor.stderr",
+      dryRun: false,
+    })
+  } catch (err) {
+    fail({
+      error: "chrome dump-dom failed",
+      url,
+      status: httpInfo.status,
+      chromeVersion: version,
+      detail: err.message,
+    })
+  }
+  const html = dumped.html || ""
+  const title = extractTitle(html)
+  const markers = markerReport(html)
+  const dumpPath = path.join(evidenceDir(), "doctor.dump.html")
+  fs.writeFileSync(dumpPath, html)
+  const oldIdentity = markers.oldFound.length > 0 && markers.missing.length > 0
+  const ok =
+    httpInfo.status === 200 &&
+    markers.missing.length === 0 &&
+    !oldIdentity &&
+    !markers.oldFound.includes("old-#hero-id") &&
+    !markers.oldFound.includes("old-threat-hunt-copy")
+  const payload = {
+    ok,
+    url,
+    status: httpInfo.status,
+    title,
+    markers: { found: markers.found, missing: markers.missing },
+    chromeVersion: version,
+  }
+  if (markers.oldFound.length) payload.oldIdentity = markers.oldFound
+  if (!ok) {
+    payload.error = oldIdentity
+      ? "old leftover #hero identity from unused components; live App.jsx expected"
+      : "doctor identity check failed"
+    payload.dumpPath = dumpPath
+    emit(payload)
+    process.exit(1)
+  }
+  emit(payload)
+}
+
+async function cmdSnapshot(opts) {
+  const url = normalizeBase(opts.baseUrl)
+  const dest = opts.path || path.join(evidenceDir(), "snapshot.html")
+  const argv = [...chromeCommonArgs(), "--dump-dom", url]
+  if (opts.dryRun) {
+    emit({ ok: true, dryRun: true, command: "snapshot", url, path: dest, chrome: CHROME_BIN, argv })
+    return
+  }
+  let dumped
+  try {
+    dumped = await runChrome({
+      extraArgs: ["--dump-dom"],
+      url,
+      stderrName: "chrome-snapshot.stderr",
+    })
+  } catch (err) {
+    fail({ error: "chrome dump-dom failed", url, detail: err.message })
+  }
+  const html = dumped.html || ""
+  fs.mkdirSync(path.dirname(path.resolve(dest)), { recursive: true })
+  fs.writeFileSync(dest, html)
+  const extractPath = dest.replace(/\.html?$/i, "") + ".extract.txt"
+  fs.writeFileSync(extractPath, compactExtract(html))
+  const ids = listIds(html)
+  emit({
+    ok: true,
+    url,
+    path: path.resolve(dest),
+    extractPath: path.resolve(extractPath),
+    bytes: Buffer.byteLength(html),
+    ids,
+    title: extractTitle(html),
+  })
+}
+
+async function cmdScreenshot(opts) {
+  const url = normalizeBase(opts.baseUrl)
+  const dest = opts.path || path.join(evidenceDir(), "screenshot.png")
+  fs.mkdirSync(path.dirname(path.resolve(dest)), { recursive: true })
+  const abs = path.resolve(dest)
+  const argv = [...chromeCommonArgs(), `--screenshot=${abs}`, url]
+  if (opts.dryRun) {
+    emit({ ok: true, dryRun: true, command: "screenshot", url, path: abs, chrome: CHROME_BIN, argv })
+    return
+  }
+  try {
+    await runChrome({
+      extraArgs: [`--screenshot=${abs}`],
+      url,
+      stderrName: "chrome-screenshot.stderr",
+    })
+  } catch (err) {
+    fail({ error: "chrome screenshot failed", url, path: abs, detail: err.message })
+  }
+  if (!fs.existsSync(abs)) fail({ error: "chrome did not write screenshot", path: abs, url })
+  emit({ ok: true, url, path: abs, bytes: fs.statSync(abs).size })
+}
+
+async function cmdGoto(opts) {
+  const base = normalizeBase(opts.baseUrl)
+  const dest = opts.dest || opts.rest[0]
+  const url = resolveGoto(dest, base)
+  refuseOutbound(url, base)
+  const id = targetIdFromUrl(url)
+  const argv = [...chromeCommonArgs(), "--dump-dom", url]
+  const shotArgs = opts.path ? [...chromeCommonArgs(), `--screenshot=${path.resolve(opts.path)}`, url] : null
+  if (opts.dryRun) {
+    emit({
+      ok: true,
+      dryRun: true,
+      command: "goto",
+      url,
+      id,
+      chrome: CHROME_BIN,
+      argv,
+      screenshotArgv: shotArgs,
+    })
+    return
+  }
+  let dumped
+  try {
+    dumped = await runChrome({
+      extraArgs: ["--dump-dom"],
+      url,
+      stderrName: "chrome-goto.stderr",
+    })
+  } catch (err) {
+    fail({ error: "chrome dump-dom failed", url, detail: err.message })
+  }
+  const html = dumped.html || ""
+  const found = id ? hasElemId(html, id) : false
+  const dumpPath = path.join(evidenceDir(), `goto-${id || "page"}.html`)
+  fs.writeFileSync(dumpPath, html)
+  let shot = null
+  if (opts.path) {
+    const abs = path.resolve(opts.path)
+    fs.mkdirSync(path.dirname(abs), { recursive: true })
+    try {
+      await runChrome({
+        extraArgs: [`--screenshot=${abs}`],
+        url,
+        stderrName: "chrome-goto-screenshot.stderr",
+      })
+    } catch (err) {
+      fail({ error: "chrome screenshot failed", url, path: abs, detail: err.message, foundId: found })
+    }
+    if (!fs.existsSync(abs)) fail({ error: "chrome did not write screenshot", path: abs, url })
+    shot = { path: abs, bytes: fs.statSync(abs).size }
+  }
+  const payload = {
+    ok: found,
+    url,
+    id,
+    found: found,
+    dumpPath,
+    title: extractTitle(html),
+  }
+  if (shot) {
+    payload.path = shot.path
+    payload.bytes = shot.bytes
+  }
+  if (!found) {
+    payload.error = id ? `target id #${id} not found in dump-dom` : "no hash id to confirm"
+    emit(payload)
+    process.exit(1)
+  }
+  emit(payload)
+}
+
+function cmdClick(opts) {
+  const url = normalizeBase(opts.baseUrl)
+  const selector = opts.rest.join(" ").trim() || null
+  if (opts.dryRun) {
+    emit({
+      ok: true,
+      dryRun: true,
+      command: "click",
+      url,
+      selector,
+      wouldRefuse: isLiveHost(url),
+      reason: isLiveHost(url)
+        ? "click refused on live GitHub Pages (shared recruiter instance; no mutation)"
+        : "click is not implemented; this skill is read-only against live Pages",
+    })
+    return
+  }
+  if (isLiveHost(url)) {
+    fail({
+      error: "click refused on live",
+      reason: "live GitHub Pages is a shared public instance; click would mutate menu state or open mailto/outbound tabs. Use snapshot, screenshot, and goto.",
+      url,
+      selector,
+    }, 2)
+  }
+  fail({
+    error: "click not supported",
+    reason: "this skill drives live Pages only; click is refused. Use snapshot / screenshot / goto.",
+    url,
+    selector,
+  }, 2)
 }
 
 function pidAlive(pid) {
-  if (!pid) return false;
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (e) {
-    return false;
+  try { process.kill(pid, 0); return true } catch { return false }
+}
+
+function cmdCleanup(opts) {
+  if (opts.dryRun) {
+    emit({ ok: true, dryRun: true, command: "cleanup", pidFile: pidFile(), evidenceDir: evidenceDir() })
+    return
   }
-}
-
-function cmdHelp() {
-  process.stdout.write(helpText());
-}
-
-async function cmdDoctor() {
-  const url = envUrl();
-  const mode = envMode();
-  const http = await httpStatus(url);
-  const checks = {
-    http200: http.status === 200,
-    title: false,
-    signal: false,
-    workCard: false,
-    navWork: false,
-    navAbout: false,
-    navContact: false,
-  };
-  let title = "";
-  let dom = "";
-  if (checks.http200) {
-    dom = dumpDom(url);
-    title = titleOf(dom);
-    checks.title = title.includes("Jesus Bustillos-Molina");
-    checks.signal = dom.includes("I find the signal");
-    checks.workCard = dom.includes("AI Agent Architecture");
-    checks.navWork = /\bWork\b/.test(dom);
-    checks.navAbout = /\bAbout\b/.test(dom);
-    checks.navContact = /\bContact\b/.test(dom);
+  const file = pidFile()
+  let list = []
+  try { list = JSON.parse(fs.readFileSync(file, "utf8")) } catch { list = [] }
+  const killed = []
+  const alreadyDead = []
+  for (const rec of list) {
+    const pid = rec && rec.pid
+    if (!pid) continue
+    if (!pidAlive(pid)) { alreadyDead.push(pid); continue }
+    try { process.kill(pid, "SIGTERM") } catch { /* */ }
+    killed.push(pid)
   }
-  const passed = Object.values(checks).every(Boolean);
-  const payload = { command: "doctor", mode: mode, url: url, httpStatus: http.status, title: title, checks: checks, chrome: chromePath() };
-  if (!passed) {
-    const missing = Object.entries(checks).filter(function (kv) { return !kv[1]; }).map(function (kv) { return kv[0]; });
-    fail(1, "doctor failed: " + missing.join(", "), "Fix JBUSTY_URL / wait for Pages, then rerun `node control-jbusty.mjs doctor`. Do not edit src/ product code from this skill.", payload);
+  for (const pid of killed) {
+    if (pidAlive(pid)) {
+      try { process.kill(pid, "SIGKILL") } catch { /* */ }
+    }
   }
-  ok(payload);
+  const evidence = evidenceDir()
+  const files = fs.readdirSync(evidence).filter((n) => !n.startsWith(".chrome"))
+  emit({
+    ok: true,
+    command: "cleanup",
+    killed,
+    alreadyDead,
+    evidenceDir: evidence,
+    evidenceSurvives: true,
+    evidenceFiles: files,
+  })
 }
 
-function cmdInfo() {
-  const pid = readPid();
-  ok({
-    command: "info",
-    mode: envMode(),
-    url: envUrl(),
-    productionUrl: PRODUCTION_URL,
-    localPreviewUrl: "http://" + DEFAULT_HOST + ":" + DEFAULT_PORT + BASE_PATH,
-    chrome: chromePath(),
-    pidFile: PID_FILE,
-    pid: pid,
-    pidAlive: pidAlive(pid),
-    evidenceDir: EVIDENCE_DIR,
-    clickAllowed: !(envMode() === "live" || isProductionUrl(envUrl())),
-  });
-}
-
-function cmdSnapshot() {
-  const url = envUrl();
-  const dom = dumpDom(url);
-  const title = titleOf(dom);
-  const names = [
-    "AI Agent Architecture",
-    "AI Agents Escaping Sandboxes",
-    "Open, But How Open?",
-    "The Hidden Cost of AI Agents",
-    "Secure SDLC: STRIDE, PASTA & SSDF",
-    "Hacking a Satellite—Safely Explained",
-  ];
-  const projects = names.map(function (name, i) {
-    return { number: String(i + 1).padStart(2, "0"), title: name, present: dom.includes(name) || dom.includes(name.replace(/&/g, '&amp;')) };
-  });
-  ok({
-    command: "snapshot",
-    url: url,
-    title: title,
-    landmarks: {
-      skipLink: /class="skip-link"/.test(dom) && /href="#main-content"/.test(dom),
-      brand: /class="brand"/.test(dom) && /Jesus Bustillos-Molina, home/.test(dom),
-      menuToggle: /class="menu-toggle"/.test(dom) && /aria-controls="nav-links"/.test(dom),
-      nav: /id="nav-links"/.test(dom),
-      hero: /id="top"/.test(dom) && /I find the signal/.test(dom),
-      work: /id="work"/.test(dom),
-      about: /id="about"/.test(dom) && /Curious by nature/.test(dom),
-      contact: /id="contact"/.test(dom),
-    },
-    navLabels: { Work: /\bWork\b/.test(dom), About: /\bAbout\b/.test(dom), Contact: /\bContact\b/.test(dom) },
-    projects: projects,
-    hashes: ["#top", "#work", "#about", "#contact", "#main-content"],
-  });
-}
-
-function cmdScreenshot(dest) {
-  if (!dest) fail(2, "screenshot requires PATH", "Example: node control-jbusty.mjs screenshot /tmp/jbusty-verify-evidence-proof/home.png");
-  const shot = takeScreenshot(envUrl(), dest);
-  ok(Object.assign({ command: "screenshot", url: envUrl() }, shot));
-}
-
-function cmdGoto(rawHash) {
-  if (!rawHash) fail(2, "goto requires HASH", "Use: node control-jbusty.mjs goto work   (or #work, about, contact, top)");
-  const hash = normalizeHash(rawHash);
-  if (!hash) fail(2, "Unrecognized hash " + rawHash, "Use top, work, about, contact, or main-content (with or without #).");
-  const url = urlWithHash(envUrl(), hash);
-  const dom = dumpDom(url);
-  const id = hash.slice(1);
-  const present = new RegExp('id="' + id + '"').test(dom) || hash === "#main-content";
-  ensureDir(EVIDENCE_DIR);
-  const shot = takeScreenshot(url, path.join(EVIDENCE_DIR, id + ".png"));
-  ok({ command: "goto", hash: hash, url: url, sectionPresent: present, title: titleOf(dom), screenshot: shot });
-}
-
-function cmdClick(selector, dryRun) {
-  if (!selector) fail(2, "click requires SELECTOR", "Example: node control-jbusty.mjs click 'button.menu-toggle' --dry-run");
-  const url = envUrl();
-  const mode = envMode();
-  if (mode === "live" || isProductionUrl(url)) {
-    fail(2, "click is refused on live production (" + url + ")", "Use `goto HASH` for in-page navigation, `snapshot`/`screenshot` for read-only proof, or `launch` a local preview (JBUSTY_MODE=local) and click there. Never click the GitHub Pages site.", { command: "click", selector: selector, url: url, mode: mode });
-  }
-  if (dryRun) {
-    ok({ command: "click", dryRun: true, selector: selector, url: url, would: "click " + selector + " on local preview (not executed)" });
-    return;
-  }
-  fail(2, "Live click is refused; local click has no persistent headless session in this CLI", "Use --dry-run to record the intended selector, or `goto HASH` to follow nav links. Launch a local preview first (JBUSTY_MODE=local).", { command: "click", selector: selector, url: url, mode: mode });
-}
-
-function cmdWaitSettle() {
-  const url = envUrl();
-  const started = Date.now();
-  const dom = dumpDom(url);
-  ok({ command: "wait-settle", url: url, ms: Date.now() - started, virtualTimeBudgetMs: VIRTUAL_TIME_MS, rendered: /I find the signal/.test(dom) });
-}
-
-function cmdLaunch(dryRun) {
-  const previewUrl = "http://127.0.0.1:4173/jbusty.github.io/";
-  const root = findRepoRoot();
-  const would = { cwd: root, cmd: "vite preview --host 127.0.0.1 --port 4173 --strictPort", pidFile: PID_FILE, url: previewUrl };
-  if (dryRun) {
-    ok({ command: "launch", dryRun: true, would: would });
-    return;
-  }
-  if (!root) {
-    fail(1, "Cannot launch: jbusty-portfolio checkout not found", "Run from a local clone of JesusMBM/jbusty.github.io (do not clone just to doctor live Pages). Set JBUSTY_ROOT, or keep JBUSTY_MODE=live (default) and use doctor/snapshot/screenshot against GitHub Pages.");
-  }
-  const pid = startLocalPreview(path.join(root, "node_modules", ".bin", "vite"), root, "/tmp/jbusty-verify-local.log"); writeLaunchPid(pid, previewUrl, root, "/tmp/jbusty-verify-local.log");
-}
-
-function startLocalPreview(viteBin, root, logFile) {
-  const logFd = fs.openSync(logFile, "a");
-  const child = spawn(viteBin, ["preview", "--host", "127.0.0.1", "--port", "4173", "--strictPort"], {
-    cwd: root,
-    detached: true,
-    stdio: ["ignore", logFd, logFd],
-    env: process.env,
-  });
-  fs.closeSync(logFd);
-  child.unref();
-  return child.pid;
-}
-
-function writeLaunchPid(pid, previewUrl, root, logFile) {
-  ensureDir(path.dirname(PID_FILE));
-  fs.writeFileSync(PID_FILE, String(pid) + "\n");
-  fs.writeFileSync(STATE_FILE, JSON.stringify({ pid: pid, url: previewUrl, cwd: root, startedAt: new Date().toISOString() }, null, 2));
-  ok({ command: "launch", pid: pid, pidFile: PID_FILE, url: previewUrl, logFile: logFile });
-}
-
-function cmdStop(dryRun) {
-  const pid = readPid();
-  if (dryRun) {
-    ok({ command: "stop", dryRun: true, would: pid ? "signal recorded pid " + pid + " (pid file only)" : "no pid file; nothing to stop" });
-    return;
-  }
-  if (!pid) {
-    fail(1, "No pid file at " + PID_FILE, "Nothing to stop. launch writes this pid file; stop never matches by process name.");
-  }
-  if (!pidAlive(pid)) {
-    fs.rmSync(PID_FILE, { force: true });
-    ok({ command: "stop", pid: pid, killed: false, note: "pid already dead; pid file removed" });
-    return;
+async function main() {
+  const opts = parseArgs(process.argv.slice(2))
+  if (opts.help || !opts.command) {
+    process.stdout.write(HELP)
+    process.exit(0)
   }
   try {
-    process.kill(pid, "SIGTERM");
+    opts.baseUrl = opts.baseUrl || LIVE_URL
+    switch (opts.command) {
+      case "doctor":
+        await cmdDoctor(opts)
+        break
+      case "snapshot":
+        await cmdSnapshot(opts)
+        break
+      case "screenshot":
+        await cmdScreenshot(opts)
+        break
+      case "goto":
+        await cmdGoto(opts)
+        break
+      case "click":
+        cmdClick(opts)
+        break
+      case "cleanup":
+        cmdCleanup(opts)
+        break
+      default:
+        fail({ error: `unknown command: ${opts.command}`, hint: "see --help" })
+    }
   } catch (err) {
-    fail(1, "Failed to signal pid " + pid + ": " + err, "stop only signals the recorded pid.");
+    fail({ error: err.message || String(err) })
   }
-  fs.rmSync(PID_FILE, { force: true });
-  ok({ command: "stop", pid: pid, killed: true });
 }
 
-const parsed = parseArgs(process.argv.slice(2));
-const flags = parsed.flags;
-const command = parsed.command;
-const args = parsed.args;
-if (flags.help || command === "help" || command === "--help") {
-  cmdHelp();
-  process.exit(0);
+const self = fileURLToPath(import.meta.url)
+if (process.argv[1] && path.resolve(process.argv[1]) === self) {
+  main()
 }
-if (!command) fail(2, "Missing command", "Run node control-jbusty.mjs --help");
-
-const commands = {
-  doctor: function () { return cmdDoctor(); },
-  info: function () { return cmdInfo(); },
-  snapshot: function () { return cmdSnapshot(); },
-  screenshot: function () { return cmdScreenshot(args[0]); },
-  goto: function () { return cmdGoto(args[0]); },
-  click: function () { return cmdClick(args[0], flags.dryRun); },
-  launch: function () { return cmdLaunch(flags.dryRun); },
-  stop: function () { return cmdStop(flags.dryRun); },
-  "wait-settle": function () { return cmdWaitSettle(); },
-};
-
-if (!commands[command]) {
-  fail(2, "Unknown command " + command, "Run node control-jbusty.mjs --help");
-}
-
-Promise.resolve(commands[command]()).catch(function (err) {
-  fail(1, err && err.message ? err.message : String(err), "Rerun doctor. Do not edit src/ product code.");
-});
