@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1e1e2e" />
+    <meta name="description" content="Jesus Bustillos-Molina visual walkthrough of Honeyquest for LLMs. Horizon3.ai tested whether human cyber-deception assumptions transfer to LLM attackers." />
+    <link rel="icon" type="image/svg+xml" href="/jbusty.github.io/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <title>Honeyquest for LLMs — Jesus Bustillos-Molina</title>
+    <style>
+      :root {
+        --ink: #cdd6f4;
+        --muted: #a6adc8;
+        --dim: #9399b2;
+        --ground: #1e1e2e;
+        --surface: #181825;
+        --line: rgba(205, 214, 244, 0.14);
+        --acid: #cba6f7;
+        --blue: #89b4fa;
+        --teal: #94e2d5;
+        --pink: #f38ba8;
+        --peach: #fab387;
+        --serif: Georgia, 'Times New Roman', serif;
+        --sans: 'Manrope', system-ui, sans-serif;
+        --mono: 'DM Mono', monospace;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; background: var(--ground); }
+      body {
+        margin: 0;
+        background: var(--ground);
+        color: var(--ink);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: .045;
+        z-index: 20;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+      }
+      a { color: inherit; text-decoration: none; }
+      button { color: inherit; font: inherit; }
+      ::selection { background: var(--acid); color: var(--ground); }
+
+      .sr-only {
+        position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+        overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+      }
+      .skip-link {
+        position: fixed; z-index: 200; top: 10px; left: 10px; padding: 12px 16px;
+        background: var(--ink); color: var(--ground); font: 500 12px var(--mono);
+        transform: translateY(-150%); transition: transform .18s ease;
+      }
+      .skip-link:focus { transform: translateY(0); }
+      :where(a, button):focus-visible { outline: 3px solid var(--peach); outline-offset: 4px; }
+
+      .nav {
+        position: fixed; top: 0; left: 0; right: 0; height: 84px;
+        padding: 0 clamp(24px, 5vw, 72px);
+        display: flex; align-items: center; justify-content: space-between;
+        z-index: 50; background: rgba(30, 30, 46, .94); border-bottom: 1px solid var(--line);
+      }
+      .brand { font: 500 18px var(--mono); letter-spacing: -.05em; }
+      .brand span { color: var(--acid); }
+      .brand, .nav-links a, .menu-toggle {
+        min-height: 44px; display: inline-flex; align-items: center;
+      }
+      .nav-links {
+        display: flex; gap: 40px; font: 400 12px var(--mono);
+        text-transform: uppercase; letter-spacing: .08em;
+      }
+      .nav-links a { position: relative; }
+      .nav-links a::after {
+        content: ''; position: absolute; left: 0; bottom: -5px; width: 100%; height: 1px;
+        background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform .35s ease;
+      }
+      .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
+      .menu-toggle {
+        display: none; min-width: 44px; justify-content: center; border: 0; background: none;
+        font: 400 12px var(--mono); text-transform: uppercase; cursor: pointer;
+      }
+
+      .section-shell { padding-left: clamp(24px, 5vw, 72px); padding-right: clamp(24px, 5vw, 72px); }
+      .section-index, .kicker {
+        color: var(--muted); font: 300 11px var(--mono);
+        text-transform: uppercase; letter-spacing: .1em; margin: 0 0 18px;
+      }
+      em { color: var(--acid); font-family: var(--serif); font-weight: 400; font-style: italic; }
+      h1, h2, h3 { font-weight: 300; letter-spacing: -.065em; }
+
+      .hero {
+        min-height: 100svh; position: relative; display: grid;
+        grid-template-rows: auto 1fr auto; overflow: hidden;
+        padding-top: 112px; padding-bottom: 44px;
+      }
+      .hero-meta {
+        display: flex; justify-content: space-between; color: var(--muted);
+        font: 300 10px var(--mono); text-transform: uppercase; letter-spacing: .08em;
+      }
+      .availability { display: flex; align-items: center; gap: 9px; }
+      .availability i, .status-dot {
+        width: 6px; height: 6px; border-radius: 50%; display: inline-block;
+        background: var(--teal); box-shadow: 0 0 14px rgba(148,226,213,.65);
+      }
+      .hero-copy { align-self: center; position: relative; z-index: 2; padding-top: 6vh; max-width: 1100px; }
+      .hero h1 {
+        margin: 18px 0 0; font-size: clamp(3.2rem, 8.4vw, 7.4rem);
+        line-height: .9; font-weight: 300; letter-spacing: -.075em;
+      }
+      .hero-footer {
+        display: flex; align-items: end; justify-content: space-between; gap: 32px;
+        position: relative; z-index: 2;
+      }
+      .hero-footer p {
+        margin: 0; max-width: 560px; color: var(--muted);
+        font-size: clamp(15px, 1.4vw, 18px); line-height: 1.65;
+      }
+      .text-link {
+        display: inline-flex; gap: 14px; align-items: center; padding-bottom: 8px;
+        border-bottom: 1px solid var(--ink); font: 400 12px var(--mono);
+        text-transform: uppercase; letter-spacing: .06em; white-space: nowrap;
+      }
+      .hero-orbit {
+        position: absolute; width: min(42vw, 560px); aspect-ratio: 1;
+        right: -6vw; top: 16vh; opacity: .5; pointer-events: none;
+      }
+      .hero-orbit::before {
+        content: ''; position: absolute; inset: 15%; border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, rgba(137,180,250,.22), rgba(203,166,247,.08) 45%, transparent 70%);
+        filter: blur(10px);
+      }
+      .orbit-ring {
+        position: absolute; border: 1px solid var(--line); border-radius: 50%; inset: 0;
+      }
+      .ring-two { inset: 19%; border-style: dashed; }
+      .crosshair {
+        position: absolute; inset: 0; display: grid; place-items: center;
+        color: var(--dim); font: 300 28px var(--mono);
+      }
+
+      .block {
+        padding-top: 120px; padding-bottom: 120px;
+        border-top: 1px solid var(--line);
+      }
+      .block h2 {
+        margin: 0 0 28px; font-size: clamp(2.2rem, 5vw, 4.6rem); line-height: .98;
+      }
+      .block h2 .em-blue { color: var(--blue); font-family: var(--serif); font-style: italic; }
+      .lede, .prose {
+        max-width: 740px; color: var(--muted); font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+        line-height: 1.65; font-weight: 300;
+      }
+      .prose p { margin: 0 0 1.15em; }
+      .prose p:last-child { margin-bottom: 0; }
+      .prose a {
+        color: var(--blue); border-bottom: 1px solid rgba(137, 180, 250, .45);
+      }
+      .prose strong { color: var(--ink); font-weight: 500; }
+
+      .split {
+        display: grid; grid-template-columns: 1fr 3fr; gap: 40px; align-items: start;
+      }
+      .surface-block { background: var(--surface); }
+
+      .pills { display: flex; flex-wrap: wrap; gap: 9px; padding: 0; margin: 28px 0 0; list-style: none; }
+      .pills li {
+        padding: 7px 11px; border: 1px solid var(--line); border-radius: 99px;
+        font: 300 10px var(--mono); text-transform: uppercase; letter-spacing: .06em;
+      }
+
+      .term {
+        margin-top: 48px; border: 1px solid var(--line); background: #11111b;
+        overflow: hidden;
+      }
+      .term-chrome {
+        display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        padding: 12px 16px; border-bottom: 1px solid var(--line);
+        font: 300 11px var(--mono); color: var(--dim); letter-spacing: .06em; text-transform: uppercase;
+      }
+      .term-dots { display: flex; gap: 6px; }
+      .term-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); display: block; }
+      .term-dots i:nth-child(1) { background: var(--pink); }
+      .term-dots i:nth-child(2) { background: var(--peach); }
+      .term-dots i:nth-child(3) { background: var(--teal); }
+      .listing {
+        margin: 0; padding: 8px 0 12px; list-style: none; font-family: var(--mono);
+      }
+      .listing li {
+        display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: center;
+        padding: 10px 16px; border-bottom: 1px solid rgba(205, 214, 244, 0.06);
+      }
+      .listing li:last-child { border-bottom: 0; }
+      .ln { color: var(--dim); font-size: 11px; }
+      .listing code {
+        font-family: var(--mono); font-size: clamp(11px, 1.5vw, 13px); color: var(--ink);
+        white-space: pre-wrap; overflow-wrap: anywhere; font-weight: 300;
+      }
+      .perm { color: var(--teal); }
+      .fname { color: var(--blue); }
+      .bait-name { color: var(--peach); }
+      .risk-name { color: var(--pink); }
+      .marks { display: flex; gap: 8px; flex-wrap: wrap; justify-content: end; }
+      .marks button {
+        min-height: 36px; padding: 6px 10px; border: 1px solid var(--line);
+        background: transparent; border-radius: 99px; cursor: pointer;
+        font: 400 10px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+      }
+      .marks button[aria-pressed="true"][data-mark="exploit"] {
+        background: rgba(243, 139, 168, .16); border-color: var(--pink); color: var(--pink);
+      }
+      .marks button[aria-pressed="true"][data-mark="trap"] {
+        background: rgba(250, 179, 135, .16); border-color: var(--peach); color: var(--peach);
+      }
+      .listing li.is-deceptive { background: rgba(250, 179, 135, .08); }
+      .listing li.is-risky { background: rgba(243, 139, 168, .08); }
+      .listing li.is-neutral.was-marked { background: rgba(137, 180, 250, .06); }
+      .gt-label {
+        display: none; margin-top: 6px; font: 400 10px var(--mono);
+        text-transform: uppercase; letter-spacing: .08em;
+      }
+      .revealed .gt-label { display: block; }
+      .gt-deceptive { color: var(--peach); }
+      .gt-risky { color: var(--pink); }
+      .gt-neutral { color: var(--dim); }
+
+      .term-actions {
+        display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+        padding: 16px; border-top: 1px solid var(--line);
+      }
+      .btn {
+        min-height: 44px; padding: 10px 18px; border: 1px solid var(--line);
+        background: transparent; cursor: pointer; font: 400 12px var(--mono);
+        text-transform: uppercase; letter-spacing: .08em;
+      }
+      .btn-primary { background: var(--acid); color: var(--ground); border-color: var(--acid); }
+      .btn-primary:hover { filter: brightness(1.08); }
+      .hint { color: var(--dim); font-size: 13px; line-height: 1.5; max-width: 52ch; }
+
+      .debrief {
+        padding: 20px 16px 24px; border-top: 1px solid var(--line);
+        color: var(--muted); font-size: 15px; line-height: 1.65; max-width: 72ch;
+      }
+      .debrief[hidden] { display: none; }
+      .debrief h3 {
+        margin: 0 0 12px; font-size: 1.15rem; letter-spacing: -.03em; color: var(--ink);
+      }
+      .debrief ul { margin: 0; padding-left: 1.15em; }
+      .debrief li { margin: 0 0 .45em; }
+      .scoreline { color: var(--ink); margin-bottom: 12px; }
+
+      .stat-row {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+        background: var(--line); border: 1px solid var(--line); margin-top: 48px;
+      }
+      .stat {
+        background: var(--ground); padding: 28px 22px;
+      }
+      .stat b {
+        display: block; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 300;
+        letter-spacing: -.06em; color: var(--ink); line-height: 1;
+      }
+      .stat span {
+        display: block; margin-top: 10px; color: var(--dim);
+        font: 300 11px var(--mono); text-transform: uppercase; letter-spacing: .08em;
+      }
+
+      .pair {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+        background: var(--line); border: 1px solid var(--line); margin: 40px 0 32px;
+      }
+      .big {
+        background: var(--surface); padding: clamp(28px, 5vw, 48px);
+      }
+      .big .who {
+        font: 300 11px var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--dim);
+        margin: 0 0 12px;
+      }
+      .big .num {
+        font-size: clamp(4.2rem, 12vw, 8.5rem); line-height: .85; letter-spacing: -.08em; font-weight: 300;
+      }
+      .big.llm .num { color: var(--acid); }
+      .big.human .num { color: var(--blue); }
+      .big p { margin: 16px 0 0; color: var(--muted); max-width: 36ch; line-height: 1.55; font-weight: 300; }
+
+      .range {
+        margin-top: 36px; padding: 24px 0 0; border-top: 1px solid var(--line);
+      }
+      .range-track {
+        position: relative; height: 2px; background: var(--line); margin: 28px 0 12px;
+      }
+      .range-fill {
+        position: absolute; left: 61%; right: 7.5%; top: -2px; height: 6px;
+        background: linear-gradient(90deg, var(--teal), var(--acid));
+      }
+      .range-label {
+        display: flex; justify-content: space-between; font: 300 11px var(--mono);
+        color: var(--dim); text-transform: uppercase; letter-spacing: .06em; gap: 12px;
+      }
+
+      .delta-grid {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 36px;
+      }
+      .delta {
+        border: 1px solid var(--line); padding: 28px 24px;
+      }
+      .delta .num { font-size: clamp(2.6rem, 6vw, 4.2rem); letter-spacing: -.07em; line-height: 1; }
+      .delta.neg .num { color: var(--teal); }
+      .delta.pos .num { color: var(--pink); }
+      .delta h3 { margin: 0 0 10px; font-size: 1rem; letter-spacing: 0; font-weight: 500; font-family: var(--mono); text-transform: uppercase; font-size: 11px; color: var(--dim); }
+      .delta p { margin: 12px 0 0; color: var(--muted); font-size: 15px; line-height: 1.55; font-weight: 300; }
+
+      .cite-box {
+        margin-top: 28px; padding: 28px 0 0; border-top: 1px solid var(--line);
+        font-size: 15px; line-height: 1.7; color: var(--muted); max-width: 740px;
+      }
+      .cite-box a { color: var(--blue); border-bottom: 1px solid rgba(137, 180, 250, .45); }
+
+      footer.page-foot {
+        display: grid; grid-template-columns: 1fr auto auto; gap: 24px; align-items: center;
+        padding-top: 28px; padding-bottom: 36px; border-top: 1px solid var(--line);
+        font: 400 10px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--dim);
+      }
+      footer.page-foot a { min-height: 44px; display: inline-flex; align-items: center; color: var(--ink); }
+      footer.page-foot a:hover { color: var(--acid); }
+
+      @media (max-width: 900px) {
+        .nav { height: 70px; }
+        .menu-toggle { display: block; }
+        .nav-links {
+          position: fixed; inset: 0; background: var(--ground);
+          display: flex; flex-direction: column; justify-content: center; align-items: center;
+          gap: 32px; font-size: 20px; opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 1;
+        }
+        .nav-links.open { opacity: 1; pointer-events: auto; }
+        .hero { padding-top: 94px; }
+        .hero-orbit { width: 90vw; right: -40vw; }
+        .split, .stat-row, .pair, .delta-grid, footer.page-foot { grid-template-columns: 1fr; }
+        .listing li { grid-template-columns: 36px 1fr; }
+        .marks { grid-column: 2; justify-content: start; }
+        .block { padding-top: 88px; padding-bottom: 88px; }
+        .hero-footer { flex-direction: column; align-items: start; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="nav">
+      <a class="brand" href="https://jesusmbm.github.io/jbusty.github.io/" aria-label="Jesus Bustillos-Molina, home">JBM<span>°</span></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open navigation menu">Menu</button>
+      <nav id="nav-links" class="nav-links" aria-label="Page sections">
+        <a href="#instrument">Instrument</a>
+        <a href="#listing">Listing</a>
+        <a href="#findings">Findings</a>
+        <a href="#cite">Cite</a>
+      </nav>
+    </header>
+
+    <main id="main-content" tabindex="-1">
+      <section class="hero section-shell" id="top">
+        <div class="hero-meta">
+          <span class="availability"><i></i> Visual research</span>
+          <span>AI SECURITY / CYBER DECEPTION</span>
+        </div>
+        <div class="hero-copy">
+          <p class="kicker">07 / AI SECURITY REVIEW</p>
+          <h1>They name the trap. Then they <em>open</em> it.</h1>
+        </div>
+        <div class="hero-footer">
+          <p>This is my visual walkthrough of Horizon3.ai measuring whether human cyber-deception assumptions transfer to LLM attackers. Same recon instrument. Different attacker class.</p>
+          <a class="text-link" href="https://jesusmbm.github.io/jbusty.github.io/">Back to the portfolio <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="hero-orbit" aria-hidden="true">
+          <span class="orbit-ring"></span>
+          <span class="orbit-ring ring-two"></span>
+          <span class="crosshair">+</span>
+        </div>
+      </section>
+
+      <section class="block section-shell" id="instrument">
+        <div class="split">
+          <p class="section-index">What Honeyquest is</p>
+          <div>
+            <h2>A per-line recon quiz, not a live <em>agent.</em></h2>
+            <div class="prose">
+              <p>Original Honeyquest, from Kahlhofer et al. at RAID 2024, is a questionnaire dressed as recon. You get numbered artifact lines. Each line is secretly labeled neutral, risky, or deceptive. You mark exploit if you would probe it, trap if it looks like bait, or you leave it alone.</p>
+              <p>Horizon3.ai adapted that instrument to LLMs. The model returns exploit marks, trap marks, and a short justification. That is the cognitive layer. Marks plus reasoning. It is not a full agent harness. No tools, no memory, no multi-turn loop. I am reviewing how a model judges a listing, not how a harnessed agent behaves on a live box.</p>
+            </div>
+            <ul class="pills">
+              <li>Neutral / risky / deceptive</li>
+              <li>Exploit vs trap marks</li>
+              <li>Cognitive layer only</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="block surface-block section-shell" id="listing">
+        <div class="split">
+          <p class="section-index">Interactive fake directory</p>
+          <div>
+            <h2>Mark the web root like an <em>attacker.</em></h2>
+            <p class="lede">Numbered filesystem listing. Exploit, trap, or leave it. After you submit I show the labels I planted, then a short debrief against that ground truth. Nothing leaves the browser.</p>
+          </div>
+        </div>
+
+        <div class="term" role="region" aria-label="Fake reconnaissance directory listing">
+          <div class="term-chrome">
+            <span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span>ls -la /var/www/html</span>
+            <span>recon / cognitive layer</span>
+          </div>
+          <ol class="listing" id="listing-lines">
+            <li data-kind="neutral" data-line="1">
+              <span class="ln">01</span>
+              <div>
+                <code><span class="perm">drwxr-xr-x</span>  www-data  www-data  4096  Jun  4 02:11  <span class="fname">assets/</span></code>
+                <span class="gt-label gt-neutral">Ground truth. Neutral.</span>
+              </div>
+              <div class="marks" role="group" aria-label="Mark line 1, assets directory">
+                <button type="button" data-mark="exploit" aria-pressed="false">Exploit</button>
+                <button type="button" data-mark="trap" aria-pressed="false">Trap</button>
+              </div>
+            </li>
+            <li data-kind="neutral" data-line="2">
+              <span class="ln">02</span>
+              <div>
+                <code><span class="perm">-rw-r--r--</span>  www-data  www-data   428  Jun  4 02:11  <span class="fname">favicon.ico</span></code>
+                <span class="gt-label gt-neutral">Ground truth. Neutral.</span>
+              </div>
+              <div class="marks" role="group" aria-label="Mark line 2, favicon">
+                <button type="button" data-mark="exploit" aria-pressed="false">Exploit</button>
+                <button type="button" data-mark="trap" aria-pressed="false">Trap</button>
+              </div>
+            </li>
+            <li data-kind="neutral" data-line="3">
+              <span class="ln">03</span>
+              <div>
+                <code><span class="perm">-rw-r--r--</span>  www-data  www-data  4310  Jun  4 02:10  <span class="fname">index.html</span></code>
+                <span class="gt-label gt-neutral">Ground truth. Neutral.</span>
+              </div>
+              <div class="marks" role="group" aria-label="Mark line 3, index.html">
+                <button type="button" data-mark="exploit" aria-pressed="false">Exploit</button>
+                <button type="button" data-mark="trap" aria-pressed="false">Trap</button>
+              </div>
+            </li>
+            <li data-kind="risky" data-line="4">
+              <span class="ln">04</span>
+              <div>
+                <code><span class="perm">-rw-r--r--</span>  www-data  www-data  2144  Apr 19 03:11  <span class="risk-name">config.php</span>  $db_host='10.2.8.14'; $db_pass='s3rv1ce-db-prod';</code>
+                <span class="gt-label gt-risky">Ground truth. Risky. World-readable PHP config with a live credential.</span>
+              </div>
+              <div class="marks" role="group" aria-label="Mark line 4, config.php">
+                <button type="button" data-mark="exploit" aria-pressed="false">Exploit</button>
+                <button type="button" data-mark="trap" aria-pressed="false">Trap</button>
+              </div>
+            </li>
+            <li data-kind="deceptive" data-bait data-line="5">
+              <span class="ln">05</span>
+              <div>
+                <code><span class="perm">-rw-rw-rw-</span>  www-data  www-data    87  Jun  3 18:44  <span class="bait-name">passwords.txt</span></code>
+                <span class="gt-label gt-deceptive">Ground truth. Deceptive. Honeyfile bait.</span>
+              </div>
+              <div class="marks" role="group" aria-label="Mark line 5, passwords.txt">
+                <button type="button" data-mark="exploit" aria-pressed="false">Exploit</button>
+                <button type="button" data-mark="trap" aria-pressed="false">Trap</button>
+              </div>
+            </li>
+            <li data-kind="neutral" data-line="6">
+              <span class="ln">06</span>
+              <div>
+                <code><span class="perm">-rw-r--r--</span>  www-data  www-data   126  Jan  8  2024  <span class="fname">robots.txt</span></code>
+                <span class="gt-label gt-neutral">Ground truth. Neutral.</span>
+              </div>
+              <div class="marks" role="group" aria-label="Mark line 6, robots.txt">
+                <button type="button" data-mark="exploit" aria-pressed="false">Exploit</button>
+                <button type="button" data-mark="trap" aria-pressed="false">Trap</button>
+              </div>
+            </li>
+            <li data-kind="neutral" data-line="7">
+              <span class="ln">07</span>
+              <div>
+                <code><span class="perm">drwxr-xr-x</span>  www-data  www-data  4096  Jun  4 01:58  <span class="fname">uploads/</span></code>
+                <span class="gt-label gt-neutral">Ground truth. Neutral.</span>
+              </div>
+              <div class="marks" role="group" aria-label="Mark line 7, uploads directory">
+                <button type="button" data-mark="exploit" aria-pressed="false">Exploit</button>
+                <button type="button" data-mark="trap" aria-pressed="false">Trap</button>
+              </div>
+            </li>
+          </ol>
+          <div class="term-actions">
+            <button type="button" class="btn btn-primary" id="reveal">Reveal ground truth</button>
+            <button type="button" class="btn" id="reset-marks">Clear marks</button>
+            <p class="hint">Toggle a mark on a line. Click the same button again to leave it. One mark per line.</p>
+          </div>
+          <div class="debrief" id="debrief" hidden></div>
+        </div>
+      </section>
+
+      <section class="block section-shell" id="experiment">
+        <div class="split">
+          <p class="section-index">The experiment</p>
+          <div>
+            <h2>Same 174 queries. Twenty-one models. Forty-seven <em>humans.</em></h2>
+            <div class="prose">
+              <p>Horizon3 ran 21 models across 10 providers on the original Honeyquest set. Filesystem listings, .htaccess files, HTTP responses, HTTP requests. Three independent trials per model and query. That produced 10,962 LLM answers, scored against the 47-person Kahlhofer baseline on the same 174 recon queries.</p>
+            </div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat"><b>21</b><span>models</span></div>
+          <div class="stat"><b>10</b><span>providers</span></div>
+          <div class="stat"><b>174</b><span>queries</span></div>
+          <div class="stat"><b>10,962</b><span>LLM answers</span></div>
+        </div>
+      </section>
+
+      <section class="block surface-block section-shell" id="findings">
+        <div class="split">
+          <p class="section-index">Finding 1. Fell for trap</p>
+          <div>
+            <h2>Models take the bait more than <span class="em-blue">twice</span> as often.</h2>
+            <div class="prose">
+              <p>The LLM cohort fell for traps in 78.5% of answers. Humans did it 37% of the time. All 21 models sat above the human 95% confidence interval. Floor 61% on Kimi K2-thinking. Ceiling 92.5% on Sonnet 4.6.</p>
+              <p>They also hit real risks more. Risk detected 77.6% versus 44%. Trap detection stayed close, 13.5% versus 15%. The models are greedy, not blind.</p>
+            </div>
+          </div>
+        </div>
+        <div class="pair">
+          <div class="big llm">
+            <p class="who">LLM cohort · fell for trap</p>
+            <div class="num">78.5%</div>
+            <p>Every model in the study beat the human interval. They marked bait as something to exploit.</p>
+          </div>
+          <div class="big human">
+            <p class="who">Human baseline · fell for trap</p>
+            <div class="num">37%</div>
+            <p>People still bite. They just bite less, and they sometimes walk away from the obvious honeyfile.</p>
+          </div>
+        </div>
+        <div class="range">
+          <div class="range-track" aria-hidden="true"><span class="range-fill"></span></div>
+          <div class="range-label">
+            <span>Kimi K2-thinking 61%</span>
+            <span>Per-model fell-for-trap</span>
+            <span>Sonnet 4.6 92.5%</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="block section-shell">
+        <div class="split">
+          <p class="section-index">Finding 2. No attention diversion</p>
+          <div>
+            <h2>The defender benefit that works on people does not show up <em>here.</em></h2>
+            <div class="prose">
+              <p>Honeyquest's original claim is diversion. Plant bait, and humans mark the real risk less. Humans moved ΔRR −22% (p=0.0013). Deception reduced risk-marking.</p>
+              <p>The LLM cohort moved the other way. ΔRR +9.9%, not significant. You cannot conclude diversion. Models still see the real hole, and they still mark the bait. The cost of doing both is tokens, not courage.</p>
+              <p>One paired technique did pull models off the real risk. httpheaders-devtoken, ΔRR −11.3%. The rest of the paired set did not.</p>
+            </div>
+            <div class="delta-grid">
+              <article class="delta neg">
+                <h3>Humans</h3>
+                <div class="num">−22%</div>
+                <p>ΔRR. Deception reduced risk-marking. p=0.0013. This is the attention diversion defenders were counting on.</p>
+              </article>
+              <article class="delta pos">
+                <h3>LLM cohort</h3>
+                <div class="num">+9.9%</div>
+                <p>ΔRR. Opposite direction, not significant. Attention diversion does not transfer as a cohort effect.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block surface-block section-shell">
+        <div class="split">
+          <p class="section-index">Finding 3. Recognition-action gap</p>
+          <div>
+            <h2>Seeing it in the chain of thought is not <em>avoiding</em> it.</h2>
+            <div class="prose">
+              <p>When a model said trap-shaped things in its reasoning, it still exploit-marked the bait 73.4% of the time. That is walked-into-trap. It bound that recognition to a trap mark only 20.1% of the time. Side-stepped is the rare move.</p>
+              <p>Recognition versus fell-for-trap does not track. Spearman r=+0.08, p=0.73. Naming the honeyfile in the justification is not a refusal. Assertive style does track falling for traps, r=+0.54, p=0.012. Confidence on the page, bait in the marks.</p>
+            </div>
+            <div class="delta-grid">
+              <article class="delta pos">
+                <h3>Walked into trap</h3>
+                <div class="num">73.4%</div>
+                <p>Said trap-shaped things. Still put an exploit mark on the bait.</p>
+              </article>
+              <article class="delta neg">
+                <h3>Side-stepped</h3>
+                <div class="num">20.1%</div>
+                <p>Named the trap in reasoning and actually trap-marked it.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block section-shell" id="limit">
+        <div class="split">
+          <p class="section-index">Limit</p>
+          <div>
+            <h2>Cognitive layer only. Not a full <em>harness.</em></h2>
+            <div class="prose">
+              <p>Single-shot marks. No tools, no memory, no multi-turn planning. Honeyquest does not cover post-compromise, lateral movement, persistence, or exfil. Treat 78.5 and 73.4 as judgment numbers, not as what a tool-using agent does after it has a shell.</p>
+              <p>That limit is the point of the instrument. Horizon3 measured how the model decides what looks like a target. The body of the agent is a different experiment.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block surface-block section-shell" id="means">
+        <div class="split">
+          <p class="section-index">What it means for AI-native deception</p>
+          <div>
+            <h2>If the attacker is a model, cost is tokens, not <em>fear.</em></h2>
+            <div class="prose">
+              <p>People get diverted. They get curious, then cautious. An LLM attacker does not owe you that psychology. Bait that burns budget and attention is the useful part. A honeyfile that a person sidesteps can still be a cheap tripwire a model will spend context on.</p>
+              <p>Do not bet that an obvious passwords.txt will pull the model off config.php. Human-psych assumptions (divert, scare, obvious honeyfile) do not transfer cleanly. Build deception that writes a log and wastes tokens. Stop waiting for the model to flinch.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block section-shell" id="cite">
+        <div class="split">
+          <p class="section-index">Cite</p>
+          <div>
+            <h2>Paper, authors, original <em>instrument.</em></h2>
+            <div class="cite-box">
+              <p>Kerri Prinos, Lilianne Brush, and Cameron Denton. <em style="color: var(--ink); font-style: italic;">Honeyquest for LLMs: Rethinking Cyber Deception for AI Attackers.</em> Horizon3.ai, June 2026. <a href="https://arxiv.org/abs/2606.21037">arXiv:2606.21037</a>.</p>
+              <p>Original Honeyquest. Mario Kahlhofer, Stefan Achleitner, Stefan Rass, and René Mayrhofer. RAID 2024. <a href="https://dl.acm.org/doi/10.1145/3678890.3678897">ACM DL</a>.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="page-foot section-shell">
+      <span>© 2026 Jesus Bustillos-Molina</span>
+      <a href="https://jesusmbm.github.io/jbusty.github.io/">Back to portfolio</a>
+      <a href="#top">Back to top ↑</a>
+    </footer>
+
+    <script>
+      (function () {
+        var listing = document.getElementById('listing-lines');
+        var revealBtn = document.getElementById('reveal');
+        var resetBtn = document.getElementById('reset-marks');
+        var debrief = document.getElementById('debrief');
+        var menuBtn = document.querySelector('.menu-toggle');
+        var nav = document.getElementById('nav-links');
+
+        menuBtn.addEventListener('click', function () {
+          var open = nav.classList.toggle('open');
+          menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          menuBtn.setAttribute('aria-label', (open ? 'Close' : 'Open') + ' navigation menu');
+          menuBtn.textContent = open ? 'Close' : 'Menu';
+        });
+        nav.querySelectorAll('a').forEach(function (a) {
+          a.addEventListener('click', function () {
+            nav.classList.remove('open');
+            menuBtn.setAttribute('aria-expanded', 'false');
+            menuBtn.textContent = 'Menu';
+          });
+        });
+
+        listing.addEventListener('click', function (event) {
+          var btn = event.target.closest('button[data-mark]');
+          if (!btn) return;
+          var group = btn.parentElement;
+          var next = btn.getAttribute('aria-pressed') === 'true' ? 'false' : 'true';
+          group.querySelectorAll('button[data-mark]').forEach(function (b) {
+            b.setAttribute('aria-pressed', 'false');
+          });
+          btn.setAttribute('aria-pressed', next);
+        });
+
+        function currentMark(row) {
+          var on = row.querySelector('button[data-mark][aria-pressed="true"]');
+          return on ? on.getAttribute('data-mark') : 'none';
+        }
+
+        function fileLabel(row) {
+          var el = row.querySelector('.bait-name, .risk-name, .fname');
+          return el ? el.textContent : ('line ' + row.getAttribute('data-line'));
+        }
+
+        revealBtn.addEventListener('click', function () {
+          var rows = [].slice.call(listing.querySelectorAll('li[data-kind]'));
+          listing.classList.add('revealed');
+          var items = [];
+          var baitMark = 'none';
+          var riskMark = 'none';
+          var extra = 0;
+
+          rows.forEach(function (row) {
+            var kind = row.getAttribute('data-kind');
+            var mark = currentMark(row);
+            row.classList.remove('is-deceptive', 'is-risky', 'is-neutral', 'was-marked');
+            row.classList.add('is-' + kind);
+            if (mark !== 'none') row.classList.add('was-marked');
+            if (kind === 'deceptive') baitMark = mark;
+            else if (kind === 'risky') riskMark = mark;
+            else if (mark !== 'none') extra += 1;
+            items.push(
+              '<li>Line ' + row.getAttribute('data-line') + ' (' + fileLabel(row) +
+              '). You marked ' + mark + '. Label is ' + kind + '.</li>'
+            );
+          });
+
+          var baitLine;
+          if (baitMark === 'exploit') {
+            baitLine = 'You exploit-marked passwords.txt. That is falling for the trap. The LLM cohort did this in 78.5% of answers. Humans, 37%.';
+          } else if (baitMark === 'trap') {
+            baitLine = 'You trap-marked passwords.txt. That is the rare correct refusal. Models only detected the trap about 13.5% of the time, close to the human 15%.';
+          } else {
+            baitLine = 'You left passwords.txt unmarked. You did not take the bait, and you also did not call it a trap.';
+          }
+
+          var riskLine;
+          if (riskMark === 'exploit') {
+            riskLine = 'You exploit-marked config.php, the world-readable credential line. That is the real risk. Models hit real risks in 77.6% of answers versus 44% for humans.';
+          } else if (riskMark === 'trap') {
+            riskLine = 'You trap-marked config.php. That is a real credential path, not bait. Both cohorts mistook risk for a trap at similar rates.';
+          } else {
+            riskLine = 'You left config.php unmarked. The live $db_pass sitting in a 644 PHP file is the hole a human honeyfile is supposed to protect.';
+          }
+
+          var extraLine = extra
+            ? 'You also marked ' + extra + ' neutral line' + (extra === 1 ? '' : 's') + '. Most of this listing is filler on purpose.'
+            : 'You left the neutral filler alone. Good recon hygiene.';
+
+          debrief.hidden = false;
+          debrief.innerHTML =
+            '<h3>Your marks versus ground truth</h3>' +
+            '<p class="scoreline">' + baitLine + '</p>' +
+            '<p>' + riskLine + '</p>' +
+            '<p>' + extraLine + '</p>' +
+            '<p>Diversion is the human story. Attention on bait is supposed to drop attention on the real risk. Horizon3 did not find that cohort effect for LLMs.</p>' +
+            '<ul>' + items.join('') + '</ul>';
+          revealBtn.textContent = 'Update debrief';
+          debrief.focus?.();
+        });
+
+        resetBtn.addEventListener('click', function () {
+          listing.querySelectorAll('button[data-mark]').forEach(function (b) {
+            b.setAttribute('aria-pressed', 'false');
+          });
+          listing.classList.remove('revealed');
+          listing.querySelectorAll('li').forEach(function (row) {
+            row.classList.remove('is-deceptive', 'is-risky', 'is-neutral', 'was-marked');
+          });
+          debrief.hidden = true;
+          debrief.innerHTML = '';
+          revealBtn.textContent = 'Reveal ground truth';
+        });
+      })();
+    </script>
+  </body>
+</html>

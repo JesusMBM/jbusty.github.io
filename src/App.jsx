@@ -68,6 +68,15 @@ const projects = [
     status: 'Visual investigation',
     url: 'https://jbm-satellite-cyber.netlify.app',
   },
+  {
+    number: '07',
+    title: 'Honeyquest for LLMs',
+    type: 'AI security review',
+    description: 'My visual walkthrough of Horizon3.ai\'s finding that human cyber-deception assumptions do not transfer to LLM attackers — they fall for bait more, don\'t get diverted, and still exploit traps they named.',
+    tools: ['AI Security', 'Cyber Deception', 'LLM Evaluation'],
+    status: 'Visual research',
+    url: 'https://jesusmbm.github.io/jbusty.github.io/honeyquest/',
+  },
 ]
 
 const capabilities = [
