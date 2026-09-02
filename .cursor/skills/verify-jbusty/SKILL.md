@@ -32,7 +32,7 @@ cd .cursor/skills/verify-jbusty
 node control-jbusty.mjs doctor
 ```
 
-Shared instance: never activate mailto, never follow the six project cards to other origins.
+Shared instance: never activate mailto, never follow the seven project cards (Netlify or /honeyquest/).
 
 ## Doctor
 
@@ -60,9 +60,9 @@ Stable handles from live App.jsx (not leftover components):
 - button.menu-toggle — aria-controls nav-links, aria-label Open/Close navigation menu, text Menu/Close, aria-expanded
 - nav#nav-links — aria-label Primary navigation; Work #work, About #about, Contact #contact
 - main#main-content — page landmark
-- section#top.hero — kicker "AI systems · cybersecurity"; h1 "I find the signal inside the noise."; availability "Available for AI systems and AI security work"; hero-footer "I design agent systems..."; a.circle-link href #work aria-label "Explore selected work"
-- section.statement — no id; section-index "01 / Approach"; copy "An agent is not a model" / "paying close attention". Snapshot only (do not invent #approach).
-- section#work — section-index "02 / Personal research"; heading "Questions explored through visual research."; six a.project cards, new tab
+- section#top.hero — kicker "AI systems · cybersecurity"; h1 "I find the signal inside the noise."; availability "Available for AI systems and AI security work"; hero-footer "I design agent systems and study how they fail. Security practice is for the part that still has to hold under pressure."; a.circle-link href #work aria-label "Explore selected work"
+- section#approach.statement — section-index "01 / Approach"; copy "An agent is not a model" / "Miss those details and the loop goes off the rails". Snapshot primary; optional goto #approach.
+- section#work — section-index "02 / Personal research"; heading "Visual research on agents and how they fail."; seven a.project cards, new tab (01–06 Netlify; 07 same-origin /honeyquest/)
 - section#about — section-index "03 / Profile"; "Curious by nature. Methodical by practice."; name; Textron Aviation; mailto jbustillosmolina@gmail.com "Start a conversation"; capabilities Build / Evaluate / Secure / Investigate
 - section#contact — "Open to AI systems work"; Let's talk mailto; footer copyright year; GitHub https://github.com/JesusMBM; LinkedIn https://www.linkedin.com/in/jesus-bm/; Back to top href #top
 
@@ -76,7 +76,7 @@ node control-jbusty.mjs goto --url '#work'
 node control-jbusty.mjs goto --url '#about' --path /tmp/verify-jbusty-evidence/about.png
 ```
 
-goto resolves hashes against the live base (`goto --url '#work'` or `goto work`). Quote `#work` in the shell; unquoted `#` is a comment. It dump-doms and confirms the target id exists. It refuses other origins (the six Netlify project URLs). The Approach block has no id — use snapshot, not goto.
+goto resolves hashes against the live base (`goto --url '#work'` or `goto work`). Quote `#work` in the shell; unquoted `#` is a comment. It dump-doms and confirms the target id exists. It refuses other origins (Netlify project URLs) and same-origin project paths such as /honeyquest/. Approach is section#approach — snapshot is primary proof; goto #approach is optional.
 
 The click command on live Pages always returns {ok:false, error:"click refused on live"} and exit 2. Do not activate menu, mailto, or project cards.
 
