@@ -17,7 +17,7 @@ This directory is the maintained source for verifying the user-facing behavior o
 - Prefer the live handles in each feature file (ids, aria-labels, hrefs) over coordinates or leftover component selectors.
 - Treat every command as literal. Keep quoted names and flags unchanged.
 - Run browser actions through node control-jbusty.mjs (doctor, snapshot, screenshot, goto).
-- Resolve in-page movement with `goto --url '#work'` (or `goto work`) and the same for #top, #about, #contact, #main-content. Quote hashes; unquoted # is a shell comment. Do not goto Netlify project URLs. The Approach block has no id — snapshot it.
+- Resolve in-page movement with `goto --url '#work'` (or `goto work`) and the same for #top, #about, #contact, #main-content, and #approach. Quote hashes; unquoted # is a shell comment. Do not goto Netlify project URLs or /honeyquest/. Approach proof is primarily snapshot; #approach is optional.
 - Restore nothing: the live site is static. Do not remove proof artifacts during cleanup.
 
 ## Proof and skip reporting
@@ -25,7 +25,7 @@ This directory is the maintained source for verifying the user-facing behavior o
 - Capture the user action and the resulting state, not only the final screen.
 - UI proof includes a dump-dom/snapshot extract and a screenshot with portfolio identity visible.
 - Hash navigation proof includes JSON found true for the target id plus the dump-dom file.
-- Work-card proof is the DOM containing all six titles and hrefs. Opening those hrefs is out of scope.
+- Work-card proof is the DOM containing all seven titles and hrefs. Opening those hrefs is out of scope.
 - Record the feature file used with every artifact (--path names under the evidence dir).
 - Report an unreachable path with the attempted command and the unmet precondition.
 - Do not report a skipped entry point as verified through a different path.
@@ -45,7 +45,7 @@ Keep implementation details out of the map. Name only user paths, stable handles
 ## Features
 
 - [Hero and primary navigation](./hero-nav.md) covers skip link, brand home, menu toggle, Work/About/Contact, hero copy, hero-footer, and the explore-work circle link.
-- [Approach / statement](./approach-statement.md) covers the no-id 01 / Approach block between hero and Work.
-- [Work / visual research](./work-research.md) covers 02 / Personal research, the six research cards, titles, and new-tab URLs, proven from dump-dom without following outbound links.
+- [Approach / statement](./approach-statement.md) covers section #approach (01 / Approach) between hero and Work.
+- [Work / visual research](./work-research.md) covers 02 / Personal research, the seven research cards, titles, and new-tab URLs, proven from dump-dom without following project links.
 - [About / profile](./about-profile.md) covers 03 / Profile, bio, Textron Aviation, capabilities, and Start a conversation mailto.
 - [Contact and footer](./contact-footer.md) covers Let's talk mailto, GitHub, LinkedIn, Back to top, and copyright year.
