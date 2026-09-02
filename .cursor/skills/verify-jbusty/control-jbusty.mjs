@@ -2,7 +2,7 @@
 /**
  * Drive the live jbusty portfolio on GitHub Pages.
  * One JSON object on stdout. Exit 0 on success, non-zero on failure.
- * Click is always refused on jesusmbm.github.io. Never follow outbound project origins.
+ * Click is always refused on jesusmbm.github.io. Never follow outbound project origins or same-origin project paths.
  */
 import { spawn } from "node:child_process"
 import fs from "node:fs"
@@ -64,7 +64,7 @@ DEFAULTS
 Chrome is always invoked with --headless=new --no-sandbox --disable-gpu
 --disable-dev-shm-usage --timeout=30000 --virtual-time-budget=8000.
 Stderr is written to the evidence dir. Never click live. Never follow
-outbound project (netlify) origins.
+outbound project (netlify) origins or same-origin project paths (/honeyquest/).
 
 EXAMPLES
   node control-jbusty.mjs --help
@@ -349,6 +349,11 @@ function markerReport(html) {
   return { found, missing, oldFound }
 }
 
+function normalizePathname(pathname) {
+  if (!pathname || pathname === "/") return "/"
+  return pathname.replace(/\/+$/, "") || "/"
+}
+
 function refuseOutbound(url, base) {
   let target
   let origin
@@ -364,6 +369,17 @@ function refuseOutbound(url, base) {
       url,
       origin: target.origin,
       reason: "verification stays on live Pages; project cards open other origins and must not be followed",
+    })
+  }
+  // Card 07 (Honeyquest) is same-origin under /honeyquest/. Stay on the SPA home path.
+  const homePath = normalizePathname(origin.pathname)
+  const targetPath = normalizePathname(target.pathname)
+  if (targetPath !== homePath) {
+    fail({
+      error: "refusing project-path navigation",
+      url,
+      path: target.pathname,
+      reason: "verification stays on the portfolio SPA home; do not follow same-origin project paths such as /honeyquest/",
     })
   }
 }
