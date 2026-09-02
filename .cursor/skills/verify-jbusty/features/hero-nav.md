@@ -9,7 +9,7 @@ The live header and #top hero let a visitor skip to main content, return home, o
 - `menu-toggle` is .menu-toggle (aria-controls="nav-links", aria-label Open/Close navigation menu, text Menu/Close, aria-expanded).
 - `primary-nav` is #nav-links aria-label "Primary navigation" with Work #work, About #about, Contact #contact.
 - `hero-copy` is section#top.hero: kicker "AI systems · cybersecurity", h1 "I find the signal inside the noise.", availability "Available for AI systems and AI security work".
-- `hero-footer` is the hero-footer paragraph "I design agent systems, study how they fail, and use security practice to keep the 25% that still has to hold under pressure."
+- `hero-footer` is the hero-footer paragraph "I design agent systems and study how they fail. Security practice is for the part that still has to hold under pressure."
 - `explore-work` is a.circle-link href #work aria-label "Explore selected work".
 
 ## How to get to it (user POV)
