@@ -356,8 +356,8 @@
         *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
       }
     </style>
-  </head>
-  <body>
+  <link rel="stylesheet" href="./research-theme.css"></head>
+  <body data-research="honeyquest">
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="nav">
       <a class="brand" href="https://jesusmbm.github.io/jbusty.github.io/" aria-label="Jesus Bustillos-Molina, home">JBM<span>°</span></a>
@@ -469,7 +469,7 @@
             <li data-kind="risky" data-line="4">
               <span class="ln">04</span>
               <div>
-                <code><span class="perm">-rw-r--r--</span>  www-data  www-data  2144  Apr 19 03:11  <span class="risk-name">config.php</span>  $db_host='10.2.8.14'; $db_pass='s3rv1ce-db-prod';</code>
+                <code><span class="perm">-rw-r--r--</span>  www-data  www-data  2144  Apr 19 03:11  <span class="risk-name">config.php</span>  $db_host='10.2.8.14'; $db_pass='[REDACTED EXAMPLE]';</code>
                 <span class="gt-label gt-risky">Ground truth. Risky. World-readable PHP config with a live credential.</span>
               </div>
               <div class="marks" role="group" aria-label="Mark line 4, config.php">
@@ -711,7 +711,7 @@
           } else if (riskMark === 'trap') {
             riskLine = 'You trap-marked config.php. That is a real credential path, not bait. Both cohorts mistook risk for a trap at similar rates.';
           } else {
-            riskLine = 'You left config.php unmarked. The live $db_pass sitting in a 644 PHP file is the hole a human honeyfile is supposed to protect.';
+            riskLine = 'You left config.php unmarked. The example $db_pass sitting in a 644 PHP file is the hole a human honeyfile is supposed to protect.';
           }
 
           var extraLine = extra
@@ -744,5 +744,5 @@
         });
       })();
     </script>
-  </body>
+  <script src="./research-shell.js"></script></body>
 </html>

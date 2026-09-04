@@ -1,294 +1,35 @@
-import { useEffect, useRef, useState } from 'react'
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react'
+import { useState } from 'react'
+import { projects } from './projects'
 
-const motionTokens = {
-  duration: { instant: 0.08, fast: 0.18, normal: 0.35, slow: 0.6, crawl: 1, ambient: 14, marquee: 24 },
-  easing: { smooth: [0.22, 1, 0.36, 1], sharp: [0.4, 0, 0.2, 1], linear: [0, 0, 1, 1] },
-  distance: { sm: 8, md: 16, lg: 24, xl: 48 },
-  scale: { subtle: 0.98, press: 0.95, pop: 1.04 },
+function ProjectCard({ project, featured = false }) {
+  return <a className={`research-card ${featured ? 'featured' : ''}`} href={project.url} target="_blank" rel="noreferrer">
+    <div className="card-meta"><span>{project.number} / {project.type}</span><span aria-hidden="true">↗</span></div>
+    <div><h3>{project.title}</h3><p>{project.description}</p></div>
+    <div className="card-bottom"><span>{project.status}</span><span>Read research<span className="sr-only"> (opens in a new tab)</span> <span aria-hidden="true">↗</span></span></div>
+  </a>
 }
 
-const springs = {
-  snappy: { type: 'spring', stiffness: 300, damping: 30 },
-  gentle: { type: 'spring', stiffness: 120, damping: 14 },
-}
-
-const projects = [
-  {
-    number: '01',
-    title: 'AI Agent Architecture',
-    type: 'AI systems research',
-    description: 'An agent is loops, tools, context, and permissions, not a model by itself. This visual guide walks those layers, including evaluation and safety.',
-    tools: ['Agent Loops', 'Graph Workflows', 'Evaluation', 'Safety'],
-    status: 'Visual research',
-    url: 'https://jbm-agent-architecture.netlify.app',
-  },
-  {
-    number: '02',
-    title: 'AI Agents Escaping Sandboxes',
-    type: 'AI security review',
-    description: 'Agents leave intended boundaries when tools and permissions are the real attack surface. Trusting model behavior is not a control.',
-    tools: ['AI Security', 'Sandboxing', 'Threat Modeling'],
-    status: 'Field note',
-    url: 'https://jbm-agent-sandbox-review.netlify.app',
-  },
-  {
-    number: '03',
-    title: 'Open, But How Open?',
-    type: 'AI ecosystem research',
-    description: 'Open-weight, open-source, and closed are different. The labels get mixed on purpose and by accident.',
-    tools: ['Open Weights', 'Open Source AI', 'Model Policy', 'AI Infrastructure'],
-    status: 'Visual explainer',
-    url: 'https://jbm-open-models-explained.netlify.app',
-  },
-  {
-    number: '04',
-    title: 'The Hidden Cost of AI Agents',
-    type: 'Agent economics research',
-    description: 'The harness around the model often spends more tokens than the prompt. Loops, context, tools, and caching set the real bill.',
-    tools: ['Agent Harnesses', 'Token Economics', 'Prompt Caching', 'Context Engineering'],
-    status: 'Interactive explainer',
-    url: 'https://jbm-harness-economics.netlify.app',
-  },
-  {
-    number: '05',
-    title: 'Secure SDLC: STRIDE, PASTA & SSDF',
-    type: 'Software security research',
-    description: 'STRIDE, PASTA, and NIST SSDF make software risk visible before release. Security has to enter the lifecycle, not the postmortem.',
-    tools: ['Secure SDLC', 'STRIDE', 'PASTA', 'NIST SSDF'],
-    status: 'Visual research',
-    url: 'https://jbm-secure-sdlc.netlify.app',
-  },
-  {
-    number: '06',
-    title: 'Hacking a Satellite—Safely Explained',
-    type: 'Space systems security',
-    description: 'Satellite security is ground stations, radio links, updates, and credentials, not movie hacking.',
-    tools: ['Space Systems', 'Threat Modeling', 'NIST'],
-    status: 'Visual investigation',
-    url: 'https://jbm-satellite-cyber.netlify.app',
-  },
-  {
-    number: '07',
-    title: 'Honeyquest for LLMs',
-    type: 'AI security review',
-    description: 'Human cyber-deception assumptions do not transfer to LLM attackers. They take bait more, do not get diverted, and still exploit traps they named.',
-    tools: ['AI Security', 'Cyber Deception', 'LLM Evaluation'],
-    status: 'Visual research',
-    url: 'https://jesusmbm.github.io/jbusty.github.io/honeyquest/',
-  },
-]
-
-const capabilities = [
-  ['Build', 'Agent loops, tools, GitHub Actions, Azure OpenAI, Python'],
-  ['Evaluate', 'Harness cost, context, caching, and whether the system actually works'],
-  ['Secure', 'Sandboxing, tool mediation, observability, secure SDLC for AI'],
-  ['Investigate', 'SIEM, threat hunting, vulnerability analysis, risk reporting'],
-]
-
-function Arrow({ diagonal = false }) {
-  return <span aria-hidden="true">{diagonal ? '↗' : '→'}</span>
-}
-
-function App() {
+export default function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const menuButtonRef = useRef(null)
-  const navRef = useRef(null)
-  const reduce = useReducedMotion()
-  const [pageVisible, setPageVisible] = useState(true)
-  const canAnimate = !reduce && pageVisible
-  const { scrollYProgress } = useScroll()
-  const progress = useSpring(scrollYProgress, springs.snappy)
-  const heroY = useTransform(scrollYProgress, [0, 0.18], [0, canAnimate ? -110 : 0])
-  const orbitRotate = useTransform(scrollYProgress, [0, 1], [0, canAnimate ? 270 : 0])
-
-  useEffect(() => {
-    const updateVisibility = () => {
-      const visible = document.visibilityState !== 'hidden'
-      setPageVisible(visible)
-      document.documentElement.classList.toggle('motion-paused', !visible)
-    }
-    updateVisibility()
-    document.addEventListener('visibilitychange', updateVisibility)
-    return () => {
-      document.removeEventListener('visibilitychange', updateVisibility)
-      document.documentElement.classList.remove('motion-paused')
-    }
-  }, [])
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => entries.forEach(entry => entry.isIntersecting && entry.target.classList.add('is-visible')),
-      { threshold: 0.12 },
-    )
-    document.querySelectorAll('[data-reveal]').forEach(element => observer.observe(element))
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!menuOpen) return undefined
-
-    const previousOverflow = document.body.style.overflow
-    const focusable = [...navRef.current.querySelectorAll('a[href]')]
-    document.body.style.overflow = 'hidden'
-    focusable[0]?.focus()
-
-    const handleKeyDown = event => {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        setMenuOpen(false)
-        requestAnimationFrame(() => menuButtonRef.current?.focus())
-        return
-      }
-
-      if (event.key !== 'Tab' || focusable.length === 0) return
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault()
-        last.focus()
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault()
-        first.focus()
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => {
-      document.body.style.overflow = previousOverflow
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [menuOpen])
-
-  const closeMenu = () => setMenuOpen(false)
-
-  return (
-    <>
-      <a className="skip-link" href="#main-content">Skip to main content</a>
-      <motion.div className="progress" style={{ scaleX: progress }} aria-hidden="true" />
-      <motion.header className="nav" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? motionTokens.duration.fast : motionTokens.duration.slow, ease: motionTokens.easing.smooth }}>
-        <a className="brand" href="#top" aria-label="Jesus Bustillos-Molina, home">JBM<span>°</span></a>
-        <button ref={menuButtonRef} className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="nav-links" aria-label={`${menuOpen ? 'Close' : 'Open'} navigation menu`}>
-          {menuOpen ? 'Close' : 'Menu'}
-        </button>
-        <nav ref={navRef} id="nav-links" className={menuOpen ? 'nav-links open' : 'nav-links'} aria-label="Primary navigation">
-          <a href="#work" onClick={closeMenu}>Work</a>
-          <a href="#about" onClick={closeMenu}>About</a>
-          <a href="#contact" onClick={closeMenu}>Contact</a>
-        </nav>
-      </motion.header>
-
-      <main id="main-content" tabIndex="-1">
-        <section id="top" className="hero section-shell">
-          <motion.div
-            className="ambient-scan"
-            animate={canAnimate ? { x: ['-15vw', '115vw'] } : { x: 0 }}
-            transition={{ duration: motionTokens.duration.ambient, ease: motionTokens.easing.linear, repeat: Infinity }}
-            aria-hidden="true"
-          />
-          <div className="hero-meta reveal" data-reveal>
-            <span className="availability"><i /> Available for AI systems and AI security work</span>
-            <span>AI SYSTEMS / CYBERSECURITY</span>
-          </div>
-          <motion.div className="hero-copy" style={canAnimate ? { y: heroY } : undefined} initial={false}>
-            <p className="kicker">AI systems · cybersecurity</p>
-            <h1>I find the signal<br />inside the <em>noise.</em></h1>
-          </motion.div>
-          <div className="hero-footer reveal" data-reveal>
-            <p>I design agent systems and study how they fail. Security practice is for the part that still has to hold under pressure.</p>
-            <a className="circle-link" href="#work" aria-label="Explore selected work"><Arrow /></a>
-          </div>
-          <motion.div className="hero-orbit" style={canAnimate ? { rotate: orbitRotate } : undefined} aria-hidden="true">
-            <span className="orbit-ring ring-one" />
-            <span className="orbit-ring ring-two" />
-            <span className="orbit-dot" />
-            <span className="crosshair">+</span>
-          </motion.div>
-        </section>
-
-        <section id="approach" className="statement section-shell">
-          <p className="section-index reveal" data-reveal>01 / Approach</p>
-          <div className="statement-copy reveal" data-reveal>
-            <p>An agent is not a model. It is a loop of tools, context, and permissions. Miss those details and the loop goes off the rails.</p>
-          </div>
-        </section>
-
-        <section id="work" className="work section-shell">
-          <div className="section-heading reveal" data-reveal>
-            <p className="section-index">02 / Personal research</p>
-            <h2>Visual research on agents<br />and how they <em>fail.</em></h2>
-          </div>
-          <div className="project-list">
-            {projects.map(project => (
-              <motion.a className="project reveal" data-reveal key={project.number} href={project.url} target="_blank" rel="noreferrer" whileHover={canAnimate ? { x: 12, scale: 1.003 } : undefined} transition={springs.snappy}>
-                <div className="project-number">{project.number}</div>
-                <div className="project-main">
-                  <p className="project-type">{project.type}</p>
-                  <h3>{project.title}<span className="sr-only"> (opens in a new tab)</span></h3>
-                  <p className="project-description">{project.description}</p>
-                  <ul>{project.tools.map(tool => <li key={tool}>{tool}</li>)}</ul>
-                </div>
-                <div className="project-side">
-                  <span className="project-status"><i /> {project.status}</span>
-                  <span className="project-arrow" aria-hidden="true"><Arrow diagonal /></span>
-                </div>
-              </motion.a>
-            ))}
-          </div>
-        </section>
-
-        <div className="signal-strip" aria-hidden="true">
-          <motion.div
-            animate={canAnimate ? { x: ['0%', '-50%'] } : { x: 0 }}
-            transition={{ duration: motionTokens.duration.marquee, ease: motionTokens.easing.linear, repeat: Infinity }}
-          >
-            <span>Build · Evaluate · Secure · Investigate ·</span>
-            <span>Build · Evaluate · Secure · Investigate ·</span>
-          </motion.div>
-        </div>
-
-        <section id="about" className="about section-shell">
-          <div className="about-heading reveal" data-reveal>
-            <p className="section-index">03 / Profile</p>
-            <h2>Curious by nature.<br />Methodical by <em>practice.</em></h2>
-          </div>
-          <div className="about-grid">
-            <div className="profile-mark reveal" data-reveal aria-hidden="true">
-              <span>J</span><span>B</span><span>M</span>
-            </div>
-            <div className="about-copy reveal" data-reveal>
-              <p>I’m Jesus Bustillos-Molina. I build and study AI agent systems. Agents and AI security are the headline. Security ops is supporting practice.</p>
-              <p>Cyber Security Analyst at Textron Aviation in Wichita. KSU MIS. ISC² CC. WGU MS in Cybersecurity &amp; Information Assurance in progress.</p>
-              <a className="text-link" href="mailto:jbustillosmolina@gmail.com">Start a conversation <Arrow /></a>
-            </div>
-          </div>
-          <div className="capabilities">
-            {capabilities.map(([title, body], index) => (
-            <motion.div className="capability reveal" data-reveal key={title} whileHover={canAnimate ? { x: 10 } : undefined} transition={springs.snappy}>
-                <span>0{index + 1}</span><h3>{title}</h3><p>{body}</p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        <section id="contact" className="contact section-shell">
-          <div className="contact-label reveal" data-reveal><i /> Open to AI systems work</div>
-          <div className="contact-copy reveal" data-reveal>
-            <p>Have an agent system, a messy harness, or a security problem worth taking apart?</p>
-          <motion.a href="mailto:jbustillosmolina@gmail.com" whileHover={canAnimate ? { x: 8 } : undefined} whileTap={canAnimate ? { scale: motionTokens.scale.press } : undefined} transition={springs.snappy}>Let’s talk.<Arrow diagonal /></motion.a>
-          </div>
-          <footer>
-            <span>© {new Date().getFullYear()} Jesus Bustillos-Molina</span>
-          <div><a href="https://github.com/JesusMBM" target="_blank" rel="noreferrer">GitHub<span className="sr-only"> (opens in a new tab)</span></a><a href="https://www.linkedin.com/in/jesus-bm/" target="_blank" rel="noreferrer">LinkedIn<span className="sr-only"> (opens in a new tab)</span></a></div>
-            <a href="#top">Back to top ↑</a>
-          </footer>
-        </section>
-      </main>
-    </>
-  )
+  const close = () => setMenuOpen(false)
+  return <>
+    <a className="skip-link" href="#main">Skip to content</a>
+    <header className="site-nav">
+      <a className="wordmark" href="#top" aria-label="Jesus Bustillos-Molina home">JBM<span> / </span><span className="wordmark-caption">Independent research</span></a>
+      <button className="menu-button" aria-expanded={menuOpen} aria-controls="navigation" onClick={() => setMenuOpen(!menuOpen)}> {menuOpen ? 'Close' : 'Menu'}</button>
+      <nav id="navigation" className={menuOpen ? 'navigation open' : 'navigation'} aria-label="Primary" onKeyDown={e => { if (e.key === 'Escape') { close(); document.querySelector('.menu-button')?.focus() } }}>
+        <a href="#work" onClick={close}>Research</a><a href="#about" onClick={close}>About</a><a href="#contact" onClick={close}>Contact <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+    <main id="main">
+      <section className="hero shell" id="top">
+        <div className="hero-content"><p className="eyebrow">Jesus Bustillos-Molina</p><h1>AI systems,<br/><span>examined closely.</span></h1><p className="hero-description">I build and study AI agents—their architecture, economics, and security.</p><div className="hero-actions"><a className="button primary" href="#work">Explore research <span aria-hidden="true">↓</span></a><a className="button" href="#contact">Get in touch</a></div></div>
+        <figure className="system-map"><figcaption><span>01 / System anatomy</span><span>Conceptual model</span></figcaption><div className="system-boundary"><p>PERMISSIONS &amp; CONTROLS</p><div className="system-context">Context <small>Instructions · memory</small></div><span className="flow-line" aria-hidden="true">↓</span><div className="system-loop">Agent loop <small>Plan · act · observe</small></div><span className="flow-line" aria-hidden="true">↓</span><div className="system-tools">Tools <small>Actions · external systems</small></div></div><div className="system-evaluation">Evaluation <span>Check behavior and outcomes</span></div><p className="figure-note">The system around the model matters.</p></figure>
+        <div className="hero-baseline"><span>AI systems / AI security / Cybersecurity</span><span>Wichita, Kansas</span></div>
+      </section>
+      <section id="work" className="research shell"><div className="section-head"><div><p className="eyebrow">01 / Selected research</p><h2>Take the system apart.</h2></div><p>Seven visual guides to how AI systems work, what they cost, and where they break.</p></div><div className="research-grid">{projects.map((project,i)=><ProjectCard key={project.number} project={project} featured={i===0}/>)}</div></section>
+      <section id="about" className="about shell"><div><p className="eyebrow">02 / About</p><h2>Curiosity, with<br/>a security mindset.</h2></div><div className="about-body"><p className="intro">I’m Jesus. I build and study AI agent systems, with a particular interest in the tools, context, and permissions that shape their behavior.</p><p>I’m a Cyber Security Analyst at Textron Aviation in Wichita. My security practice informs the questions I bring to AI systems: how do we evaluate them, where can they fail, and which controls hold up?</p><dl className="credentials"><div><dt>Education</dt><dd>Management Information Systems, Kansas State University</dd></div><div><dt>Continuing study</dt><dd>MS Cybersecurity &amp; Information Assurance, WGU · In progress</dd></div><div><dt>Certification</dt><dd>ISC² Certified in Cybersecurity</dd></div></dl></div><div className="capabilities">{[['Build','Agent loops, tools, GitHub Actions, Azure OpenAI, Python'],['Evaluate','Harness cost, context, caching, and system behavior'],['Secure','Sandboxing, tool mediation, observability, secure SDLC'],['Investigate','SIEM, threat hunting, vulnerability analysis, risk reporting']].map(([title,body],i)=><div key={title}><span className="eyebrow">0{i+1}</span><h3>{title}</h3><p>{body}</p></div>)}</div></section>
+      <section id="contact" className="contact shell"><p className="eyebrow">03 / Contact</p><div className="contact-top"><h2>Something worth<br/>figuring out?</h2><a className="button primary" href="mailto:jbustillosmolina@gmail.com">Let’s talk <span aria-hidden="true">↗</span></a></div><p>AI systems, agent behavior, and security problems.</p><footer><span>© {new Date().getFullYear()} Jesus Bustillos-Molina</span><div><a href="https://github.com/JesusMBM" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/jesus-bm/" target="_blank" rel="noreferrer">LinkedIn ↗</a><a href="#top">Back to top ↑</a></div></footer></section>
+    </main>
+  </>
 }
-
-export default App
