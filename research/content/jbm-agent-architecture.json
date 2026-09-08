@@ -1,0 +1,468 @@
+{
+  "slug": "jbm-agent-architecture",
+  "title": "How an AI agent gets a job done",
+  "category": "AI systems",
+  "summary": "Follow how an AI system chooses a step, uses a tool, and checks the result. Learn what information it needs and where people should set limits.",
+  "reviewed": "2026-09-04",
+  "reviewedLabel": "4 September 2026",
+  "takeaways": [
+    "An agent is a whole software system, not just a model.",
+    "Make branches, permissions, and stopping rules explicit.",
+    "Add complexity only when it improves measured results."
+  ],
+  "sections": [
+    {
+      "id": "basics",
+      "title": "What makes software an agent?",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "A model generates a response from the information it receives. A workflow arranges steps in a process. An agent lets a model choose some next steps while surrounding software carries them out. A chat window can contain any of these; its appearance does not reveal the architecture.",
+          "sources": [
+            "A1",
+            "A2"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "An agent can propose a tool call, inspect the result, and continue toward a goal. Words such as “choose” and “remember” describe software behavior here; they do not establish feelings or consciousness.",
+          "sources": []
+        }
+      ],
+      "aliases": [
+        "start"
+      ]
+    },
+    {
+      "id": "mission",
+      "title": "Follow one familiar job",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Imagine planning a day at Kennedy Space Center with a $500 budget and an interest in space history. This is a teaching example, not a priced travel offer. The assistant needs the visit date, starting point, party size, and what the budget covers.",
+          "sources": []
+        },
+        {
+          "type": "flow",
+          "title": "From request to usable itinerary",
+          "steps": [
+            "Agree on the date, travelers, priorities, and spending limit.",
+            "Gather official visitor information and relevant travel evidence.",
+            "Build a schedule with travel time and estimated costs.",
+            "Check source dates, arithmetic, and missing assumptions.",
+            "Deliver the plan; show any proposed booking before a purchase decision."
+          ],
+          "note": "The budget is a constraint to test. It is not permission to spend money.",
+          "sources": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "anatomy",
+      "title": "Six parts that work together",
+      "blocks": [
+        {
+          "type": "table",
+          "caption": "Building blocks and their jobs",
+          "headers": [
+            "Part",
+            "What it does in the example"
+          ],
+          "rows": [
+            [
+              "Model",
+              "Interprets the goal and proposes what to do next. Suggests a schedule after reading the available activities."
+            ],
+            [
+              "Tools",
+              "Functions that can retrieve information, calculate, or make an allowed change. Look up official hours or add the budget with a calculator."
+            ],
+            [
+              "Instructions",
+              "Explain the task, constraints, boundaries, and what a finished result should include. Use the correct visit date and do not purchase tickets without a decision from the user."
+            ],
+            [
+              "State",
+              "Records progress and facts for this run. Hours verified; travel time still missing; purchase not approved."
+            ],
+            [
+              "Memory",
+              "Stores information for later use when the application is designed to retain it. A travel preference the user wants remembered for future plans."
+            ],
+            [
+              "Evaluation",
+              "Checks whether the system meets its requirements on representative tasks. Can it notice a missing ticket fee or conflicting dates?"
+            ]
+          ],
+          "sources": [
+            "A1",
+            "A5"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "These parts need not be separate services. A simple task may need no long-term memory. The model proposes actions; the application decides which operations may execute.",
+          "sources": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "loop",
+      "title": "Choose, act, inspect—and know when to stop",
+      "blocks": [
+        {
+          "type": "flow",
+          "title": "A bounded control loop",
+          "steps": [
+            "Read the current state: opening hours are missing.",
+            "Propose a lookup of the official visitor source.",
+            "Check that the requested operation is permitted, then run it.",
+            "Inspect the result: does it cover the intended visit date?",
+            "Continue with new evidence, finish, pause for missing information, or stop at a limit."
+          ],
+          "note": "A failed lookup needs a revised approach or an honest gap. Repeating it indefinitely is not progress.",
+          "sources": [
+            "A1",
+            "A2"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "The harness is the software managing this loop: it supplies context, tracks progress, controls tools, records outcomes, and handles recovery. Permission belongs in enforced checks, not merely in the model’s statement that an action is allowed.",
+          "sources": [
+            "S9",
+            "S10"
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "context",
+      "title": "Keep the working record useful",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Context is the material available for the model’s current work: instructions, the request, source excerpts, tool descriptions, and relevant history. Keep the visit date, budget assumptions, confirmed facts, and unresolved questions. Retrieve detailed pages when needed and remove duplicate material. A summary can lose a crucial condition, so preserve its source. There is no universal percentage split for context.",
+          "sources": [
+            "A7"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "State records this job’s progress. Saved checkpoints preserve state between steps; longer-term storage can retain information across conversations. An in-memory checkpoint will not survive a process restart. Retention and access rules matter whenever the application stores user information.",
+          "sources": [
+            "A5"
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "patterns",
+      "title": "Five useful ways to arrange the work",
+      "blocks": [
+        {
+          "type": "table",
+          "caption": "Patterns can be combined; each needs a failure route",
+          "headers": [
+            "Pattern",
+            "Travel example",
+            "Failure or exit to define"
+          ],
+          "rows": [
+            [
+              "Prompt chaining",
+              "Draft, check, then revise the itinerary.",
+              "Repair a failed check or stop; early mistakes can spread."
+            ],
+            [
+              "Routing",
+              "Send weather and ticket questions to different sources.",
+              "Include an uncertain route when the category is unclear."
+            ],
+            [
+              "Parallel work",
+              "Check hours, weather, and travel together after agreeing the date.",
+              "Combine only compatible evidence; handle missing results."
+            ],
+            [
+              "Coordinator and workers",
+              "Create an extra viewing-restrictions task if a possible launch matters.",
+              "Limit new tasks, handoffs, and duplicate work."
+            ],
+            [
+              "Create and review",
+              "Review a draft against dates, travel time, and budget.",
+              "Pass, revise with specific feedback, or stop at the retry limit."
+            ]
+          ],
+          "sources": [
+            "A2"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Parallel work fits independent questions. If one answer determines the next question, keep those steps sequential. A second model can repeat the first model’s mistake, so objective checks still need sources or calculations.",
+          "sources": []
+        }
+      ],
+      "aliases": [
+        "chain",
+        "evaluate",
+        "orchestrate",
+        "parallel",
+        "route"
+      ]
+    },
+    {
+      "id": "graph-engineering",
+      "title": "Make the branches explicit",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "A graph is a map of work: nodes are steps, edges are permitted routes, and state records the current situation. A step may use code, a tool, or a model. LangGraph is one framework for implementing these stateful processes; using it does not guarantee a correct answer.",
+          "sources": [
+            "A3",
+            "A4"
+          ]
+        },
+        {
+          "type": "table",
+          "caption": "Example transitions after checking a draft",
+          "headers": [
+            "Check result",
+            "Next route"
+          ],
+          "rows": [
+            [
+              "Missing evidence",
+              "Return to source gathering."
+            ],
+            [
+              "Repairable schedule error",
+              "Revise the draft, then check again."
+            ],
+            [
+              "All requirements pass",
+              "Deliver the itinerary."
+            ],
+            [
+              "Missing user decision",
+              "Pause and ask about the specific choice."
+            ],
+            [
+              "Blocked or attempt limit reached",
+              "Stop and explain the remaining gap."
+            ]
+          ],
+          "sources": [
+            "A3"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Saved progress supports interruption and recovery, but a checkpoint does not undo an external action. Restarted code may run again. A booking operation needs duplicate prevention so that recovery cannot accidentally create two reservations.",
+          "sources": [
+            "A5"
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "build-order",
+      "title": "Choose the smallest design that earns its cost",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Use ordinary software for exact rules and structured inputs; use one model call when language interpretation or drafting is the main challenge. Add a fixed workflow for known stages, an agent loop for discovery-dependent actions, and persistent state when interruption or branching requires it. These are options, not a ladder every project must climb.",
+          "sources": [
+            "A1",
+            "A2"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Start with one agent when it works reliably. Several agents can help with independent work or distinct tool access, but require a common brief, clear responsibility, and a way to reconcile results. Measure full-task success, waiting time, cost, and handoff errors. Another agent’s output remains evidence to inspect, not permission to act.",
+          "sources": [
+            "A1",
+            "S8"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Test missing information, unavailable tools, ambiguous requests, and attempted misuse. Use code for arithmetic and hard limits, dated sources for changing facts, and clear stop conditions. Before deployment, assign an owner, restrict account access, protect stored records, and prepare to revoke access. Recheck representative tasks after models, tools, or rules change.",
+          "sources": [
+            "S9",
+            "S13"
+          ]
+        }
+      ],
+      "aliases": []
+    }
+  ],
+  "glossary": [
+    [
+      "Language model / LLM",
+      "Software trained on data to generate language and other supported outputs, including proposed tool calls."
+    ],
+    [
+      "Agent",
+      "Software that uses a model to select actions toward a goal and inspect the results."
+    ],
+    [
+      "Workflow",
+      "An arranged process of steps, branches, and checks."
+    ],
+    [
+      "API",
+      "A defined way for programs to request information or an action from another service."
+    ],
+    [
+      "Tool",
+      "A function an agent can call, such as search, calculate, or create a record."
+    ],
+    [
+      "Prompt",
+      "Instructions and information sent to a model."
+    ],
+    [
+      "Context",
+      "The information supplied for the model's current work."
+    ],
+    [
+      "Context window",
+      "The model's limit on active information and generated content; exact limits depend on the model."
+    ],
+    [
+      "Token",
+      "A small unit used to represent text or other supported input and output."
+    ],
+    [
+      "Retrieval",
+      "Finding stored information and bringing relevant parts into the current context."
+    ],
+    [
+      "State",
+      "The current working facts and progress of a run."
+    ],
+    [
+      "Memory",
+      "Information the application saves for use later."
+    ],
+    [
+      "Harness",
+      "The surrounding software that runs, controls, and records an agent's work."
+    ],
+    [
+      "Node / edge",
+      "A step in a workflow map / a route to the next step."
+    ],
+    [
+      "Checkpoint",
+      "A saved snapshot that supports continuation or recovery."
+    ],
+    [
+      "Evaluation",
+      "A repeatable check of how well the system meets its requirements."
+    ],
+    [
+      "Authorization",
+      "A check that a particular user or agent may perform a particular action."
+    ],
+    [
+      "Prompt injection",
+      "Instructions hidden in input or retrieved material that try to redirect the agent."
+    ],
+    [
+      "Idempotent action",
+      "An action designed so repeating the same request does not unintentionally repeat its effect."
+    ]
+  ],
+  "sources": [
+    {
+      "id": "A1",
+      "title": "A practical guide to building agents",
+      "short": "OpenAI",
+      "url": "https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/",
+      "note": "Model, tools and instructions; single-agent loops; gradual complexity; evaluation and control. Product examples within the older guide are not a current model recommendation.",
+      "published": ""
+    },
+    {
+      "id": "A2",
+      "title": "Building effective agents",
+      "short": "Anthropic",
+      "url": "https://www.anthropic.com/engineering/building-effective-agents",
+      "note": "Workflow versus agent distinction; five common workflow patterns; simplest useful design. These patterns are examples rather than a mandatory taxonomy.",
+      "published": ""
+    },
+    {
+      "id": "A5",
+      "title": "Persistence",
+      "short": "LangChain",
+      "url": "https://docs.langchain.com/oss/python/langgraph/persistence",
+      "note": "Checkpoints preserve thread state; stores support information across threads. In-memory checkpoints do not survive process restarts.",
+      "published": ""
+    },
+    {
+      "id": "S9",
+      "title": "LLM06:2025 Excessive Agency",
+      "short": "OWASP Gen AI Security Project",
+      "url": "https://genai.owasp.org/llmrisk/llm062025-excessive-agency/",
+      "note": "Minimize functionality, permissions and autonomy; downstream authorization; approval for high-impact actions; monitoring and rate limits.",
+      "published": ""
+    },
+    {
+      "id": "S10",
+      "title": "API1:2023 Broken Object Level Authorization",
+      "short": "OWASP API Security Project",
+      "url": "https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/",
+      "note": "Every record-level operation must check whether the requesting user may act on that record. Technical context, not proof of the gym's precise implementation.",
+      "published": ""
+    },
+    {
+      "id": "A7",
+      "title": "Effective context engineering for AI agents",
+      "short": "Anthropic",
+      "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "note": "Select relevant context; retrieve details when needed; compress history carefully; tool definitions form part of context.",
+      "published": "2025-09-29"
+    },
+    {
+      "id": "A3",
+      "title": "Graph API overview",
+      "short": "LangChain",
+      "url": "https://docs.langchain.com/oss/python/langgraph/graph-api",
+      "note": "State, nodes, edges, branching and replay; a resumed node can repeat work and side effects. Private state labels are not equivalent to security controls.",
+      "published": ""
+    },
+    {
+      "id": "A4",
+      "title": "LangGraph overview",
+      "short": "LangChain",
+      "url": "https://docs.langchain.com/oss/python/langgraph/overview",
+      "note": "LangGraph as infrastructure for stateful, long-running workflows and agents, not an automatic guarantee of quality.",
+      "published": ""
+    },
+    {
+      "id": "S8",
+      "title": "How we contain Claude across products",
+      "short": "Anthropic",
+      "url": "https://www.anthropic.com/engineering/how-we-contain-claude",
+      "note": "Environment/model/content defenses; approved-domain data exfiltration; connector and sub-agent outputs remain a source of untrusted content. Avoid copying product-specific performance figures.",
+      "published": ""
+    },
+    {
+      "id": "S13",
+      "title": "Careful adoption of agentic AI services",
+      "short": "ASD ACSC, CISA, NSA, Canadian Centre for Cyber Security, NCSC-NZ and NCSC-UK",
+      "url": "https://media.defense.gov/2026/Apr/30/2003922823/-1/-1/0/CAREFUL%20ADOPTION%20OF%20AGENTIC%20AI%20SERVICES_FINAL.PDF",
+      "note": "Lifecycle security, restricted privilege, testing, visibility and response. Guidance for organizations; not proof that any particular agent is safe.",
+      "published": "2026-04-30"
+    }
+  ],
+  "reviewNote": "Sources reviewed 4 September 2026. This guide explains the evidence available at that review date; it is not a live status report. Travel details are hypothetical; no ticket prices or bookings were checked. Architecture examples illustrate design choices, not measured product performance."
+}

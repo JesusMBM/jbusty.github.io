@@ -1,0 +1,90 @@
+{
+  "slug": "honeyquest",
+  "title": "How AI models respond to security decoys",
+  "category": "AI security, explained",
+  "summary": "Honeyquest tested which clues 21 AI models would investigate. They often selected planted decoys, while also selecting genuine weaknesses. Here is what those questionnaire choices mean for defenders.",
+  "reviewed": "2026-09-04",
+  "reviewedLabel": "September 4, 2026",
+  "takeaways": [
+    "This was a questionnaire: the models selected described targets without carrying out cyberattacks.",
+    "Selecting bait did not necessarily divert attention from a genuine weakness.",
+    "The August revision qualifies what the models' trap-related explanations can tell us."
+  ],
+  "sections": [
+    {
+      "id": "what",
+      "title": "A test of what looks worth investigating",
+      "blocks": [
+        {"type":"p","text":"Cyber deception means planting convincing decoys, such as fake files or login details, to attract or detect an intruder. Honeyquest tests which clues look interesting without building a complete computer system. Participants see numbered lines from a file listing or web traffic record and mark what they would investigate, avoid as a trap, or leave alone.","sources":["original"]},
+        {"type":"p","text":"Researchers hold an answer key identifying ordinary items, genuine weaknesses and planted decoys. Participants do not see those labels before answering. One question can contain several targets, so someone can select both a decoy and a weakness.","sources":["llm"]},
+        {"type":"p","text":"Horizon3.ai tested 21 models from 10 providers on 174 questions, repeated three times: 10,962 model responses. Each answer was separate, with no memory of earlier questions or live attack loop. Models returned structured choices and short explanations. The comparison used 3,669 earlier responses from 47 people with security-work or security-competition experience; they did not all answer every question.","sources":["llm","original"]},
+        {"type":"callout","title":"Choices on paper","text":"The measured action was selecting a line to investigate. These figures do not report files opened, passwords stolen, systems compromised or successful attacks."}
+      ]
+    },
+    {
+      "id": "listing",
+      "title": "Try a fictional folder review",
+      "blocks": [
+        {"type":"p","text":"Imagine an authorized review of a fictional website folder. This teaching exercise has an invented answer key; a filename alone cannot establish whether a real file is dangerous or a trap. No real system is connected, and your choices stay in this browser."},
+        {"type":"interactive","kind":"decoys","title":"Which items attract your attention?","description":"Choose items, reveal the explanations, then change your choices or reset. This illustrates the idea; your results are not comparable with the study percentages.","data":{"question":"For each line, mark whether it looks like a decoy and whether you would investigate it. You may select both boxes or leave both empty. These separate judgments simplify the original questionnaire.","items":[
+          {"label":"assets/ — images and page assets","explanation":"Ordinary item in this example. The author planted no weakness or decoy here."},
+          {"label":"favicon.ico — browser-tab icon","explanation":"Ordinary item in this example. A real investigation would need more context than the filename."},
+          {"label":"index.html — main webpage","explanation":"Ordinary item in this example. No planted weakness or decoy."},
+          {"label":"config.php — website settings","explanation":"Intended weakness: assume this settings file exposes a fictional password to someone who should not have access. No credential is displayed. The assumption, rather than the filename, makes this the weakness."},
+          {"label":"passwords.txt — suggests saved passwords","explanation":"Planted decoy in this example's answer key. The name is a clue, not proof that a real file is bait. Choosing it need not stop you also choosing config.php."},
+          {"label":"robots.txt — instructions for search engines","explanation":"Ordinary item in this example. No planted weakness or decoy."},
+          {"label":"uploads/ — uploaded files","explanation":"Ordinary item in this example. Its safety in a real system would depend on details this exercise does not provide."}
+        ]}}
+      ]
+    },
+    {
+      "id": "findings",
+      "title": "Models selected more bait and more weaknesses",
+      "blocks": [
+        {"type":"table","caption":"Reported questionnaire choices; denominators differ by question type","headers":["Measured choice","Model responses","Human responses","Denominator"],"rows":[["Selected at least one intended decoy to investigate","78.5%","37%","Responses to questions containing decoys"],["Selected an intended genuine weakness to investigate","77.6%","44%","Responses to questions containing genuine weaknesses"],["Marked an intended decoy as a trap to avoid","13.5%","15%","Responses to questions containing decoys"]],"sources":["llm"]},
+        {"type":"p","text":"The decoy-selection rate was about 2.12 times the human rate, a difference of 41.5 percentage points. This is an aggregate over responses, not the percentage of models fooled. Model rates ranged from 61% to 92.5% in this setup. Models selected more items overall: the median number of investigate marks was three per question, compared with one for humans.","sources":["llm"]}
+      ]
+    },
+    {
+      "id": "diversion",
+      "title": "Attracting attention is different from diverting it",
+      "blocks": [
+        {"type":"p","text":"To test diversion, researchers compared paired questions: the same genuine weakness shown alone and alongside a decoy. In the human study, adding a decoy reduced selection of the weakness by 22% relative to the version without it. For models, the reported relative change was +9.9%.","sources":["llm","original"]},
+        {"type":"callout","title":"Relative change is not percentage points","text":"For illustration, a 22% relative reduction from 50% would produce 39%: an 11-percentage-point drop. Those example rates are invented, not the study's starting and ending rates."},
+        {"type":"p","text":"The model test specifically looked for a reduction; it did not establish an overall diversion benefit. It also does not establish that the apparent increase was a reliable harmful effect. One of five paired techniques did show a significant reduction for models: a fake developer access token in a web response header. The other four lacked statistically significant evidence of diversion in this test.","sources":["llm"]}
+      ]
+    },
+    {
+      "id": "revision",
+      "title": "What the August revision clarifies",
+      "blocks": [
+        {"type":"p","text":"Researchers also searched explanations for trap-related vocabulary and suspicion. Among responses to deceptive questions that triggered those rules, 73.4% still selected an intended decoy to investigate. In that same group, 20.1% marked the decoy as a trap to avoid and 6.5% left it unmarked.","sources":["llm"]},
+        {"type":"p","text":"Version 2, revised August 17, separates the 73.4% result. The authors classified 48.5% of the suspicion-language group as correctly identifying a trap yet selecting it, and 24.8% as misidentifying it and selecting it. Published rounding makes these components sum to 73.3% rather than 73.4%.","sources":["llm"]},
+        {"type":"p","text":"The classification uses text rules, including whether a negation appears within six words before matched trap vocabulary. It is not a direct measurement of understanding. The useful observation is narrower: a model's written warning can differ from its selected option.","sources":["llm"]}
+      ]
+    },
+    {
+      "id": "means",
+      "title": "Measure what a defense changes",
+      "blocks": [
+        {"type":"p","text":"Honeyquest describes these models, questions and prompts. Repeated responses are not thousands of independent models, and a questionnaire cannot establish how a persistent agent with tools will behave during a real intrusion.","sources":["llm"]},
+        {"type":"p","text":"For a practical test, ask whether a decoy creates a useful alert, delays progress, reduces access to genuine assets, or consumes time and computing budget. Those are proposed measures for live testing, not demonstrated Honeyquest outcomes. An appealing decoy becomes a useful defense only when the outcome helps the defender."}
+      ]
+    }
+  ],
+  "glossary": [
+    ["LLM","Large language model: software trained on text that can generate answers and choose between described options."],
+    ["AI agent","A system combining a model with tools so it can take actions through a task."],
+    ["Decoy or honeyfile","A planted item designed to attract attention; a honeyfile is a file used as a decoy."],
+    ["Credential","Information used to sign in, such as a password or access key."],
+    ["Investigate mark","The questionnaire choice meaning ‘I would try this’; it does not perform an attack."],
+    ["Trap mark","The original questionnaire choice identifying bait to avoid."],
+    ["Diversion","Drawing attention away from a genuine weakness."],
+    ["Statistically significant","Meeting a statistical test's threshold; this does not establish practical importance or guarantee the result generalizes."]
+  ],
+  "sources": [
+    {"id":"llm","title":"Honeyquest for LLMs: Rethinking Cyber Deception for AI Attackers","short":"LLM study, version 2","url":"https://arxiv.org/html/2606.21037v2","note":"Kerri Prinos, Lilianne Brush and Cameron Denton, Horizon3.ai. Controlling source for model methods, numerical results, limitations and the revised explanation classification; especially sections 3–5.","published":"First posted June 19, 2026; revised August 17, 2026"},
+    {"id":"original","title":"Honeyquest: Rapidly Measuring the Enticingness of Cyber Deception Techniques with Code-based Questionnaires","short":"Original human study","url":"https://arxiv.org/html/2408.10796","note":"Mario Kahlhofer, Stefan Achleitner, Stefan Rass and René Mayrhofer. RAID 2024 study introducing the questionnaire and reporting the human participant results; Table 8 gives the paired diversion comparison.","published":"arXiv August 20, 2024; ACM publication September 30, 2024"}
+  ],
+  "reviewNote": "Sources were checked September 4, 2026. This guide incorporates the August 17 version 2 clarification; the September 8 editorial update does not represent a fresh full-source review. Percentages describe questionnaire responses, with denominators stated beside the results. The interactive folder is an original, simplified teaching example, not a reproduction or validation of the research test."
+}

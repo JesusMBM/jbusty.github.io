@@ -1,0 +1,360 @@
+{
+  "slug": "jbm-open-models-explained",
+  "title": "Open, but how open?",
+  "category": "AI models",
+  "summary": "An AI model can be available to use without being available to download, inspect or change. Learn what different kinds of access give you, and what to check before choosing a release.",
+  "reviewed": "2026-09-04",
+  "reviewedLabel": "4 September 2026",
+  "takeaways": [
+    "Open weights means the trained model files are available; permissions still depend on the licence.",
+    "Open-source AI also requires relevant code, training-data information and freedoms to change and share.",
+    "Check the exact release, computing requirements and operating responsibilities."
+  ],
+  "sections": [
+    {
+      "id": "access",
+      "title": "Three kinds of access",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "“Open” can describe several different things. A public chatbot lets you try a model, but that alone does not give you the files to run it. A downloadable release gives you more control over deployment, but may still leave its training process largely undocumented. Treat these as separate questions instead of a single yes-or-no label.",
+          "sources": [
+            "osi"
+          ]
+        },
+        {
+          "type": "interactive",
+          "kind": "openness",
+          "title": "Explore the layers of access",
+          "description": "Choose a category to see what it generally offers. The exact release’s files and licence remain the final check.",
+          "data": {
+            "items": [
+              {
+                "label": "Closed",
+                "title": "Closed access: use a service",
+                "text": "The provider runs the model. Your access is through its offered application or API.",
+                "layers": [
+                  {
+                    "name": "Use the model",
+                    "state": "Service access",
+                    "explanation": "You submit requests under the service terms."
+                  },
+                  {
+                    "name": "Run on your own computers",
+                    "state": "Generally unavailable",
+                    "explanation": "The service does not normally supply a self-hosted copy."
+                  },
+                  {
+                    "name": "Download weights",
+                    "state": "Generally unavailable",
+                    "explanation": "Public weight files are generally absent from this offer."
+                  },
+                  {
+                    "name": "Training code",
+                    "state": "Not promised",
+                    "explanation": "A hosted service need not publish its training software."
+                  },
+                  {
+                    "name": "Training-data information",
+                    "state": "Varies",
+                    "explanation": "Providers may publish reports with different levels of detail."
+                  },
+                  {
+                    "name": "Use, change and share rights",
+                    "state": "Service terms",
+                    "explanation": "Check the rights attached to the service and its outputs."
+                  }
+                ]
+              },
+              {
+                "label": "Open-weight",
+                "title": "Open weights: download the trained model",
+                "text": "Weights are available, but other development materials and permissions vary by release.",
+                "layers": [
+                  {
+                    "name": "Use the model",
+                    "state": "Licence applies",
+                    "explanation": "Use must follow the named release’s terms."
+                  },
+                  {
+                    "name": "Run on your own computers",
+                    "state": "Equipment permitting",
+                    "explanation": "Compatible software and enough computing power are needed."
+                  },
+                  {
+                    "name": "Download weights",
+                    "state": "Published",
+                    "explanation": "You can obtain the model’s learned numerical settings."
+                  },
+                  {
+                    "name": "Training code",
+                    "state": "Varies",
+                    "explanation": "Downloaded weights do not imply published training code."
+                  },
+                  {
+                    "name": "Training-data information",
+                    "state": "Varies",
+                    "explanation": "A release may explain little or much about training material."
+                  },
+                  {
+                    "name": "Use, change and share rights",
+                    "state": "Check the licence",
+                    "explanation": "Some licences add conditions to commercial use or redistribution."
+                  }
+                ]
+              },
+              {
+                "label": "Open-source",
+                "title": "Open-source AI: access plus freedoms",
+                "text": "This guide uses the Open Source Initiative definition, which requires access needed to use, study, change and share the system.",
+                "layers": [
+                  {
+                    "name": "Use the model",
+                    "state": "Freedom required",
+                    "explanation": "The definition includes freedom to use for any purpose."
+                  },
+                  {
+                    "name": "Run on your own computers",
+                    "state": "Equipment permitting",
+                    "explanation": "Open licensing does not remove hardware requirements."
+                  },
+                  {
+                    "name": "Download weights",
+                    "state": "Required",
+                    "explanation": "Parameters must be available in the preferred form for modification."
+                  },
+                  {
+                    "name": "Training code",
+                    "state": "Required",
+                    "explanation": "Relevant code for training and running the system is required."
+                  },
+                  {
+                    "name": "Training-data information",
+                    "state": "Required",
+                    "explanation": "Sufficient detail is required; not every training example must be downloadable."
+                  },
+                  {
+                    "name": "Use, change and share rights",
+                    "state": "Freedoms required",
+                    "explanation": "The definition includes studying, modifying and sharing the system."
+                  }
+                ]
+              }
+            ],
+            "defaultIndex": 1
+          },
+          "sources": [
+            "osi"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Under the Open Source Initiative’s definition, open-source AI must include weights, relevant code and sufficiently detailed training-data information, alongside the freedom to use, study, change and share it. The definition does not demand a freely downloadable copy of every training example. A publisher’s marketing label is not an independent certification.",
+          "sources": [
+            "osi"
+          ]
+        }
+      ],
+      "aliases": [
+        "spectrum",
+        "scanner-panel"
+      ]
+    },
+    {
+      "id": "weights",
+      "title": "What are weights?",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Weights are numerical settings adjusted during training. They help determine how the model responds to a new question. Imagine a very large bank of dials: training adjusts them, and a weights download records the resulting settings. Those settings still need software and computing equipment to produce an answer.",
+          "sources": [
+            "gptoss"
+          ]
+        },
+        {
+          "type": "flow",
+          "title": "A simplified model interaction",
+          "steps": [
+            "Your question enters the running software",
+            "The software uses the learned settings",
+            "The model produces a response"
+          ],
+          "note": "This illustrates the role of weights, not the model’s actual architecture."
+        },
+        {
+          "type": "p",
+          "text": "Having those final settings does not automatically reveal every decision made during training. Code describes procedures; training-data information describes the material and preparation behind the learning process. A more complete release makes more of those choices available for inspection.",
+          "sources": [
+            "osi"
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "examples",
+      "title": "Four releases, four checks",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "OpenAI’s gpt-oss-120b and gpt-oss-20b are downloadable models under Apache 2.0, with usage-policy documentation. They are separate from OpenAI’s hosted API models. This illustrates why it is better to classify an exact release than to call an entire company “open” or “closed.”",
+          "sources": [
+            "gptoss"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Claude Opus 5 appears in Anthropic’s hosted model catalogue. Access through a service lets a user submit requests while a provider operates the model; that offer does not supply public weights to run independently. Access to an assistant and possession of its model files are different arrangements.",
+          "sources": [
+            "claude"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "NVIDIA publishes Nemotron 3 Ultra weights alongside development materials, including training datasets and recipes. Its model card lists OpenMDW-1.1 and substantial server requirements. This shows why examining the released materials is useful; this guide does not independently certify full compliance with the OSI definition.",
+          "sources": [
+            "nemotron"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Moonshot AI publishes Kimi K3 weights under a custom licence. Some commercial uses carry additional agreement or attribution conditions. Its size also makes clear that a public download is not automatically practical on a personal computer. Availability, permission and computing requirements need separate checks.",
+          "sources": [
+            "kimi",
+            "kimilicence"
+          ]
+        }
+      ],
+      "aliases": [
+        "models"
+      ]
+    },
+    {
+      "id": "capabilities",
+      "title": "Capability and openness answer different questions",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "“Can it work with pictures?” is a question about capability. “Can I download, inspect or change it?” is a question about access and rights. A text model may be either hosted or downloadable, and an image-capable model can have either arrangement. Do not infer one property from the other.",
+          "sources": []
+        },
+        {
+          "type": "p",
+          "text": "Similarly, downloadable weights do not establish that a model will be accurate, secure or inexpensive for your task. A useful evaluation asks whether it handles your examples reliably and whether the available software, licence and equipment support the way you intend to use it.",
+          "sources": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "responsibility",
+      "title": "More control brings operating work",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Running a model on infrastructure you control can let you choose where processing happens and how the system is adapted. Privacy still depends on the whole setup, including logs, connected tools and outside services. A local model connected to an external search tool still has an external data path.",
+          "sources": []
+        },
+        {
+          "type": "p",
+          "text": "The operator must budget for equipment, electricity, updates, access controls and people who maintain the system. Before adopting a release, ask who handles failures, how updates are tested, and how users report problems. Compare those responsibilities with the convenience and limits of a managed service.",
+          "sources": []
+        },
+        {
+          "type": "list",
+          "items": [
+            "Can I download this exact model’s weights?",
+            "Does the licence allow my intended use, modifications and sharing?",
+            "Which code and training-data information are available?",
+            "What hardware, software and skills will operation require?",
+            "Where does information travel, including through connected tools?",
+            "Who will maintain the deployment and check its results?"
+          ],
+          "sources": [
+            "osi",
+            "kimilicence",
+            "nemotron"
+          ]
+        }
+      ],
+      "aliases": []
+    }
+  ],
+  "glossary": [
+    [
+      "Weights",
+      "Learned numerical settings used by a model."
+    ],
+    [
+      "Training",
+      "Adjusting a model using examples and feedback."
+    ],
+    [
+      "Licence",
+      "Terms describing permitted use, modification and sharing."
+    ],
+    [
+      "Self-hosting",
+      "Running software on equipment managed by you or your chosen operator."
+    ],
+    [
+      "API",
+      "A connection through which software requests a service."
+    ],
+    [
+      "Training-data information",
+      "Details about material used for training and how it was prepared."
+    ]
+  ],
+  "sources": [
+    {
+      "id": "osi",
+      "title": "Open Source AI Definition 1.0",
+      "short": "Open Source AI Definition 1.0",
+      "url": "https://opensource.org/ai/open-source-ai-definition",
+      "note": "Defines required freedoms and preferred forms for modification.",
+      "published": ""
+    },
+    {
+      "id": "gptoss",
+      "title": "OpenAI: gpt-oss guide",
+      "short": "OpenAI: gpt-oss guide",
+      "url": "https://help.openai.com/en/articles/11870455",
+      "note": "Downloadable models, licensing and operating requirements.",
+      "published": ""
+    },
+    {
+      "id": "claude",
+      "title": "Anthropic model catalogue",
+      "short": "Anthropic model catalogue",
+      "url": "https://platform.claude.com/docs/en/models/overview",
+      "note": "Hosted model availability.",
+      "published": ""
+    },
+    {
+      "id": "nemotron",
+      "title": "NVIDIA Nemotron 3 Ultra model card",
+      "short": "NVIDIA Nemotron 3 Ultra model card",
+      "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-NVFP4",
+      "note": "Publisher description of materials, licence and hardware.",
+      "published": ""
+    },
+    {
+      "id": "kimi",
+      "title": "Kimi K3 model card",
+      "short": "Kimi K3 model card",
+      "url": "https://huggingface.co/moonshotai/Kimi-K3",
+      "note": "Publisher description of the downloadable model.",
+      "published": ""
+    },
+    {
+      "id": "kimilicence",
+      "title": "Kimi K3 licence",
+      "short": "Kimi K3 licence",
+      "url": "https://huggingface.co/moonshotai/Kimi-K3/blob/main/LICENSE",
+      "note": "Read the exact terms for commercial and redistribution conditions.",
+      "published": ""
+    }
+  ],
+  "reviewNote": "Independent educational guide based on sources checked on 4 September 2026. Categories describe access arrangements, not quality rankings or legal certification. Verify the named release and licence before adoption."
+}

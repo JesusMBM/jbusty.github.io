@@ -1,0 +1,461 @@
+{
+  "slug": "jbm-secure-sdlc",
+  "title": "Building safer software, step by step",
+  "category": "Software security",
+  "summary": "How a team checks for security problems while planning, building, releasing, and maintaining software. The common methods are explained with everyday examples.",
+  "reviewed": "2026-09-04",
+  "reviewedLabel": "4 September 2026",
+  "takeaways": [
+    "Security work continues throughout a product’s life.",
+    "STRIDE asks threat questions; PASTA connects scenarios to consequences.",
+    "Useful evidence supports decisions and shows when to reconsider them."
+  ],
+  "sections": [
+    {
+      "id": "big-picture",
+      "title": "Four ideas with different jobs",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "A software development lifecycle describes how an idea becomes a product and how that product is maintained. Secure development adds decisions about what to protect, safeguards against misuse, checks that those safeguards work, and responses when problems appear. Threat modeling is a structured discussion of what could go wrong in a particular system.",
+          "sources": [
+            "S1",
+            "S6"
+          ]
+        },
+        {
+          "type": "table",
+          "caption": "How the approaches fit together",
+          "headers": [
+            "Idea",
+            "Purpose"
+          ],
+          "rows": [
+            [
+              "Secure SDLC — secure software development lifecycle",
+              "Organize security work throughout development and operation."
+            ],
+            [
+              "STRIDE",
+              "Prompt questions about six kinds of threat."
+            ],
+            [
+              "PASTA",
+              "Connect plausible attacks and weaknesses to business consequences."
+            ],
+            [
+              "SSDF — Secure Software Development Framework",
+              "Describe practices a secure-development program should support."
+            ]
+          ],
+          "sources": [
+            "S1",
+            "S4",
+            "S7"
+          ]
+        }
+      ],
+      "aliases": [
+        "overview"
+      ]
+    },
+    {
+      "id": "development-stages",
+      "title": "Explore six development stages",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "These six stages are a teaching outline, not a mandatory NIST sequence. Teams revisit decisions and may work on several stages at once. Bringing security earlier is sometimes called “shifting left”; maintaining protection after release matters too.",
+          "sources": [
+            "S1",
+            "S6"
+          ]
+        },
+        {
+          "type": "interactive",
+          "kind": "lifecycle",
+          "title": "Choose a stage",
+          "description": "Each button reveals its purpose, a familiar comparison, and evidence a team can show.",
+          "data": {
+            "items": [
+              {
+                "label": "PLAN",
+                "title": "Decide what must be protected.",
+                "text": "Understand users, important information, and the harm that failure or misuse could cause. Agree on security requirements and name the people responsible for decisions.",
+                "example": "Before building a house, decide who will live there and what hazards it must withstand.",
+                "evidence": "Written requirements, important data, and named decision owners."
+              },
+              {
+                "label": "DESIGN",
+                "title": "Decide how the parts work safely together.",
+                "text": "Draw components and information movements. Identify where permissions change. Discuss plausible failures and select safeguards while the design is still easy to change.",
+                "example": "A building plan shows doors and fire barriers before construction starts.",
+                "evidence": "A reviewed diagram, threat scenarios, and reasons for chosen safeguards."
+              },
+              {
+                "label": "BUILD",
+                "title": "Make software follow its rules.",
+                "text": "Review important changes, protect development tools, and check outside components. Keep passwords and other credentials out of source code.",
+                "example": "Builders inspect materials and check their work against the plan.",
+                "evidence": "Review records, a component list, and records of credential protection."
+              },
+              {
+                "label": "TEST",
+                "title": "Check what happens when things go wrong.",
+                "text": "Test normal use and misuse. Combine automated checks with human review. Investigate findings and confirm that important fixes work.",
+                "example": "Installing a fire alarm is different from testing that it works.",
+                "evidence": "Relevant test results, investigated findings, and retests of fixes."
+              },
+              {
+                "label": "RELEASE",
+                "title": "Know what is being delivered.",
+                "text": "Check the intended version and its origin. Record unresolved problems, decisions about them, and who accepts the remaining risk.",
+                "example": "A delivery needs the correct contents and a record of approval.",
+                "evidence": "A traceable release record, integrity information, and documented risk decisions."
+              },
+              {
+                "label": "OPERATE",
+                "title": "Maintain protection during use.",
+                "text": "Monitor for trouble, receive vulnerability reports, update software, and rehearse response. Feed lessons back into requirements, designs, and tests.",
+                "example": "A bridge needs inspections and maintenance after it opens.",
+                "evidence": "Monitoring records, response plans, update records, and lessons learned."
+              }
+            ]
+          },
+          "sources": [
+            "S1"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "A checkpoint asks whether there is enough evidence to proceed. For a release, that might mean confirming that critical fixes were retested and recording unresolved risks. The appropriate evidence depends on the product and the harm a failure could cause.",
+          "sources": [
+            "S1"
+          ]
+        }
+      ],
+      "aliases": [
+        "sdlc",
+        "phase-detail"
+      ]
+    },
+    {
+      "id": "stride",
+      "title": "STRIDE questions",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Microsoft’s STRIDE categories help a team notice different kinds of failure. They do not calculate likelihood, rank business risk, or supply protections by themselves. The security concerns below describe the goal being challenged.",
+          "sources": [
+            "S4",
+            "S5"
+          ]
+        },
+        {
+          "type": "table",
+          "caption": "Six prompts for a design discussion",
+          "headers": [
+            "Category",
+            "Plain-language meaning",
+            "Security concern"
+          ],
+          "rows": [
+            [
+              "Spoofing",
+              "Pretending to be another user, device, or service.",
+              "Identity: who is this?"
+            ],
+            [
+              "Tampering",
+              "Making an unauthorized change to information or software.",
+              "Integrity: was it improperly changed?"
+            ],
+            [
+              "Repudiation",
+              "Disputing an action when reliable evidence is missing.",
+              "Accountability: can we trace what happened?"
+            ],
+            [
+              "Information disclosure",
+              "Exposing information to someone who should not receive it.",
+              "Confidentiality: who may see it?"
+            ],
+            [
+              "Denial of service",
+              "Preventing legitimate use of a service.",
+              "Availability: can people use it?"
+            ],
+            [
+              "Elevation of privilege",
+              "Gaining permissions that were not granted.",
+              "Authorization: what may this identity do?"
+            ]
+          ],
+          "sources": [
+            "S5"
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "checkout",
+      "title": "A checkout example",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Imagine a customer sends an order to a checkout service, which stores it in an orders database. Customer-controlled input crosses a trust boundary into the store’s system. A protected network connection does not establish that the requested action is allowed.",
+          "sources": [
+            "S4",
+            "S6"
+          ]
+        },
+        {
+          "type": "table",
+          "caption": "Original teaching example: questions to investigate",
+          "headers": [
+            "Possible problem",
+            "Defensive question"
+          ],
+          "rows": [
+            [
+              "Another person’s login session is used.",
+              "How are sessions protected?"
+            ],
+            [
+              "An unapproved price is accepted.",
+              "Does the service validate prices against trusted data?"
+            ],
+            [
+              "An order change cannot be traced.",
+              "Are useful audit records protected?"
+            ],
+            [
+              "A customer sees another customer’s order.",
+              "Is access checked for each order?"
+            ],
+            [
+              "Heavy traffic blocks checkout.",
+              "How is overload limited and recovery handled?"
+            ],
+            [
+              "A customer reaches administrator functions.",
+              "Are privileged actions separately restricted?"
+            ]
+          ],
+          "sources": [
+            "S5",
+            "S6"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "These are questions, not findings about a real store. A log entry can help establish what happened, but does not automatically prove a person’s identity or intent.",
+          "sources": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "pasta",
+      "title": "The PASTA process",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "PASTA means Process for Attack Simulation and Threat Analysis. Developed by Tony UcedaVélez and Marco M. Morana, it links technical evidence to organizational goals and consequences. Its seven stages can be summarized as follows.",
+          "sources": [
+            "S7"
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "Establish the purpose and the losses that matter.",
+            "Set the scope: people, technology, and dependencies.",
+            "Map components, information movements, and permission boundaries.",
+            "Examine evidence about relevant threats.",
+            "Connect threats to weaknesses that could enable harm.",
+            "Check plausible attack paths using evidence and authorized testing where appropriate.",
+            "Analyze consequences, prioritize responses, and document remaining risk."
+          ],
+          "sources": [
+            "S7"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "STRIDE can broaden an initial discussion; PASTA supports deeper investigation and prioritization. They can be combined. Neither removes the need to document assumptions and check that the analysis reflects the actual product.",
+          "sources": [
+            "S6",
+            "S7"
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "nist",
+      "title": "NIST guidance",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "The US National Institute of Standards and Technology’s SSDF describes practices that fit into an existing development process. It does not prescribe a programming language or these six teaching stages.",
+          "sources": [
+            "S1"
+          ]
+        },
+        {
+          "type": "table",
+          "caption": "Four SSDF practice groups",
+          "headers": [
+            "Group",
+            "Purpose"
+          ],
+          "rows": [
+            [
+              "Prepare the Organization",
+              "Provide responsibilities, requirements, tools, and suitable environments."
+            ],
+            [
+              "Protect the Software",
+              "Protect code and releases; help recipients check release integrity."
+            ],
+            [
+              "Produce Well-Secured Software",
+              "Apply security requirements to design, coding, review, testing, and configuration."
+            ],
+            [
+              "Respond to Vulnerabilities",
+              "Find, assess, address, and learn from weaknesses."
+            ]
+          ],
+          "sources": [
+            "S1"
+          ]
+        },
+        {
+          "type": "callout",
+          "title": "Version status checked 4 September 2026",
+          "text": "At that check, SSDF 1.1 was the final core framework. SSDF 1.2, released on 17 December 2025, remained an initial public draft. Its comment period had closed. This is a dated status statement, not a new September 8 verification.",
+          "sources": [
+            "S1",
+            "S2",
+            "S3"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "A useful threat model supports a decision and records why. It may justify a changed design, a new test, better monitoring, or keeping the existing approach. Record the owner and what new evidence would trigger a review.",
+          "sources": [
+            "S6"
+          ]
+        }
+      ],
+      "aliases": [
+        "ssdf"
+      ]
+    }
+  ],
+  "glossary": [
+    [
+      "Threat",
+      "Something that could cause harm."
+    ],
+    [
+      "Vulnerability",
+      "A weakness that could enable harm."
+    ],
+    [
+      "Risk",
+      "Possible consequences considered together with their likelihood."
+    ],
+    [
+      "Safeguard",
+      "A measure intended to reduce risk."
+    ],
+    [
+      "Dependency",
+      "Another component or service a product relies on."
+    ],
+    [
+      "Trust boundary",
+      "A point where permissions, ownership, or trust assumptions change."
+    ],
+    [
+      "Authentication",
+      "Checking an asserted identity or message origin."
+    ],
+    [
+      "Authorization",
+      "Deciding which actions an identity is allowed to take."
+    ],
+    [
+      "Provenance",
+      "Information about where software came from."
+    ],
+    [
+      "Residual risk",
+      "Risk remaining after safeguards are applied."
+    ]
+  ],
+  "sources": [
+    {
+      "id": "S1",
+      "title": "NIST SP 800-218: SSDF 1.1",
+      "short": "NIST SSDF 1.1",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+      "note": "Secure-development practices and the four groups.",
+      "published": "3 February 2022; final"
+    },
+    {
+      "id": "S2",
+      "title": "NIST SSDF project publications",
+      "short": "NIST publication list",
+      "url": "https://csrc.nist.gov/projects/ssdf/publications",
+      "note": "Final versus draft status at the recorded check.",
+      "published": "Maintained publication list"
+    },
+    {
+      "id": "S3",
+      "title": "NIST SP 800-218 Rev. 1: SSDF 1.2 draft",
+      "short": "SSDF 1.2 draft",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/r1/ipd",
+      "note": "Draft status; comments closed 30 January 2026.",
+      "published": "17 December 2025; initial public draft"
+    },
+    {
+      "id": "S4",
+      "title": "Microsoft Threat Modeling Tool overview",
+      "short": "Microsoft overview",
+      "url": "https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool",
+      "note": "Threat modeling and design analysis.",
+      "published": "Maintained documentation"
+    },
+    {
+      "id": "S5",
+      "title": "Microsoft Threat Modeling Tool threats",
+      "short": "Microsoft STRIDE",
+      "url": "https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-threats",
+      "note": "Six threat categories.",
+      "published": "25 August 2022"
+    },
+    {
+      "id": "S6",
+      "title": "OWASP Threat Modeling Cheat Sheet",
+      "short": "OWASP",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+      "note": "Models, diagrams, responses, and iteration.",
+      "published": "Maintained guidance; undated"
+    },
+    {
+      "id": "S7",
+      "title": "VerSprite: PASTA Threat Modeling",
+      "short": "PASTA originator",
+      "url": "https://versprite.com/cybersecurity-listings/devsecops/pasta-threat-modeling/",
+      "note": "Originator organization’s account of the seven-stage methodology; marketing effectiveness claims excluded.",
+      "published": "Undated"
+    }
+  ],
+  "reviewNote": "Source verification was performed on 4 September 2026. Copy reorganized on 8 September 2026 without a new live-source check. The six-stage outline and checkout scenario are educational examples; source links support the underlying practices."
+}

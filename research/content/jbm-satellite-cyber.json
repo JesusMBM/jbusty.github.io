@@ -1,0 +1,455 @@
+{
+  "slug": "jbm-satellite-cyber",
+  "title": "Satellite security starts with the whole system",
+  "category": "Space systems",
+  "summary": "A space service depends on ground computers, radio links, spacecraft, user devices, and suppliers. Protecting the service means understanding how these parts depend on each other.",
+  "reviewed": "2026-09-04",
+  "reviewedLabel": "4 September 2026",
+  "takeaways": [
+    "A service can fail even when the spacecraft is working.",
+    "Privacy, message checks, replay protection, and permission are separate questions.",
+    "An outage, a deceived receiver, and unauthorized spacecraft control are different outcomes."
+  ],
+  "sections": [
+    {
+      "id": "whole-system",
+      "title": "Think about the whole service",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Operators prepare instructions on Earth. Communication links carry commands and information. Spacecraft perform a mission, and people use the resulting signals or data. Security therefore starts with a practical question: which part could fail, what could an intruder actually do there, and which protections would limit the consequences?",
+          "sources": [
+            "T1",
+            "T4"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Space changes the engineering choices. Physical repair is often difficult or unavailable, energy and computing resources are constrained, and missions may operate for many years. Security choices need to work alongside reliability and safety. An update or recovery action that is routine on an office computer may be unsuitable for a particular spacecraft.",
+          "sources": [
+            "T1"
+          ]
+        },
+        {
+          "type": "table",
+          "caption": "Parts of a conceptual space service",
+          "headers": [
+            "Part",
+            "What belongs here",
+            "Security question"
+          ],
+          "rows": [
+            [
+              "Ground segment",
+              "Operator accounts, control computers, mission facilities, and supporting networks.",
+              "Who can reach sensitive systems or approve actions?"
+            ],
+            [
+              "Link segment",
+              "Communication between spacecraft, ground systems, and users.",
+              "Can messages be checked and service disruption handled?"
+            ],
+            [
+              "Space segment",
+              "The spacecraft’s computers, software, instruments, and communications equipment.",
+              "How are commands and updates controlled?"
+            ],
+            [
+              "User segment",
+              "Receivers, modems, and terminals used to access the service.",
+              "Could a local device failure mislead or interrupt its user?"
+            ]
+          ],
+          "sources": [
+            "T4"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Suppliers are a concern across all four parts. Purchased software, hardware, outside services, and maintenance arrangements can introduce dependencies. Operators need to understand who is responsible for each interface and how problems will be reported and addressed.",
+          "sources": [
+            "T3",
+            "T4"
+          ]
+        },
+        {
+          "type": "callout",
+          "title": "Conceptual explanation",
+          "text": "This guide contains no live spacecraft data, mission status, or measured attack results. Its examples describe questions for system design and review."
+        }
+      ],
+      "aliases": [
+        "map",
+        "orbit-caption"
+      ]
+    },
+    {
+      "id": "message-checks",
+      "title": "Four questions about a message",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Radio reception is only the start of a decision. A clear signal or familiar-looking message does not establish that its contents should be trusted. Different security checks answer different questions.",
+          "sources": [
+            "T6"
+          ]
+        },
+        {
+          "type": "table",
+          "caption": "Checks have different jobs",
+          "headers": [
+            "Question",
+            "What helps",
+            "What it does not establish"
+          ],
+          "rows": [
+            [
+              "May someone else read the contents?",
+              "Encryption can provide confidentiality.",
+              "Encryption alone does not establish that an action is permitted."
+            ],
+            [
+              "Is the origin expected, and was the message altered?",
+              "Cryptographic authentication and integrity checks help verify origin and detect changes.",
+              "Results depend on correct implementation and protected keys."
+            ],
+            [
+              "Is this message being reused improperly?",
+              "Replay protection checks sequence or freshness information.",
+              "A previously valid message is not automatically appropriate now."
+            ],
+            [
+              "May this action happen now?",
+              "Permissions, approval rules, and mission-specific safety checks.",
+              "Passing message checks does not make every instruction safe."
+            ]
+          ],
+          "sources": [
+            "T6",
+            "T7",
+            "T2"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Authentication does not always require a digital signature, and some systems authenticate messages without encrypting their contents. The appropriate design depends on what must be protected. Keeping cryptographic keys secure is essential: message checks lose value when an attacker can use the expected key.",
+          "sources": [
+            "T6"
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "radio-risks",
+      "title": "Disruption and false messages differ",
+      "blocks": [
+        {
+          "type": "cards",
+          "items": [
+            {
+              "title": "Jamming",
+              "text": "Interference makes a legitimate radio signal harder or impossible to receive."
+            },
+            {
+              "title": "Spoofing",
+              "text": "A signal or message is presented as coming from a source it does not genuinely represent."
+            },
+            {
+              "title": "Replay",
+              "text": "An earlier legitimate message is sent again, potentially at an inappropriate time."
+            }
+          ],
+          "sources": [
+            "T4",
+            "T6",
+            "T7"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "These problems require different safeguards. Encryption can protect contents, but it does not stop radio interference from reaching a receiver. Message authentication and replay checks address different failures from radio resilience and operational response. A receiver accepting a false navigation signal does not, by itself, show that the spacecraft was compromised.",
+          "sources": [
+            "T4",
+            "T6",
+            "T7"
+          ]
+        }
+      ],
+      "aliases": [
+        "signal"
+      ]
+    },
+    {
+      "id": "ground-scenario",
+      "title": "A hypothetical ground-system scenario",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "CISA’s April 2024 recommendations emphasize ground systems because they are accessible and connected to other systems. That makes them an important place to start a review; it is not a measured ranking of every mission’s vulnerabilities. The following example is hypothetical. Every transition would require another protection to fail.",
+          "sources": [
+            "T4"
+          ]
+        },
+        {
+          "type": "table",
+          "caption": "Possible problems and opportunities to interrupt them",
+          "headers": [
+            "Hypothetical problem",
+            "Defensive decision"
+          ],
+          "rows": [
+            [
+              "A deceptive message reaches an operator.",
+              "Make suspicious requests easy to report; protect devices and accounts."
+            ],
+            [
+              "Someone obtains a login credential.",
+              "Require stronger sign-in checks and respond to suspicious account use."
+            ],
+            [
+              "An intruder reaches a ground network.",
+              "Separate mission systems and restrict access to the needs of each role."
+            ],
+            [
+              "The intruder attempts a control action.",
+              "Check permissions, command origin, and mission-specific approval rules."
+            ],
+            [
+              "Abnormal behavior appears.",
+              "Alert operators, investigate, and follow rehearsed response procedures."
+            ]
+          ],
+          "sources": [
+            "T4",
+            "T2"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "A stolen login does not automatically provide mission control. The purpose of this example is to ask whether one failure could lead to another, and where independent protections would interrupt that progression. It is not evidence about a real mission or an account of an incident.",
+          "sources": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "everyday-services",
+      "title": "Why people depend on space services",
+      "blocks": [
+        {
+          "type": "table",
+          "caption": "Different services, different dependencies",
+          "headers": [
+            "Service",
+            "What people use"
+          ],
+          "rows": [
+            [
+              "Navigation",
+              "Signals that help devices estimate location."
+            ],
+            [
+              "Weather and Earth observation",
+              "Measurements and images used to understand conditions on Earth."
+            ],
+            [
+              "Communications",
+              "Connections for people and organizations, including remote locations."
+            ],
+            [
+              "Timing",
+              "Precise time information used to coordinate other systems."
+            ]
+          ],
+          "sources": [
+            "T1",
+            "T4",
+            "T5"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "These services use different spacecraft, orbits, operators, receivers, and backup arrangements. A fault may affect one device, a provider, or a wider set of users. The outcome depends on the affected component, its role, and available alternatives; a dramatic consequence should not be inferred from the word “satellite” alone.",
+          "sources": [
+            "T1",
+            "T3"
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "defense-layers",
+      "title": "Protect, limit, detect, and recover",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "The five groupings below are an educational summary of defenses, not a complete standard or a guarantee for every mission. They help connect engineering choices to day-to-day responsibilities.",
+          "sources": [
+            "T2",
+            "T4",
+            "T5"
+          ]
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "Design for the mission. Identify essential services, consequences, decision owners, and supplier expectations. Revisit threats as the system changes.",
+            "Verify access and messages. Protect accounts and cryptographic keys, check command origin, and enforce who may request each action.",
+            "Limit damage. Separate important networks and give accounts, services, and devices only the access they need.",
+            "Notice abnormal behavior. Review system records and telemetry—measurements and status reports—for changes that need investigation.",
+            "Prepare to respond and recover. Rehearse decisions, protect ground-system backups, and plan mission-specific safe operation and restoration."
+          ],
+          "sources": [
+            "T2",
+            "T4",
+            "T5"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "A backup is useful only within a recovery plan that operators can carry out. Ground-system restoration and spacecraft recovery are different tasks. Some mission actions may be irreversible or constrained by safety, so response procedures must reflect the actual system.",
+          "sources": [
+            "T1",
+            "T2"
+          ]
+        }
+      ],
+      "aliases": [
+        "defense"
+      ]
+    },
+    {
+      "id": "read-claims",
+      "title": "Read security claims precisely",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Ask which component was affected and what the evidence establishes. An outage, a compromised terminal, an intercepted message, receiver deception, and unauthorized spacecraft control describe different events. Separate confirmed outcomes from possible consequences.",
+          "sources": [
+            "T4"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Threat catalogs such as The Aerospace Corporation’s SPARTA help teams describe and reason about spacecraft threats. Listing a technique is not proof that it works against every satellite or that an incident occurred. A useful explanation names the affected service, the failed protection, and the uncertainty that remains.",
+          "sources": [
+            "T8"
+          ]
+        }
+      ],
+      "aliases": []
+    }
+  ],
+  "glossary": [
+    [
+      "Ground segment",
+      "Earth-based systems used to operate and support a mission."
+    ],
+    [
+      "Uplink / downlink",
+      "Communication toward a spacecraft / from a spacecraft toward Earth."
+    ],
+    [
+      "Telemetry",
+      "Measurements and status information used for monitoring."
+    ],
+    [
+      "Payload",
+      "Equipment performing the mission, such as a camera or communications equipment."
+    ],
+    [
+      "User terminal",
+      "A device used to receive or exchange a satellite service."
+    ],
+    [
+      "Cryptographic key",
+      "Mathematical material used by a security algorithm; secrecy requirements depend on its role."
+    ],
+    [
+      "Replay protection",
+      "Checks intended to reject improperly reused messages."
+    ],
+    [
+      "Least privilege",
+      "Giving an account or device only the access it needs."
+    ],
+    [
+      "Network segmentation",
+      "Separating networks so access to one does not automatically provide access to all."
+    ],
+    [
+      "Resilience",
+      "The ability to maintain or restore essential functions when something goes wrong."
+    ]
+  ],
+  "sources": [
+    {
+      "id": "T1",
+      "title": "NIST IR 8270: Introduction to Cybersecurity for Commercial Satellite Operations",
+      "short": "NIST introduction",
+      "url": "https://csrc.nist.gov/pubs/ir/8270/final",
+      "note": "Broad scope, operational constraints, and risk context.",
+      "published": "25 July 2023; final"
+    },
+    {
+      "id": "T2",
+      "title": "NIST IR 8401: Satellite Ground Segment",
+      "short": "NIST ground systems",
+      "url": "https://csrc.nist.gov/pubs/ir/8401/final",
+      "note": "Ground command-and-control responsibilities and safeguards; uses the earlier Cybersecurity Framework, not CSF 2.0.",
+      "published": "30 December 2022; final"
+    },
+    {
+      "id": "T3",
+      "title": "NIST IR 8441: Cybersecurity Framework Profile for Hybrid Satellite Networks",
+      "short": "NIST hybrid networks",
+      "url": "https://csrc.nist.gov/pubs/ir/8441/final",
+      "note": "Interfaces and independently operated components; references CSF 1.1.",
+      "published": "25 September 2023; final"
+    },
+    {
+      "id": "T4",
+      "title": "CISA: Recommendations to Space System Operators for Improving Cybersecurity",
+      "short": "CISA recommendations",
+      "url": "https://www.cisa.gov/resources-tools/resources/recommendations-space-system-operators-improving-cybersecurity",
+      "note": "Four segments, ground exposure, suppliers, and layered protection. Publication date comes from the PDF cover, not its hosting path.",
+      "published": "April 2024"
+    },
+    {
+      "id": "T5",
+      "title": "ESA: How ESA ensures cybersecurity in space",
+      "short": "ESA security lifecycle",
+      "url": "https://www.esa.int/About_Us/Cyber_resilience_at_ESA/How_ESA_ensures_cybersecurity_in_space",
+      "note": "Security through design, operation, and disposal; monitoring and response.",
+      "published": "7 February 2024"
+    },
+    {
+      "id": "T6",
+      "title": "CCSDS 355.0-B-2: Space Data Link Security Protocol",
+      "short": "CCSDS message security",
+      "url": "https://ccsds.org/Pubs/355x0b2.pdf",
+      "note": "Authentication, integrity, confidentiality, and replay protection. Date follows the document cover; catalog month differs.",
+      "published": "July 2022; Issue 2"
+    },
+    {
+      "id": "T7",
+      "title": "ESA SPACE-SHIELD: CCSDS SDLS Sequence numbers",
+      "short": "ESA replay protection",
+      "url": "https://spaceshield.esa.int/mitigations/M2004/",
+      "note": "Replay protection using sequence checks.",
+      "published": "21 April 2023; entry version 1.2"
+    },
+    {
+      "id": "T8",
+      "title": "The Aerospace Corporation: SPARTA",
+      "short": "SPARTA",
+      "url": "https://aerospace.org/sparta",
+      "note": "Purpose of the spacecraft threat catalog; not evidence of an incident.",
+      "published": "Maintained catalog; undated"
+    }
+  ],
+  "reviewNote": "Sources were checked on 4 September 2026. Copy reorganized on 8 September 2026 without a new live-source check. Examples are hypothetical and the defense grouping is educational. This page provides no live spacecraft telemetry and makes no vulnerability claim about a named mission."
+}

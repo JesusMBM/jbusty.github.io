@@ -2,9 +2,11 @@
 
 Astra supplied the portfolio design direction and source audit. The portfolio React source is redesigned in `src/`; Honeyquest retains its authored page in `public/honeyquest/`.
 
-The six directories here contain **snapshots of the existing public Netlify deploys**, retrieved on 2026-09-04, plus the shared research presentation. These are deployable static bundles, not recovered framework source. Original research content, citations, diagrams, calculators, and application JavaScript are retained. The satellite bundle references its original public hero image by an absolute URL so review pages can display it.
+The six directories contain complete static sites generated from the authored JSON in `research/content/`. They replace the previous compiled deployment snapshots. Honeyquest is generated into `public/honeyquest/`.
 
-`research-theme.css` and `research-shell.js` are the shared authored files. They add the portfolio return link, an accessible research menu, next-article navigation, a consistent reading hierarchy, compact section spacing, and reduced-motion support. Each static directory includes copies for independent deployment. `npm run build` also packages all six under `dist/research/` for review; it does not deploy them.
+The guides preserve the learning interactions: model access tabs, the cost calculator and sortable comparison, lifecycle-stage selector, and fictional decoy exercise. Source links, precise evidence limits, and glossaries are included throughout. Provider prices were reconfirmed September 8, 2026; other source-review dates remain accurately marked September 4. There is no live data feed.
+
+`npm run build` regenerates all seven guides and includes the six Netlify-targeted guides under `dist/research/`. The portfolio now links to these local copies so a portfolio deployment publishes the revised reading experience together. Each static directory remains deployable to its original Netlify site below. Updating this repository does not itself publish those separate Netlify deployments.
 
 | Directory | Existing Netlify site ID | Original live URL |
 | --- | --- | --- |
@@ -15,6 +17,6 @@ The six directories here contain **snapshots of the existing public Netlify depl
 | jbm-secure-sdlc | eb59ef92-f440-4523-adfe-72afe009e880 | https://jbm-secure-sdlc.netlify.app |
 | jbm-satellite-cyber | 4405fd87-7752-4041-b565-dccedc6c7543 | https://jbm-satellite-cyber.netlify.app |
 
-Deploy a reviewed static directory to its matching existing Netlify site. Do not create replacement sites. Prefer integrating the shared files into the original framework sources once those source projects are available, so a later framework deployment preserves the redesign.
+Deploy a reviewed static directory to its matching existing Netlify site. Do not create replacement sites. Source updates belong in `research/content/` and the shared assets under `research/assets/`, followed by regeneration.
 
-The portfolio keeps its original live project URLs. Review copies cross-link within `/research/`; Honeyquest links to its existing GitHub Pages route. Third-party references, GitHub, and LinkedIn are destinations, not redesign targets.
+GitHub and LinkedIn are external destinations, not redesign targets. The independent Netlify origins need their own authorized deployment after review.
