@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/package-research.mjs",
+    "build": "node research/generate.mjs && vite build && node scripts/package-research.mjs",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:research": "node --test research/tests/*.test.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

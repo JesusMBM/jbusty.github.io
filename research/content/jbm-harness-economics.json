@@ -1,0 +1,860 @@
+{
+  "slug": "jbm-harness-economics",
+  "title": "The hidden cost of AI agents",
+  "category": "AI costs",
+  "summary": "An automated helper may consult its model many times before finishing a job. See what the meter counts, try a transparent example and compare selected published rates.",
+  "reviewed": "2026-09-04",
+  "reviewedLabel": "4 September 2026",
+  "takeaways": [
+    "The whole job can involve many paid requests.",
+    "Caching changes how repeated input is billed; the first read still costs money.",
+    "Compare the cost of successful work, not just a model’s token price."
+  ],
+  "sections": [
+    {
+      "id": "harness",
+      "title": "The model is one part of the job",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "The model proposes an answer or next action. Surrounding software supplies instructions, connects tools, tracks progress and decides whether to call the model again. Developers often call that software the harness. Like a cook working in a kitchen, a capable model needs a workflow around it; the workflow affects both results and cost.",
+          "sources": [
+            "loop"
+          ]
+        },
+        {
+          "type": "flow",
+          "title": "One job can involve repeated model calls",
+          "steps": [
+            "Read the task and available information",
+            "Choose an answer or permitted action",
+            "Use a tool and inspect its result",
+            "Finish, ask for help or take another step"
+          ],
+          "note": "A conceptual agent loop. Actual systems may combine stages or stop at a budget limit.",
+          "sources": [
+            "loop"
+          ]
+        }
+      ],
+      "aliases": [
+        "definition"
+      ]
+    },
+    {
+      "id": "tokens",
+      "title": "What the meter counts",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "A token is a small piece of text used in processing and billing. It can be part of a word, a whole word or punctuation. Input includes instructions, documents, questions and earlier conversation. Output is generated material. Some systems also charge for reasoning that does not appear in the visible answer.",
+          "sources": [
+            "deepseek",
+            "grokcache"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "The price cards use one million tokens as their unit. The calculator controls use thousands. Input and output have separate rates, so two requests with the same combined text size can cost different amounts. Subscriptions, tool calls, taxes and infrastructure can add charges outside a text-token calculation.",
+          "sources": [
+            "openai",
+            "anthropic"
+          ]
+        }
+      ],
+      "aliases": [
+        "loop"
+      ]
+    },
+    {
+      "id": "calculator",
+      "title": "Try a simple job",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "This invented scenario sends the same reference text at every step and keeps earlier replies unchanged. No new tool results or user messages are added. Move one control at a time to see whether repeated reading, longer answers or more steps is driving the change. It is a worked example rather than a prediction of typical agent usage.",
+          "sources": []
+        },
+        {
+          "type": "interactive",
+          "kind": "cost",
+          "title": "Estimate the text-model bill",
+          "description": "Choose a rate card, step count, reference size and reply length. The receipt separates fresh input from reused input.",
+          "data": {
+            "models": [
+              {
+                "id": "gpt-6-astra",
+                "name": "GPT-6 Astra",
+                "provider": "OpenAI",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 10,
+                "cacheRead": 1,
+                "cacheWrite": 12.5,
+                "output": 50,
+                "contextTokens": 1050000,
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 1024,
+                "cacheLifetimeSeconds": 1800,
+                "longContext": {
+                  "thresholdTokens": 272000,
+                  "comparison": ">",
+                  "inputMultiplier": 2,
+                  "cacheReadMultiplier": 2,
+                  "cacheWriteMultiplier": 2,
+                  "outputMultiplier": 1.5
+                },
+                "source": "https://developers.openai.com/api/docs/pricing",
+                "modelSource": "https://developers.openai.com/api/docs/models/gpt-6-astra",
+                "cacheSource": "https://developers.openai.com/api/docs/guides/prompt-caching",
+                "notes": "Standard text rates.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.2
+              },
+              {
+                "id": "gpt-5.6-sol",
+                "name": "GPT-5.6 Sol",
+                "provider": "OpenAI",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 4,
+                "cacheRead": 0.4,
+                "cacheWrite": 5,
+                "output": 20,
+                "contextTokens": 1050000,
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 1024,
+                "cacheLifetimeSeconds": 1800,
+                "longContext": {
+                  "thresholdTokens": 272000,
+                  "comparison": ">",
+                  "inputMultiplier": 2,
+                  "cacheReadMultiplier": 2,
+                  "cacheWriteMultiplier": 2,
+                  "outputMultiplier": 1.5
+                },
+                "source": "https://developers.openai.com/api/docs/pricing",
+                "modelSource": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+                "cacheSource": "https://developers.openai.com/api/docs/guides/prompt-caching",
+                "notes": "Standard text rates. Promotional pricing stated to last at least through 2026-11-21.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.08
+              },
+              {
+                "id": "gpt-5.6-terra",
+                "name": "GPT-5.6 Terra",
+                "provider": "OpenAI",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 2,
+                "cacheRead": 0.2,
+                "cacheWrite": 2.5,
+                "output": 12,
+                "contextTokens": 1050000,
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 1024,
+                "cacheLifetimeSeconds": 1800,
+                "longContext": {
+                  "thresholdTokens": 272000,
+                  "comparison": ">",
+                  "inputMultiplier": 2,
+                  "cacheReadMultiplier": 2,
+                  "cacheWriteMultiplier": 2,
+                  "outputMultiplier": 1.5
+                },
+                "source": "https://developers.openai.com/api/docs/pricing",
+                "modelSource": "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
+                "cacheSource": "https://developers.openai.com/api/docs/guides/prompt-caching",
+                "notes": "Standard text rates.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.044
+              },
+              {
+                "id": "gpt-5.6-luna",
+                "name": "GPT-5.6 Luna",
+                "provider": "OpenAI",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 0.2,
+                "cacheRead": 0.02,
+                "cacheWrite": 0.25,
+                "output": 1.2,
+                "contextTokens": 1050000,
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 1024,
+                "cacheLifetimeSeconds": 1800,
+                "longContext": {
+                  "thresholdTokens": 272000,
+                  "comparison": ">",
+                  "inputMultiplier": 2,
+                  "cacheReadMultiplier": 2,
+                  "cacheWriteMultiplier": 2,
+                  "outputMultiplier": 1.5
+                },
+                "source": "https://developers.openai.com/api/docs/pricing",
+                "modelSource": "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
+                "cacheSource": "https://developers.openai.com/api/docs/guides/prompt-caching",
+                "notes": "Standard text rates.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.0044
+              },
+              {
+                "id": "claude-fable-5-1",
+                "name": "Claude Fable 5.1",
+                "provider": "Anthropic",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 10,
+                "cacheRead": 0.25,
+                "cacheWrite": 12.5,
+                "output": 50,
+                "contextTokens": 1000000,
+                "contextLimitNote": "Official overview says 1M; 1,000,000 is a conservative calculator cutoff.",
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 512,
+                "cacheLifetimeSeconds": 300,
+                "cacheWrite1h": 20,
+                "longContext": null,
+                "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+                "modelSource": "https://platform.claude.com/docs/en/models/overview",
+                "cacheSource": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+                "notes": "Standard text rates. Cache scenario uses 5-minute writes.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.2
+              },
+              {
+                "id": "claude-opus-5",
+                "name": "Claude Opus 5",
+                "provider": "Anthropic",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 5,
+                "cacheRead": 0.5,
+                "cacheWrite": 6.25,
+                "output": 25,
+                "contextTokens": 1000000,
+                "contextLimitNote": "Official overview says 1M; 1,000,000 is a conservative calculator cutoff.",
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 512,
+                "cacheLifetimeSeconds": 300,
+                "cacheWrite1h": 10,
+                "longContext": null,
+                "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+                "modelSource": "https://platform.claude.com/docs/en/models/overview",
+                "cacheSource": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+                "notes": "Standard text rates. Cache scenario uses 5-minute writes.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.1
+              },
+              {
+                "id": "claude-sonnet-5",
+                "name": "Claude Sonnet 5",
+                "provider": "Anthropic",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 2,
+                "cacheRead": 0.2,
+                "cacheWrite": 2.5,
+                "output": 10,
+                "contextTokens": 1000000,
+                "contextLimitNote": "Official overview says 1M; 1,000,000 is a conservative calculator cutoff.",
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 1024,
+                "cacheLifetimeSeconds": 300,
+                "cacheWrite1h": 4,
+                "longContext": null,
+                "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+                "modelSource": "https://platform.claude.com/docs/en/models/overview",
+                "cacheSource": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+                "notes": "Standard text rates; the announced 2026-09-01 increase was cancelled. Cache scenario uses 5-minute writes.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.04
+              },
+              {
+                "id": "grok-4.6",
+                "name": "Grok 4.6",
+                "provider": "SpaceXAI",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 2,
+                "cacheRead": 0.5,
+                "cacheWrite": 2,
+                "output": 6,
+                "contextTokens": 500000,
+                "maxOutputTokens": null,
+                "minimumCacheTokens": null,
+                "cacheLifetimeSeconds": null,
+                "longContext": {
+                  "thresholdTokens": 200000,
+                  "comparison": ">=",
+                  "inputMultiplier": 2,
+                  "cacheReadMultiplier": 2,
+                  "cacheWriteMultiplier": 2,
+                  "outputMultiplier": 2
+                },
+                "source": "https://docs.x.ai/developers/pricing",
+                "modelSource": "https://docs.x.ai/developers/grok-4-6",
+                "cacheSource": "https://docs.x.ai/developers/advanced-api-usage/prompt-caching/usage-and-pricing",
+                "notes": "Standard text rates. Non-cached tokens use the ordinary input rate; no separate write premium appears on the rate card. The newer pricing table explicitly uses >=200K. Total prompt size includes cached tokens. The model page lists no independent text output limit; context size still applies.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.032
+              },
+              {
+                "id": "deepseek-v4-pro",
+                "name": "DeepSeek V4 Pro (0813)",
+                "provider": "DeepSeek",
+                "openWeights": true,
+                "access": "Hosted API; weights also downloadable",
+                "input": 1.32,
+                "cacheRead": 0.044,
+                "cacheWrite": 1.32,
+                "output": 3.96,
+                "contextTokens": 1000000,
+                "contextLimitNote": "Official pricing page says 1M; 1,000,000 is a conservative calculator cutoff.",
+                "maxOutputTokens": 384000,
+                "minimumCacheTokens": null,
+                "cacheLifetimeSeconds": null,
+                "longContext": null,
+                "source": "https://api-docs.deepseek.com/quick_start/pricing",
+                "modelSource": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813",
+                "cacheSource": "https://api-docs.deepseek.com/guides/kv_cache/",
+                "offPeak": {
+                  "input": 0.66,
+                  "cacheRead": 0.022,
+                  "cacheWrite": 0.66,
+                  "output": 1.98
+                },
+                "peakHoursUtc": {
+                  "days": [
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday"
+                  ],
+                  "ranges": [
+                    [
+                      "01:00",
+                      "04:00"
+                    ],
+                    [
+                      "06:00",
+                      "10:00"
+                    ]
+                  ]
+                },
+                "notes": "Use PEAK rates as a declared fixed comparison, not a live clock price. All other hours are off-peak at half price. API alias currently maps to DeepSeek-V4-Pro-0813. MIT weights. Automatic cache uses best-effort stored prefixes, including input/output boundaries; calculator conservatively reuses prior inputs only. Cache-miss input has no separately listed write premium.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.02112
+              }
+            ],
+            "assumptions": "Illustrative text-only job: every step receives the same reference text plus earlier replies and produces an equally sized new reply. Reuse assumes the preceding input remains eligible and cached; the newest reply is fresh input. Excludes new tool results, hidden reasoning, retries, taxes, hosting and tool fees. Claude uses five-minute cache writes; DeepSeek uses fixed peak rates. Rate cards reconfirmed 8 September 2026; operating limits checked 4 September."
+          },
+          "sources": [
+            "openai",
+            "anthropic",
+            "grok",
+            "deepseek"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "With eight steps, 24,000 reference tokens and 2,000 reply tokens per step, total input is 248,000 tokens and output is 16,000. The reuse scenario contains 38,000 fresh input tokens and 210,000 reused tokens. Using Grok 4.6’s listed short-context rates gives $0.592 without caching and $0.277 with eligible reuse. These are arithmetic results from the stated assumptions.",
+          "sources": [
+            "grok"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "For N steps, C reference tokens and O reply tokens per step, total input is N × C + O × N × (N − 1) / 2. Total output is N × O. Every later step rereads the fixed reference plus all earlier replies. The first request has no reused input; each following request treats the latest reply as fresh.",
+          "sources": []
+        }
+      ],
+      "aliases": [
+        "lab"
+      ]
+    },
+    {
+      "id": "caching",
+      "title": "Saved input has its own rules",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Prompt caching lets a provider reuse earlier processing for matching input. There may be a charge to write that material before later discounted reads. Entries can expire, and changed text near the beginning can prevent reuse. The calculator assumes the preceding input stays eligible; it does not promise that a real service will deliver those cache hits.",
+          "sources": [
+            "openaicache",
+            "anthropiccache"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "The selected OpenAI rows use writes at 1.25 times ordinary input and reads at one tenth. Claude uses five-minute writes at 1.25 times input; Fable 5.1 has a different read discount from Opus 5 and Sonnet 5. Grok and DeepSeek charge ordinary input for misses on these rate cards, with no separately listed write premium.",
+          "sources": [
+            "openai",
+            "anthropic",
+            "grok",
+            "deepseek"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Cached input still occupies the context window: the maximum material the model can handle at once. The calculator suppresses totals if a step exceeds its selected limit. It also checks each whole prompt for higher rates: above 272,000 input tokens for these OpenAI models, and at or above 200,000 for Grok 4.6.",
+          "sources": [
+            "openai",
+            "grok"
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "id": "comparison",
+      "title": "Compare the same example task",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "This selected comparison applies the same eight-step example without caching to every model. Sort by input price, output price or example task cost, or filter for downloadable weights. It measures price under common assumptions; it does not rank intelligence, speed or reliability.",
+          "sources": []
+        },
+        {
+          "type": "interactive",
+          "kind": "comparison",
+          "title": "Selected direct-provider text rates",
+          "description": "US dollars; standard rates. Example task: eight steps, 24,000 fixed reference tokens and 2,000 new reply tokens per step. DeepSeek uses peak pricing.",
+          "data": {
+            "models": [
+              {
+                "id": "gpt-6-astra",
+                "name": "GPT-6 Astra",
+                "provider": "OpenAI",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 10,
+                "cacheRead": 1,
+                "cacheWrite": 12.5,
+                "output": 50,
+                "contextTokens": 1050000,
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 1024,
+                "cacheLifetimeSeconds": 1800,
+                "longContext": {
+                  "thresholdTokens": 272000,
+                  "comparison": ">",
+                  "inputMultiplier": 2,
+                  "cacheReadMultiplier": 2,
+                  "cacheWriteMultiplier": 2,
+                  "outputMultiplier": 1.5
+                },
+                "source": "https://developers.openai.com/api/docs/pricing",
+                "modelSource": "https://developers.openai.com/api/docs/models/gpt-6-astra",
+                "cacheSource": "https://developers.openai.com/api/docs/guides/prompt-caching",
+                "notes": "Standard text rates.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.2
+              },
+              {
+                "id": "gpt-5.6-sol",
+                "name": "GPT-5.6 Sol",
+                "provider": "OpenAI",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 4,
+                "cacheRead": 0.4,
+                "cacheWrite": 5,
+                "output": 20,
+                "contextTokens": 1050000,
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 1024,
+                "cacheLifetimeSeconds": 1800,
+                "longContext": {
+                  "thresholdTokens": 272000,
+                  "comparison": ">",
+                  "inputMultiplier": 2,
+                  "cacheReadMultiplier": 2,
+                  "cacheWriteMultiplier": 2,
+                  "outputMultiplier": 1.5
+                },
+                "source": "https://developers.openai.com/api/docs/pricing",
+                "modelSource": "https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+                "cacheSource": "https://developers.openai.com/api/docs/guides/prompt-caching",
+                "notes": "Standard text rates. Promotional pricing stated to last at least through 2026-11-21.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.08
+              },
+              {
+                "id": "gpt-5.6-terra",
+                "name": "GPT-5.6 Terra",
+                "provider": "OpenAI",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 2,
+                "cacheRead": 0.2,
+                "cacheWrite": 2.5,
+                "output": 12,
+                "contextTokens": 1050000,
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 1024,
+                "cacheLifetimeSeconds": 1800,
+                "longContext": {
+                  "thresholdTokens": 272000,
+                  "comparison": ">",
+                  "inputMultiplier": 2,
+                  "cacheReadMultiplier": 2,
+                  "cacheWriteMultiplier": 2,
+                  "outputMultiplier": 1.5
+                },
+                "source": "https://developers.openai.com/api/docs/pricing",
+                "modelSource": "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
+                "cacheSource": "https://developers.openai.com/api/docs/guides/prompt-caching",
+                "notes": "Standard text rates.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.044
+              },
+              {
+                "id": "gpt-5.6-luna",
+                "name": "GPT-5.6 Luna",
+                "provider": "OpenAI",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 0.2,
+                "cacheRead": 0.02,
+                "cacheWrite": 0.25,
+                "output": 1.2,
+                "contextTokens": 1050000,
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 1024,
+                "cacheLifetimeSeconds": 1800,
+                "longContext": {
+                  "thresholdTokens": 272000,
+                  "comparison": ">",
+                  "inputMultiplier": 2,
+                  "cacheReadMultiplier": 2,
+                  "cacheWriteMultiplier": 2,
+                  "outputMultiplier": 1.5
+                },
+                "source": "https://developers.openai.com/api/docs/pricing",
+                "modelSource": "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
+                "cacheSource": "https://developers.openai.com/api/docs/guides/prompt-caching",
+                "notes": "Standard text rates.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.0044
+              },
+              {
+                "id": "claude-fable-5-1",
+                "name": "Claude Fable 5.1",
+                "provider": "Anthropic",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 10,
+                "cacheRead": 0.25,
+                "cacheWrite": 12.5,
+                "output": 50,
+                "contextTokens": 1000000,
+                "contextLimitNote": "Official overview says 1M; 1,000,000 is a conservative calculator cutoff.",
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 512,
+                "cacheLifetimeSeconds": 300,
+                "cacheWrite1h": 20,
+                "longContext": null,
+                "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+                "modelSource": "https://platform.claude.com/docs/en/models/overview",
+                "cacheSource": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+                "notes": "Standard text rates. Cache scenario uses 5-minute writes.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.2
+              },
+              {
+                "id": "claude-opus-5",
+                "name": "Claude Opus 5",
+                "provider": "Anthropic",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 5,
+                "cacheRead": 0.5,
+                "cacheWrite": 6.25,
+                "output": 25,
+                "contextTokens": 1000000,
+                "contextLimitNote": "Official overview says 1M; 1,000,000 is a conservative calculator cutoff.",
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 512,
+                "cacheLifetimeSeconds": 300,
+                "cacheWrite1h": 10,
+                "longContext": null,
+                "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+                "modelSource": "https://platform.claude.com/docs/en/models/overview",
+                "cacheSource": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+                "notes": "Standard text rates. Cache scenario uses 5-minute writes.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.1
+              },
+              {
+                "id": "claude-sonnet-5",
+                "name": "Claude Sonnet 5",
+                "provider": "Anthropic",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 2,
+                "cacheRead": 0.2,
+                "cacheWrite": 2.5,
+                "output": 10,
+                "contextTokens": 1000000,
+                "contextLimitNote": "Official overview says 1M; 1,000,000 is a conservative calculator cutoff.",
+                "maxOutputTokens": 128000,
+                "minimumCacheTokens": 1024,
+                "cacheLifetimeSeconds": 300,
+                "cacheWrite1h": 4,
+                "longContext": null,
+                "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+                "modelSource": "https://platform.claude.com/docs/en/models/overview",
+                "cacheSource": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+                "notes": "Standard text rates; the announced 2026-09-01 increase was cancelled. Cache scenario uses 5-minute writes.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.04
+              },
+              {
+                "id": "grok-4.6",
+                "name": "Grok 4.6",
+                "provider": "SpaceXAI",
+                "openWeights": false,
+                "access": "Hosted proprietary model",
+                "input": 2,
+                "cacheRead": 0.5,
+                "cacheWrite": 2,
+                "output": 6,
+                "contextTokens": 500000,
+                "maxOutputTokens": null,
+                "minimumCacheTokens": null,
+                "cacheLifetimeSeconds": null,
+                "longContext": {
+                  "thresholdTokens": 200000,
+                  "comparison": ">=",
+                  "inputMultiplier": 2,
+                  "cacheReadMultiplier": 2,
+                  "cacheWriteMultiplier": 2,
+                  "outputMultiplier": 2
+                },
+                "source": "https://docs.x.ai/developers/pricing",
+                "modelSource": "https://docs.x.ai/developers/grok-4-6",
+                "cacheSource": "https://docs.x.ai/developers/advanced-api-usage/prompt-caching/usage-and-pricing",
+                "notes": "Standard text rates. Non-cached tokens use the ordinary input rate; no separate write premium appears on the rate card. The newer pricing table explicitly uses >=200K. Total prompt size includes cached tokens. The model page lists no independent text output limit; context size still applies.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.032
+              },
+              {
+                "id": "deepseek-v4-pro",
+                "name": "DeepSeek V4 Pro (0813)",
+                "provider": "DeepSeek",
+                "openWeights": true,
+                "access": "Hosted API; weights also downloadable",
+                "input": 1.32,
+                "cacheRead": 0.044,
+                "cacheWrite": 1.32,
+                "output": 3.96,
+                "contextTokens": 1000000,
+                "contextLimitNote": "Official pricing page says 1M; 1,000,000 is a conservative calculator cutoff.",
+                "maxOutputTokens": 384000,
+                "minimumCacheTokens": null,
+                "cacheLifetimeSeconds": null,
+                "longContext": null,
+                "source": "https://api-docs.deepseek.com/quick_start/pricing",
+                "modelSource": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813",
+                "cacheSource": "https://api-docs.deepseek.com/guides/kv_cache/",
+                "offPeak": {
+                  "input": 0.66,
+                  "cacheRead": 0.022,
+                  "cacheWrite": 0.66,
+                  "output": 1.98
+                },
+                "peakHoursUtc": {
+                  "days": [
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday"
+                  ],
+                  "ranges": [
+                    [
+                      "01:00",
+                      "04:00"
+                    ],
+                    [
+                      "06:00",
+                      "10:00"
+                    ]
+                  ]
+                },
+                "notes": "Use PEAK rates as a declared fixed comparison, not a live clock price. All other hours are off-peak at half price. API alias currently maps to DeepSeek-V4-Pro-0813. MIT weights. Automatic cache uses best-effort stored prefixes, including input/output boundaries; calculator conservatively reuses prior inputs only. Cache-miss input has no separately listed write premium.",
+                "checkedOn": "2026-09-04",
+                "exampleRequestCost": 0.02112
+              }
+            ]
+          },
+          "sources": [
+            "openai",
+            "anthropic",
+            "grok",
+            "deepseek"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "The DeepSeek row holds peak rates fixed: weekdays 01:00–04:00 and 06:00–10:00 UTC. Other hours have half-price rates. Downloadable weights means a separate model copy is available; the hosted API shown here still charges for use. This selection is not a complete catalogue.",
+          "sources": [
+            "deepseek",
+            "deepseekmodel"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Headline rates were reconfirmed on 8 September 2026. GPT-5.6 Sol remains $4 input and $20 output per million tokens, with promotional pricing stated through at least 21 November. Sonnet 5 remains $2/$10 after its planned increase was cancelled. Always open the provider link before budgeting a real deployment.",
+          "sources": [
+            "openai",
+            "anthropic"
+          ]
+        }
+      ],
+      "aliases": [
+        "leaderboard"
+      ]
+    },
+    {
+      "id": "progress",
+      "title": "Spend on useful progress",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "A low token price only helps if the job finishes acceptably. Try representative tasks, check the results and count repeated attempts. A cheaper model that needs more retries may cost more per successful outcome. A more expensive model is not automatically worth its price either.",
+          "sources": []
+        },
+        {
+          "type": "list",
+          "items": [
+            "Define what a finished, acceptable result looks like.",
+            "Provide relevant reference material and concise tool results.",
+            "Set a spending or stopping limit for repeated attempts.",
+            "Reuse stable instructions when the service supports it.",
+            "Compare total cost for work that passes the same checks."
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Long jobs may use compaction, which summarizes earlier material, or a fresh session with a written handoff. Both can reduce carried context, but can lose details and require extra work. Anthropic’s harness experiments discuss both approaches; they do not establish that resets are always necessary or always cheaper.",
+          "sources": [
+            "harness"
+          ]
+        }
+      ],
+      "aliases": []
+    }
+  ],
+  "glossary": [
+    [
+      "Harness",
+      "Software coordinating the model, tools and task progress."
+    ],
+    [
+      "Context window",
+      "The amount of material a model can handle in one request."
+    ],
+    [
+      "Cache write",
+      "Storing eligible input for later reuse."
+    ],
+    [
+      "Cache read",
+      "Using eligible input saved from earlier processing."
+    ],
+    [
+      "Compaction",
+      "Replacing earlier context with a shorter representation."
+    ],
+    [
+      "Rate card",
+      "Published prices and conditions for a service."
+    ]
+  ],
+  "sources": [
+    {
+      "id": "loop",
+      "title": "OpenAI: the Codex agent loop",
+      "short": "OpenAI: the Codex agent loop",
+      "url": "https://openai.com/index/unrolling-the-codex-agent-loop/",
+      "note": "Explains model calls, tools and conversation state.",
+      "published": ""
+    },
+    {
+      "id": "openai",
+      "title": "OpenAI API pricing",
+      "short": "OpenAI API pricing",
+      "url": "https://developers.openai.com/api/docs/pricing",
+      "note": "Selected standard text rates reconfirmed 8 September 2026.",
+      "published": ""
+    },
+    {
+      "id": "anthropic",
+      "title": "Anthropic pricing",
+      "short": "Anthropic pricing",
+      "url": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "note": "Selected rates and Sonnet announcement reconfirmed 8 September 2026.",
+      "published": ""
+    },
+    {
+      "id": "grok",
+      "title": "Grok API pricing",
+      "short": "Grok API pricing",
+      "url": "https://docs.x.ai/developers/pricing",
+      "note": "Selected rates and long-context band reconfirmed 8 September 2026.",
+      "published": ""
+    },
+    {
+      "id": "deepseek",
+      "title": "DeepSeek pricing",
+      "short": "DeepSeek pricing",
+      "url": "https://api-docs.deepseek.com/quick_start/pricing",
+      "note": "Peak/off-peak rates and alias reconfirmed 8 September 2026.",
+      "published": ""
+    },
+    {
+      "id": "openaicache",
+      "title": "OpenAI prompt caching",
+      "short": "OpenAI prompt caching",
+      "url": "https://developers.openai.com/api/docs/guides/prompt-caching",
+      "note": "Cache behaviour and eligibility.",
+      "published": ""
+    },
+    {
+      "id": "anthropiccache",
+      "title": "Anthropic prompt caching",
+      "short": "Anthropic prompt caching",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+      "note": "Write durations, reads and eligibility.",
+      "published": ""
+    },
+    {
+      "id": "grokcache",
+      "title": "Grok caching and billing",
+      "short": "Grok caching and billing",
+      "url": "https://docs.x.ai/developers/advanced-api-usage/prompt-caching/usage-and-pricing",
+      "note": "Input, output and reasoning billing.",
+      "published": ""
+    },
+    {
+      "id": "deepseekmodel",
+      "title": "DeepSeek V4 Pro 0813 model card",
+      "short": "DeepSeek V4 Pro 0813 model card",
+      "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-0813",
+      "note": "Downloadable weights and MIT licence.",
+      "published": ""
+    },
+    {
+      "id": "harness",
+      "title": "Anthropic: long-running harness design",
+      "short": "Anthropic: long-running harness design",
+      "url": "https://www.anthropic.com/engineering/harness-design-long-running-apps",
+      "note": "Task-specific experiments with compaction and handoffs.",
+      "published": "24 March 2026"
+    }
+  ],
+  "reviewNote": "Full source and operating-limit snapshot checked 4 September 2026. The four provider pricing pages were rechecked on 8 September 2026; all nine selected headline rates were unchanged. Prices are a dated selection, not a live feed. Calculations are illustrative, exclude extra fees and make no quality or speed claims."
+}
