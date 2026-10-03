@@ -1,42 +1,44 @@
-# Work / visual research
+# Selected research
 
-Section #work lists seven visual-research project cards. Cards 01–06 open Netlify origins in a new tab; card 07 (Honeyquest) is same-origin under /honeyquest/. Verification proves the live DOM contains all seven titles and hrefs; it does not open those tabs.
+Section #work ("01 / Selected research", "Understand the systems you use.") lists seven research cards. All seven open in a new tab and are same-origin on GitHub Pages: cards 01–06 under /jbusty.github.io/research/, card 07 (decoys / Honeyquest) at an absolute /honeyquest/ URL. Verification proves the live DOM contains all seven titles and hrefs; it does not open those tabs.
 
 ## Sub-features
 
-- `work-heading` is #work section-index "02 / Personal research" and heading "Visual research on agents and how they fail."
-- `work-01` is "AI Agent Architecture" to https://jbm-agent-architecture.netlify.app
-- `work-02` is "AI Agents Escaping Sandboxes" to https://jbm-agent-sandbox-review.netlify.app
-- `work-03` is "Open, But How Open?" to https://jbm-open-models-explained.netlify.app
-- `work-04` is "The Hidden Cost of AI Agents" to https://jbm-harness-economics.netlify.app
-- `work-05` is "Secure SDLC: STRIDE, PASTA & SSDF" to https://jbm-secure-sdlc.netlify.app
-- `work-06` is "Hacking a Satellite—Safely Explained" to https://jbm-satellite-cyber.netlify.app
-- `work-07` is "Honeyquest for LLMs" to https://jesusmbm.github.io/jbusty.github.io/honeyquest/
+- `work-heading` is #work eyebrow "01 / Selected research", h2 "Understand the systems you use.", intro "Seven guides with everyday examples...".
+- `work-01` (featured) is "How AI agents work" to /jbusty.github.io/research/jbm-agent-architecture/
+- `work-02` is "When AI agents cross security boundaries" to /jbusty.github.io/research/jbm-agent-sandbox-review/
+- `work-03` is "What “open” means for an AI model" to /jbusty.github.io/research/jbm-open-models-explained/
+- `work-04` is "What an AI agent actually costs" to /jbusty.github.io/research/jbm-harness-economics/
+- `work-05` is "How teams build safer software" to /jbusty.github.io/research/jbm-secure-sdlc/
+- `work-06` is "How satellite systems stay secure" to /jbusty.github.io/research/jbm-satellite-cyber/
+- `work-07` is "Can decoys mislead AI attackers?" to https://jesusmbm.github.io/jbusty.github.io/honeyquest/
+- `card-anatomy` each a.research-card has card-meta "NN / type", an h3 title, a description, a status label, and "Read research" with sr-only "(opens in a new tab)".
 
 ## How to get to it (user POV)
 
-- From the hero, choose Work in primary nav or the explore-work circle (#work).
+- From the hero, choose Research in primary nav or Explore research (#work).
 - Load https://jesusmbm.github.io/jbusty.github.io/#work directly.
-- Scan the seven a.project cards. Choosing a card would open a new tab — do not do that during verification.
+- Scan the seven cards. Choosing a card would open a new tab — do not do that during verification.
 
 ## Driving it with control-jbusty
 
 Preconditions:
 
-- node control-jbusty.mjs doctor reports ok true.
-- Do not goto or otherwise navigate chrome to any project card URL (Netlify or /honeyquest/).
+- node control-jbusty.mjs doctor reports ok true (research-cards-7 found; researchCards.count 7, researchCards.missing []).
+- Do not goto or otherwise navigate chrome to any research card URL.
 
-- **Reach the section.** A visitor opens Work. Run `node control-jbusty.mjs goto --url '#work' --path /tmp/verify-jbusty-evidence/work.png`. JSON found is true, id is work.
-- **Snapshot the cards.** Observe all seven titles and hrefs. Run `node control-jbusty.mjs snapshot --path /tmp/verify-jbusty-evidence/work.html`. JSON ids includes work. The HTML (or the sibling .extract.txt) contains each title and each exact href listed above, target="_blank", heading text "Visual research on agents", and "02 / Personal research".
-- **Proof.** All seven title+href pairs are present in that dump-dom. Outbound/project pages are not loaded. A hash screenshot may still show the hero (see Gotchas); dump-dom is the Work proof.
-- **Refuse following a card.** A visitor would choose card 01. Run `node control-jbusty.mjs goto --url 'https://jbm-agent-architecture.netlify.app'`. JSON ok is false (refusing outbound navigation). Card 07 is same-origin — still do not goto its href; helper refuses leaving the SPA home path. Run `node control-jbusty.mjs click a.project`. JSON error is "click refused on live", exit 2.
+- **Reach the section.** A visitor opens Research. Run `node control-jbusty.mjs goto --url '#work' --path /tmp/verify-jbusty-evidence/work.png`. JSON found is true, id is work.
+- **Snapshot the cards.** Observe all seven titles and hrefs. Run `node control-jbusty.mjs snapshot --path /tmp/verify-jbusty-evidence/work.html`. JSON ids includes work. The sibling work.extract.txt RESEARCH CARDS block lists each title -> exact href above with [target=_blank]; EYEBROWS includes "01 / Selected research"; HEADINGS includes "h2: Understand the systems you use.".
+- **Proof.** All seven title+href pairs are present in that dump-dom. Research pages are not loaded. A hash screenshot may still show the hero (see Gotchas); dump-dom is the proof.
+- **Refuse following a card.** A visitor would choose card 01. Run `node control-jbusty.mjs goto --url 'https://jesusmbm.github.io/jbusty.github.io/research/jbm-agent-architecture/'`. JSON ok is false, error "refusing project-path navigation". Run `node control-jbusty.mjs click a.research-card`. JSON error is "click refused on live", exit 2.
 
 ## Gotchas
 
-- Unused Projects.jsx is an old #projects list. Live identity is #work with class project cards. Doctor and this recipe fail if only #projects is present.
-- Card 06 title uses an em dash (Hacking a Satellite—Safely Explained). Assert that exact string.
-- Card 07 is hosted on the same Pages origin. Presence of the href is the proof; do not dump-dom /honeyquest/.
-- rel="noreferrer" plus target="_blank" is expected. Presence of hrefs is the proof; HTTP status of Netlify apps is out of scope.
-- Never pass a project URL to chrome dump-dom. That leaves the portfolio SPA home and is not this feature.
+- Cards are no longer on Netlify. Any https://jbm-*.netlify.app href is pre-redesign identity and fails doctor (old-netlify-cards).
+- Cards 01–06 hrefs are root-relative (/jbusty.github.io/research/...) in dump-dom because they come from Vite BASE_URL; card 07 is absolute. Match the exact strings above.
+- Card 03 title uses typographic quotes: What “open” means for an AI model. Assert that exact string.
+- Only card 01 has class featured (full-width, dark). It is still an a.research-card.
+- rel="noreferrer" plus target="_blank" is expected. Presence of hrefs is the proof; HTTP status of research pages is out of scope for this recipe.
+- Unused Projects.jsx is an old #projects list. Doctor fails if #projects appears.
 - Quote `--url '#work'`. Unquoted `#work` is a shell comment.
-- Headless `--screenshot` of a hash URL often still shows the hero. Dump-dom id found is the Work proof; do not relabel a hero PNG as work.png proof of scroll.
+- Headless `--screenshot` of a hash URL often still shows the hero. Dump-dom id found is the proof; do not relabel a hero PNG as work.png proof of scroll.
