@@ -1,17 +1,17 @@
 ---
 name: verify-jbusty
-description: Drive the jbusty portfolio live GitHub Pages web UI at https://jesusmbm.github.io/jbusty.github.io/ to prove identity, hero/nav, Approach statement, work cards, about, and contact. Use when verifying the published site, capturing dump-dom/screenshots, or checking App.jsx selectors.
+description: Drive the jbusty portfolio live GitHub Pages web UI at https://jesusmbm.github.io/jbusty.github.io/ to prove the redesigned identity (title, skip link, JBM wordmark, Research/About/Contact nav, "AI systems, examined closely." hero), the seven research cards, about, and contact. Use when verifying the published site, capturing dump-dom/screenshots, or checking App.jsx selectors.
 ---
 
 # Verify jbusty (live GitHub Pages)
 
-Agent-facing control skill for the published Jesus Bustillos-Molina portfolio. The live surface is the Vite+React SPA in src/App.jsx, served at https://jesusmbm.github.io/jbusty.github.io/ (base path /jbusty.github.io/). Index.html is a shell; identity lives in the rendered DOM.
+Agent-facing control skill for the published Jesus Bustillos-Molina portfolio. The live surface is the Vite+React SPA in src/App.jsx (cards from src/projects.js), served at https://jesusmbm.github.io/jbusty.github.io/ (base path /jbusty.github.io/). index.html is a shell that sets the title; identity lives in the rendered DOM.
 
 This skill drives the shared public Pages instance only.
 
-Leftover unused files in src/components/ describe an old design. Do not treat those files as the live UI.
+Leftover unused files in src/components/ (Hero, Nav, Projects, Skills, ...) describe an old design. Do not treat those files as the live UI. The pre-redesign App.jsx (#main-content, "I find the signal", #approach statement, Netlify project cards) is also gone.
 
-Doctor fails if dump-dom shows leftover component identity (element id hero, projects, skills) instead of App.jsx.
+Doctor fails if dump-dom shows any old identity: leftover component ids (hero, projects, skills), or pre-redesign markers (main-content, approach, "I find the signal", jbm-*.netlify.app card hrefs).
 
 A package.json script named dev (vite) exists but this skill does not start a local server. Never mutate the shared instance.
 
@@ -32,7 +32,7 @@ cd .cursor/skills/verify-jbusty
 node control-jbusty.mjs doctor
 ```
 
-Shared instance: never activate mailto, never follow the seven project cards (Netlify or /honeyquest/).
+Shared instance: never activate mailto, never follow the seven research cards (same-origin /jbusty.github.io/research/... and /honeyquest/), never follow GitHub or LinkedIn.
 
 ## Doctor
 
@@ -46,25 +46,33 @@ Checks:
 
 1. HTTP GET of the live URL returns 200
 2. Chrome dump-dom of the same URL
-3. Identity markers present: .skip-link (href #main-content, text "Skip to main content"), #main-content, #top, #work, #about, #contact, brand aria-label "Jesus Bustillos-Molina, home", h1 contains "I find the signal"
-4. Fail if dump-dom is leftover-component identity (id="hero", #projects, #skills) instead of App.jsx. id="top" with class hero is the live hero; id="hero" is not.
+3. Identity markers present (markers.found ids in parentheses):
+   - (title) title is exactly "Jesus Bustillos-Molina — AI Systems / Cybersecurity"
+   - (skip-link) a.skip-link href #main, text "Skip to content"
+   - (#main) main#main
+   - (#top, #work, #about, #contact) section ids
+   - (wordmark-aria-label) a.wordmark href #top, aria-label "Jesus Bustillos-Molina home"
+   - (primary-nav) nav#navigation aria-label "Primary" containing #work, #about, #contact
+   - (h1-examined-closely) h1 text "AI systems, examined closely."
+   - (research-cards-7) exactly seven a.research-card with the expected title + href + target _blank (see features/work-research.md)
+   - (contact-mailto) mailto:jbustillosmolina@gmail.com
+4. Fail if any old identity is present (oldIdentity array): old-#hero-id, old-#projects, old-#skills, old-threat-hunt-copy, old-#main-content, old-#approach, old-signal-h1, old-netlify-cards.
 
-JSON fields: ok, url, status, title, markers.found, markers.missing, chromeVersion. Non-zero exit if ok is false.
+JSON fields: ok, url, status, title, markers.found, markers.missing, researchCards.count, researchCards.missing, chromeVersion; oldIdentity, error and dumpPath on failure. Non-zero exit if ok is false. The failing dump is written to doctor.dump.html in the evidence dir.
 
 ## Drive
 
 Stable handles from live App.jsx (not leftover components):
 
-- a.skip-link — href #main-content, text Skip to main content
-- a.brand — href #top, aria-label Jesus Bustillos-Molina, home, visible text JBM with a degree mark
-- button.menu-toggle — aria-controls nav-links, aria-label Open/Close navigation menu, text Menu/Close, aria-expanded
-- nav#nav-links — aria-label Primary navigation; Work #work, About #about, Contact #contact
-- main#main-content — page landmark
-- section#top.hero — kicker "AI systems · cybersecurity"; h1 "I find the signal inside the noise."; availability "Available for AI systems and AI security work"; hero-footer "I design agent systems and study how they fail. Security practice is for the part that still has to hold under pressure."; a.circle-link href #work aria-label "Explore selected work"
-- section#approach.statement — section-index "01 / Approach"; copy "An agent is not a model" / "Miss those details and the loop goes off the rails". Snapshot primary; optional goto #approach.
-- section#work — section-index "02 / Personal research"; heading "Visual research on agents and how they fail."; seven a.project cards, new tab (01–06 Netlify; 07 same-origin /honeyquest/)
-- section#about — section-index "03 / Profile"; "Curious by nature. Methodical by practice."; name; Textron Aviation; mailto jbustillosmolina@gmail.com "Start a conversation"; capabilities Build / Evaluate / Secure / Investigate
-- section#contact — "Open to AI systems work"; Let's talk mailto; footer copyright year; GitHub https://github.com/JesusMBM; LinkedIn https://www.linkedin.com/in/jesus-bm/; Back to top href #top
+- a.skip-link — href #main, text "Skip to content"
+- a.wordmark — href #top, aria-label "Jesus Bustillos-Molina home", visible text "JBM / Independent research"
+- button.menu-button — aria-controls navigation, aria-expanded, text Menu/Close (visible only under 640px)
+- nav#navigation.navigation — aria-label "Primary"; Research #work, About #about, Contact #contact
+- main#main — page landmark
+- section#top.hero — eyebrow "Jesus Bustillos-Molina"; h1 "AI systems, examined closely."; hero-description "I build and study AI agents..."; a.button.primary "Explore research" href #work; a.button "Get in touch" href #contact; figure.system-map "01 / How an AI agent works" (Information → AI agent → Tools, Checks); hero-baseline "AI systems / AI security / Cybersecurity" and "Wichita, Kansas"
+- section#work.research — eyebrow "01 / Selected research"; h2 "Understand the systems you use."; seven a.research-card (first is .featured), all new tab, all same-origin
+- section#about.about — eyebrow "02 / About"; h2 "Curiosity, with a security mindset."; Textron Aviation; dl.credentials (Education, Continuing study, Certification); capabilities Build / Check / Protect / Investigate
+- section#contact.contact — eyebrow "03 / Contact"; h2 "Something worth figuring out?"; "Let’s talk" mailto; footer copyright year; GitHub https://github.com/JesusMBM; LinkedIn https://www.linkedin.com/in/jesus-bm/; Back to top href #top
 
 Commands (from the skill directory):
 
@@ -76,9 +84,11 @@ node control-jbusty.mjs goto --url '#work'
 node control-jbusty.mjs goto --url '#about' --path /tmp/verify-jbusty-evidence/about.png
 ```
 
-goto resolves hashes against the live base (`goto --url '#work'` or `goto work`). Quote `#work` in the shell; unquoted `#` is a comment. It dump-doms and confirms the target id exists. It refuses other origins (Netlify project URLs) and same-origin project paths such as /honeyquest/. Approach is section#approach — snapshot is primary proof; goto #approach is optional.
+goto resolves hashes against the live base (`goto --url '#work'` or `goto work`). Quote `#work` in the shell; unquoted `#` is a comment. It dump-doms and confirms the target id exists. It refuses other origins (GitHub, LinkedIn) and same-origin paths other than the SPA home, such as /jbusty.github.io/research/jbm-agent-architecture/ and /honeyquest/.
 
-The click command on live Pages always returns {ok:false, error:"click refused on live"} and exit 2. Do not activate menu, mailto, or project cards.
+snapshot writes the HTML plus a sibling .extract.txt with TITLE, IDS, HEADINGS, EYEBROWS, RESEARCH CARDS (title -> href [target]) and LINKS.
+
+The click command on live Pages always returns {ok:false, error:"click refused on live"} and exit 2. Do not activate menu, mailto, or research cards.
 
 --url before the command overrides the live base. --dry-run prints planned chrome argv and URL without launching chrome.
 
@@ -90,8 +100,8 @@ Proof standards:
 
 - Exercise the real user path: live Pages in headless Chrome, not leftover component files, not a local Vite server, not internal setters.
 - Capture the action and the resulting state: dump-dom / snapshot extract plus screenshot, not only a final PNG.
-- Identity must match App.jsx markers above. A screenshot without those ids in dump-dom is not proof.
-- This SPA is static. Proof is DOM contents (titles, hrefs, aria-labels) and PNG bytes. Mailto and outbound project tabs are asserted in the snapshot, never opened.
+- Identity must match the App.jsx markers above. A screenshot without those ids in dump-dom is not proof.
+- This SPA is static. Proof is DOM contents (titles, hrefs, aria-labels) and PNG bytes. Mailto, research, and social tabs are asserted in the snapshot, never opened.
 - Mocks: none. Public static site.
 - --dry-run must not launch chrome. Confirm by observing no new chrome pid and no new dump-dom file.
 
@@ -117,11 +127,11 @@ node control-jbusty.mjs --dry-run snapshot --path /tmp/verify-jbusty-evidence/sn
 node control-jbusty.mjs snapshot --path /tmp/verify-jbusty-evidence/snapshot.html
 node control-jbusty.mjs screenshot --path /tmp/verify-jbusty-evidence/screenshot.png
 node control-jbusty.mjs goto --url '#work'
-node control-jbusty.mjs --dry-run click .menu-toggle
-node control-jbusty.mjs click .menu-toggle
+node control-jbusty.mjs --dry-run click .menu-button
+node control-jbusty.mjs click .menu-button
 node control-jbusty.mjs cleanup
 ```
 
 Chrome binary: /usr/bin/google-chrome (override CHROME_PATH). Required flags: --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --timeout=30000 --virtual-time-budget=8000. Screenshot window 1280x800. Stderr always captured to a file under the evidence dir.
 
-Feature map: features/ (hero-nav, approach-statement, work-research, about-profile, contact-footer). Drive one mapped feature end-to-end after doctor; the map lists the rest.
+Feature map: features/ (hero-nav, work-research, about-profile, contact-footer). Drive one mapped feature end-to-end after doctor; the map lists the rest.

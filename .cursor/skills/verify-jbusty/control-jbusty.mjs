@@ -2,7 +2,10 @@
 /**
  * Drive the live jbusty portfolio on GitHub Pages.
  * One JSON object on stdout. Exit 0 on success, non-zero on failure.
- * Click is always refused on jesusmbm.github.io. Never follow outbound project origins or same-origin project paths.
+ * Click is always refused on jesusmbm.github.io. Never follow outbound origins or same-origin
+ * research paths (/research/..., /honeyquest/).
+ *
+ * Identity source: src/App.jsx + src/projects.js on main after the redesign (PRs #11-#12).
  */
 import { spawn } from "node:child_process"
 import fs from "node:fs"
@@ -18,23 +21,68 @@ const CHROME_TIMEOUT_MS = 30000
 const VIRTUAL_TIME_MS = 8000
 const NODE_WATCHDOG_MS = 40000
 
+const EXPECTED_TITLE = "Jesus Bustillos-Molina — AI Systems / Cybersecurity"
+
+// Seven research cards from src/projects.js. Cards 01-06 are same-origin under
+// BASE_URL research/; card 07 (Honeyquest) is an absolute same-origin URL.
+const RESEARCH_CARDS = [
+  { n: "01", title: "How AI agents work", href: "/jbusty.github.io/research/jbm-agent-architecture/" },
+  { n: "02", title: "When AI agents cross security boundaries", href: "/jbusty.github.io/research/jbm-agent-sandbox-review/" },
+  { n: "03", title: "What “open” means for an AI model", href: "/jbusty.github.io/research/jbm-open-models-explained/" },
+  { n: "04", title: "What an AI agent actually costs", href: "/jbusty.github.io/research/jbm-harness-economics/" },
+  { n: "05", title: "How teams build safer software", href: "/jbusty.github.io/research/jbm-secure-sdlc/" },
+  { n: "06", title: "How satellite systems stay secure", href: "/jbusty.github.io/research/jbm-satellite-cyber/" },
+  { n: "07", title: "Can decoys mislead AI attackers?", href: "https://jesusmbm.github.io/jbusty.github.io/honeyquest/" },
+]
+
 const REQUIRED_MARKERS = [
-  { id: "skip-link", test: (html) => /class=["'][^"']*\bskip-link\b/i.test(html) && /href=["']#main-content["']/i.test(html) && /Skip to main content/i.test(html) },
-  { id: "#main-content", test: (html) => hasElemId(html, "main-content") },
+  { id: "title", test: (html) => extractTitle(html) === EXPECTED_TITLE },
+  { id: "skip-link", test: (html) => /<a\b[^>]*class=["'][^"']*\bskip-link\b[^"']*["'][^>]*href=["']#main["'][^>]*>\s*Skip to content\s*<\/a>/i.test(html) },
+  { id: "#main", test: (html) => /<main\b[^>]*\sid=["']main["']/i.test(html) },
   { id: "#top", test: (html) => hasElemId(html, "top") },
   { id: "#work", test: (html) => hasElemId(html, "work") },
   { id: "#about", test: (html) => hasElemId(html, "about") },
   { id: "#contact", test: (html) => hasElemId(html, "contact") },
-  { id: "brand-aria-label", test: (html) => /aria-label=["']Jesus Bustillos-Molina, home["']/i.test(html) },
-  { id: "h1-signal", test: (html) => /I find the signal/i.test(html) },
+  { id: "wordmark-aria-label", test: (html) => /<a\b[^>]*class=["']wordmark["'][^>]*href=["']#top["'][^>]*aria-label=["']Jesus Bustillos-Molina home["']/i.test(html) },
+  { id: "primary-nav", test: (html) => {
+      const m = html.match(/<nav\b[^>]*\sid=["']navigation["'][^>]*>([\s\S]*?)<\/nav>/i)
+      if (!m || !/aria-label=["']Primary["']/i.test(m[0])) return false
+      return ["#work", "#about", "#contact"].every((h) => m[1].includes(`href="${h}"`))
+    } },
+  { id: "h1-examined-closely", test: (html) => {
+      const m = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)
+      return !!m && /AI systems,\s*examined closely\./.test(stripTags(m[1]))
+    } },
+  { id: "research-cards-7", test: (html) => researchCardReport(html).ok },
+  { id: "contact-mailto", test: (html) => /href=["']mailto:jbustillosmolina@gmail\.com["']/i.test(html) },
 ]
 
+// Leftover src/components/* (Hero/Projects/Skills) and the previous App.jsx design
+// (#main-content, "I find the signal", #approach statement, Netlify cards).
 const OLD_IDENTITY = [
   { id: "old-#hero-id", test: (html) => hasElemId(html, "hero") },
   { id: "old-#projects", test: (html) => hasElemId(html, "projects") },
   { id: "old-#skills", test: (html) => hasElemId(html, "skills") },
   { id: "old-threat-hunt-copy", test: (html) => /I secure systems and hunt threats/i.test(html) },
+  { id: "old-#main-content", test: (html) => hasElemId(html, "main-content") },
+  { id: "old-#approach", test: (html) => hasElemId(html, "approach") },
+  { id: "old-signal-h1", test: (html) => /I find the signal/i.test(html) },
+  { id: "old-netlify-cards", test: (html) => /href=["']https:\/\/jbm-[a-z-]+\.netlify\.app/i.test(html) },
 ]
+
+function researchCardReport(html) {
+  const cards = []
+  const re = /<a\b([^>]*class=["'][^"']*\bresearch-card\b[^"']*["'][^>]*)>([\s\S]*?)<\/a>/gi
+  let m
+  while ((m = re.exec(html))) {
+    const h3 = m[2].match(/<h3\b[^>]*>([\s\S]*?)<\/h3>/i)
+    cards.push({ href: attr(m[1], "href"), title: h3 ? stripTags(h3[1]) : "", target: attr(m[1], "target") })
+  }
+  const missing = RESEARCH_CARDS.filter(
+    (exp) => !cards.some((c) => c.href === exp.href && c.title === exp.title && c.target === "_blank"),
+  ).map((exp) => `${exp.n} ${exp.title}`)
+  return { ok: cards.length === RESEARCH_CARDS.length && missing.length === 0, count: cards.length, missing, cards }
+}
 
 const HELP = `control-jbusty — drive the live jbusty portfolio GitHub Pages UI.
 
@@ -42,7 +90,7 @@ USAGE
   node control-jbusty.mjs [--help] [--dry-run] [--url BASE] <command> [flags]
 
 COMMANDS
-  doctor                 GET live URL + chrome dump-dom; assert App.jsx identity
+  doctor                 GET live URL + chrome dump-dom; assert redesigned App.jsx identity
   snapshot [--path FILE] dump-dom HTML + compact headings/links/ids extract
   screenshot [--path FILE]
                          chrome --screenshot at 1280x800
@@ -64,7 +112,8 @@ DEFAULTS
 Chrome is always invoked with --headless=new --no-sandbox --disable-gpu
 --disable-dev-shm-usage --timeout=30000 --virtual-time-budget=8000.
 Stderr is written to the evidence dir. Never click live. Never follow
-outbound project (netlify) origins or same-origin project paths (/honeyquest/).
+outbound origins (GitHub, LinkedIn) or same-origin research paths
+(/jbusty.github.io/research/..., /honeyquest/).
 
 EXAMPLES
   node control-jbusty.mjs --help
@@ -74,7 +123,7 @@ EXAMPLES
   node control-jbusty.mjs screenshot --path /tmp/verify-jbusty-evidence/hero.png
   node control-jbusty.mjs goto --url '#work'
   node control-jbusty.mjs goto work
-  node control-jbusty.mjs click .menu-toggle
+  node control-jbusty.mjs click .menu-button
   node control-jbusty.mjs cleanup
 `
 
@@ -237,17 +286,18 @@ function compactExtract(html) {
   while ((m = headingRe.exec(html))) {
     lines.push(`  ${m[1]}: ${stripTags(m[3])}`)
   }
-  lines.push("SECTION INDEX:")
-  const indexRe = /<p\b[^>]*class=["'][^"']*\bsection-index\b[^"']*["'][^>]*>([\s\S]*?)<\/p>/gi
-  let indexFound = false
-  while ((m = indexRe.exec(html))) {
-    indexFound = true
+  lines.push("EYEBROWS:")
+  const eyebrowRe = /<(?:p|span)\b[^>]*class=["'][^"']*\beyebrow\b[^"']*["'][^>]*>([\s\S]*?)<\/(?:p|span)>/gi
+  let eyebrowFound = false
+  while ((m = eyebrowRe.exec(html))) {
+    eyebrowFound = true
     lines.push(`  ${stripTags(m[1])}`)
   }
-  if (!indexFound) lines.push("  (none)")
-  lines.push("STATEMENT:")
-  const stmt = html.match(/<div\b[^>]*class=["'][^"']*\bstatement-copy\b[^"']*["'][^>]*>([\s\S]*?)<\/div>/i)
-  lines.push(stmt ? `  ${stripTags(stmt[1])}` : "  (none)")
+  if (!eyebrowFound) lines.push("  (none)")
+  lines.push("RESEARCH CARDS:")
+  const rc = researchCardReport(html)
+  if (!rc.cards.length) lines.push("  (none)")
+  for (const c of rc.cards) lines.push(`  ${c.title} -> ${c.href}${c.target ? ` [target=${c.target}]` : ""}`)
   lines.push("LINKS:")
   const linkRe = /<a\b([^>]*)>([\s\S]*?)<\/a>/gi
   while ((m = linkRe.exec(html))) {
@@ -368,10 +418,10 @@ function refuseOutbound(url, base) {
       error: "refusing outbound navigation",
       url,
       origin: target.origin,
-      reason: "verification stays on live Pages; project cards open other origins and must not be followed",
+      reason: "verification stays on live Pages; GitHub, LinkedIn, and other origins must not be followed",
     })
   }
-  // Card 07 (Honeyquest) is same-origin under /honeyquest/. Stay on the SPA home path.
+  // All seven research cards are same-origin (/research/..., /honeyquest/). Stay on the SPA home path.
   const homePath = normalizePathname(origin.pathname)
   const targetPath = normalizePathname(target.pathname)
   if (targetPath !== homePath) {
@@ -379,7 +429,7 @@ function refuseOutbound(url, base) {
       error: "refusing project-path navigation",
       url,
       path: target.pathname,
-      reason: "verification stays on the portfolio SPA home; do not follow same-origin project paths such as /honeyquest/",
+      reason: "verification stays on the portfolio SPA home; do not follow same-origin research paths such as /research/jbm-agent-architecture/ or /honeyquest/",
     })
   }
 }
@@ -436,25 +486,24 @@ async function cmdDoctor(opts) {
   const markers = markerReport(html)
   const dumpPath = path.join(evidenceDir(), "doctor.dump.html")
   fs.writeFileSync(dumpPath, html)
-  const oldIdentity = markers.oldFound.length > 0 && markers.missing.length > 0
+  const rc = researchCardReport(html)
   const ok =
     httpInfo.status === 200 &&
     markers.missing.length === 0 &&
-    !oldIdentity &&
-    !markers.oldFound.includes("old-#hero-id") &&
-    !markers.oldFound.includes("old-threat-hunt-copy")
+    markers.oldFound.length === 0
   const payload = {
     ok,
     url,
     status: httpInfo.status,
     title,
     markers: { found: markers.found, missing: markers.missing },
+    researchCards: { count: rc.count, missing: rc.missing },
     chromeVersion: version,
   }
   if (markers.oldFound.length) payload.oldIdentity = markers.oldFound
   if (!ok) {
-    payload.error = oldIdentity
-      ? "old leftover #hero identity from unused components; live App.jsx expected"
+    payload.error = markers.oldFound.length
+      ? "old identity in dump-dom (leftover components or pre-redesign App.jsx); redesigned App.jsx expected"
       : "doctor identity check failed"
     payload.dumpPath = dumpPath
     emit(payload)
@@ -604,7 +653,7 @@ function cmdClick(opts) {
       selector,
       wouldRefuse: isLiveHost(url),
       reason: isLiveHost(url)
-        ? "click refused on live GitHub Pages (shared recruiter instance; no mutation)"
+        ? "click refused on live GitHub Pages (shared public instance; no mutation)"
         : "click is not implemented; this skill is read-only against live Pages",
     })
     return
@@ -612,7 +661,7 @@ function cmdClick(opts) {
   if (isLiveHost(url)) {
     fail({
       error: "click refused on live",
-      reason: "live GitHub Pages is a shared public instance; click would mutate menu state or open mailto/outbound tabs. Use snapshot, screenshot, and goto.",
+      reason: "live GitHub Pages is a shared public instance; click would mutate menu state or open mailto/research/outbound tabs. Use snapshot, screenshot, and goto.",
       url,
       selector,
     }, 2)

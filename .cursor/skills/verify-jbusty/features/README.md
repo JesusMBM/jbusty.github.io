@@ -1,15 +1,15 @@
 # jbusty verification map
 
-This directory is the maintained source for verifying the user-facing behavior of the live jbusty portfolio. Read the index before driving the app, then use the matching feature file as the recipe.
+This directory is the maintained source for verifying the user-facing behavior of the live jbusty portfolio (redesigned App.jsx, PRs #11-#12). Read the index before driving the app, then use the matching feature file as the recipe.
 
 ## Baseline preconditions
 
 - Target the live URL https://jesusmbm.github.io/jbusty.github.io/ (trailing slash). Do not start a local Vite server.
-- Run node control-jbusty.mjs doctor from .cursor/skills/verify-jbusty/ and require ok true (HTTP 200 plus App.jsx identity: skip-link, #main-content, #top, #work, #about, #contact, brand aria-label, h1 contains "I find the signal").
-- Never activate controls on live Pages. Menu, mailto, and outbound project tabs are shared public surface.
+- Run node control-jbusty.mjs doctor from .cursor/skills/verify-jbusty/ and require ok true (HTTP 200 plus App.jsx identity: title, skip-link, #main, #top, #work, #about, #contact, wordmark-aria-label, primary-nav, h1-examined-closely, research-cards-7, contact-mailto; no oldIdentity).
+- Never activate controls on live Pages. Menu, mailto, research cards, and social links are shared public surface.
 - Drive only through control-jbusty.mjs (headless /usr/bin/google-chrome dump-dom / screenshot).
 - Evidence lands in /tmp/verify-jbusty-evidence/ (or $VERIFY_JBUSTY_EVIDENCE). Cleanup must not delete it.
-- Unused files in src/components/ describe an old id-hero / projects / skills design. They are not the live UI.
+- Unused files in src/components/ describe an old id-hero / projects / skills design. The pre-redesign App.jsx (#main-content, "I find the signal", #approach, Netlify cards) is gone too. Neither is the live UI.
 
 ## Driving conventions
 
@@ -17,7 +17,7 @@ This directory is the maintained source for verifying the user-facing behavior o
 - Prefer the live handles in each feature file (ids, aria-labels, hrefs) over coordinates or leftover component selectors.
 - Treat every command as literal. Keep quoted names and flags unchanged.
 - Run browser actions through node control-jbusty.mjs (doctor, snapshot, screenshot, goto).
-- Resolve in-page movement with `goto --url '#work'` (or `goto work`) and the same for #top, #about, #contact, #main-content, and #approach. Quote hashes; unquoted # is a shell comment. Do not goto Netlify project URLs or /honeyquest/. Approach proof is primarily snapshot; #approach is optional.
+- Resolve in-page movement with `goto --url '#work'` (or `goto work`) and the same for #top, #main, #about, #contact. Quote hashes; unquoted # is a shell comment. Do not goto /jbusty.github.io/research/..., /honeyquest/, GitHub, or LinkedIn.
 - Restore nothing: the live site is static. Do not remove proof artifacts during cleanup.
 
 ## Proof and skip reporting
@@ -25,7 +25,7 @@ This directory is the maintained source for verifying the user-facing behavior o
 - Capture the user action and the resulting state, not only the final screen.
 - UI proof includes a dump-dom/snapshot extract and a screenshot with portfolio identity visible.
 - Hash navigation proof includes JSON found true for the target id plus the dump-dom file.
-- Work-card proof is the DOM containing all seven titles and hrefs. Opening those hrefs is out of scope.
+- Research-card proof is the DOM containing all seven titles and hrefs (doctor research-cards-7 plus the RESEARCH CARDS block of the snapshot extract). Opening those hrefs is out of scope.
 - Record the feature file used with every artifact (--path names under the evidence dir).
 - Report an unreachable path with the attempted command and the unmet precondition.
 - Do not report a skipped entry point as verified through a different path.
@@ -44,8 +44,9 @@ Keep implementation details out of the map. Name only user paths, stable handles
 
 ## Features
 
-- [Hero and primary navigation](./hero-nav.md) covers skip link, brand home, menu toggle, Work/About/Contact, hero copy, hero-footer, and the explore-work circle link.
-- [Approach / statement](./approach-statement.md) covers section #approach (01 / Approach) between hero and Work.
-- [Work / visual research](./work-research.md) covers 02 / Personal research, the seven research cards, titles, and new-tab URLs, proven from dump-dom without following project links.
-- [About / profile](./about-profile.md) covers 03 / Profile, bio, Textron Aviation, capabilities, and Start a conversation mailto.
-- [Contact and footer](./contact-footer.md) covers Let's talk mailto, GitHub, LinkedIn, Back to top, and copyright year.
+- [Hero and primary navigation](./hero-nav.md) covers the skip link, JBM wordmark, menu button, Research/About/Contact nav, the "AI systems, examined closely." hero, its two buttons, the agent system-map figure, and the hero baseline.
+- [Selected research](./work-research.md) covers #work (01 / Selected research) and the seven same-origin research cards, titles, and new-tab URLs, proven from dump-dom without following them.
+- [About / profile](./about-profile.md) covers 02 / About, bio, Textron Aviation, credentials, and capabilities Build / Check / Protect / Investigate.
+- [Contact and footer](./contact-footer.md) covers 03 / Contact, Let’s talk mailto, GitHub, LinkedIn, Back to top, and copyright year.
+
+The former Approach / statement feature (section #approach) was removed in the redesign; its recipe was deleted. Doctor treats id="approach" as old identity.
