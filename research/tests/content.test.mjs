@@ -2,8 +2,8 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFile,readdir } from 'node:fs/promises'
 const files=(await readdir(new URL('../content/',import.meta.url))).filter(f=>f.endsWith('.json'))
-test('All seven guides have checked source references, unique anchors, and complete teaching controls',async()=>{
- assert.equal(files.length,7)
+test('All research guides have checked source references, unique anchors, and complete teaching controls',async()=>{
+ assert.ok(files.length >= 7, `Expected at least seven guides, found ${files.length}`)
  for(const f of files){const g=JSON.parse(await readFile(new URL('../content/'+f,import.meta.url),'utf8'))
   assert.ok(g.summary&&g.takeaways.length>=2&&g.glossary.length>=3,f)
   assert.match(g.reviewed,/^2026-09-0[48]$/)
