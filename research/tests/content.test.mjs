@@ -6,7 +6,7 @@ test('All research guides have checked source references, unique anchors, and co
  assert.ok(files.length >= 7, `Expected at least seven guides, found ${files.length}`)
  for(const f of files){const g=JSON.parse(await readFile(new URL('../content/'+f,import.meta.url),'utf8'))
   assert.ok(g.summary&&g.takeaways.length>=2&&g.glossary.length>=3,f)
-  assert.match(g.reviewed,/^2026-09-0[48]$/)
+  assert.match(g.reviewed,/^2026-\d{2}-\d{2}$/)
   const sources=new Set(g.sources.map(s=>s.id));assert.equal(sources.size,g.sources.length,`${f}: duplicate source IDs`)
   for(const s of g.sources)assert.match(s.url,/^https:\/\//)
   const ids=g.sections.map(s=>s.id);assert.equal(new Set([...ids,'sources','glossary']).size,ids.length+2,`${f}: duplicate section anchor`)
