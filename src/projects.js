@@ -54,6 +54,15 @@ export const projects = [
     url: `${import.meta.env.BASE_URL}research/jbm-satellite-cyber/`,
   },
   {
+    number: '08',
+    title: 'When AI agents become cyber capabilities',
+    type: 'AI security / capability evaluation',
+    description: 'A technical research dossier on autonomous replication, adaptive worms, vulnerability reproduction, exploit capability ladders, benchmark math, and blue-team controls.',
+    tools: ['ARA', 'ExploitBench', 'CyberGym', 'Threat Modeling', 'Benchmark Statistics'],
+    status: 'Technical research dossier',
+    url: `${import.meta.env.BASE_URL}research/jbm-ai-cybersecurity-frontier/`,
+  },
+  {
     number: '07',
     title: 'Can decoys mislead AI attackers?',
     type: 'AI security review',
