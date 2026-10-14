@@ -1,0 +1,638 @@
+{
+  "slug": "jbm-ai-cybersecurity-frontier",
+  "category": "AI security / capability evaluation",
+  "title": "When AI agents become cyber capabilities",
+  "summary": "A technical field guide to autonomous replication, adaptive malware, vulnerability reproduction, exploit progression, and measuring AI-agent capability without confusing a crash with compromise.",
+  "reviewed": "2026-10-14",
+  "reviewedLabel": "October 14, 2026",
+  "takeaways": [
+    "Tool access, credentials, compute, and feedback loops matter as much as model size.",
+    "A crash is evidence of a trigger, not proof of arbitrary code execution or durable control.",
+    "Benchmarks must separate discovery, reproduction, exploitation, patch quality, and impact.",
+    "Defenses should constrain reachable actions and verify outcomes independently."
+  ],
+  "reviewNote": "A defensive synthesis. Each result is tied to its cited setup; benchmark results do not establish that a capability is universally available in production. Diagrams are conceptual, not deployment instructions.",
+  "sources": [
+    {
+      "id": "anthropic",
+      "title": "AI models may be capable of self-replicating without access to a datacenter",
+      "short": "Anthropic Frontier Red Team",
+      "url": "https://www.anthropic.com/research/self-replicating-ai",
+      "note": "Research note on replication tasks and low-cost connected devices.",
+      "published": "October 12, 2026",
+      "checked": "2026-10-14"
+    },
+    {
+      "id": "worms",
+      "title": "AI Agents Enable Adaptive Computer Worms",
+      "short": "arXiv:2606.03811",
+      "url": "https://arxiv.org/abs/2606.03811",
+      "note": "Research preprint on adaptive propagation across heterogeneous systems.",
+      "published": "June 2, 2026",
+      "checked": "2026-10-14"
+    },
+    {
+      "id": "exploitbench",
+      "title": "ExploitBench: A Capability Ladder Benchmark for LLM Cybersecurity Agents",
+      "short": "arXiv:2605.14153",
+      "url": "https://arxiv.org/abs/2605.14153",
+      "note": "Capability-graded evaluation across 41 V8 bugs and 16 flags.",
+      "published": "May 13, 2026",
+      "checked": "2026-10-14"
+    },
+    {
+      "id": "cybergym",
+      "title": "CyberGym: Evaluating AI Agents’ Real-World Cybersecurity Capabilities at Scale",
+      "short": "CyberGym / ICLR 2026",
+      "url": "https://www.cybergym.io/cybergym/",
+      "note": "1,507 benchmark instances across 188 software projects. Live website results may differ from the paper snapshot.",
+      "published": "ICLR 2026",
+      "checked": "2026-10-14"
+    },
+    {
+      "id": "ara",
+      "title": "Evaluating Language-Model Agents on Realistic Autonomous Tasks",
+      "short": "arXiv:2312.11671",
+      "url": "https://arxiv.org/abs/2312.11671",
+      "note": "METR report studying autonomous replication and adaptation tasks.",
+      "published": "December 18, 2023",
+      "checked": "2026-10-14"
+    }
+  ],
+  "sections": [
+    {
+      "id": "system-model",
+      "title": "Capability is a system property",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "An agent is a model embedded in a loop: observe state, choose an action, invoke a tool, receive feedback, repeat. The harness determines reachable tools, credentials, time budget, network access, retries, and stopping rules. Therefore model capability alone is an incomplete threat model.",
+          "sources": [
+            "ara",
+            "anthropic"
+          ]
+        },
+        {
+          "type": "flow",
+          "title": "Agent control loop",
+          "steps": [
+            "Goal + policy",
+            "Observe state",
+            "Plan next action",
+            "Tool / environment action",
+            "Independent verification",
+            "Continue, stop, or escalate"
+          ],
+          "note": "Risk rises with broad permissions, persistent credentials, writable state, network reachability, and missing stop conditions. Verify outside the model's own narrative.",
+          "sources": [
+            "ara",
+            "worms"
+          ]
+        },
+        {
+          "type": "cards",
+          "items": [
+            {
+              "title": "Model",
+              "text": "Planning, code generation, reasoning, and adaptation."
+            },
+            {
+              "title": "Harness",
+              "text": "Tool APIs, shell/browser access, retries, orchestration, and context."
+            },
+            {
+              "title": "Environment",
+              "text": "Reachable hosts, vulnerable software, identity boundaries, and compute."
+            },
+            {
+              "title": "Control plane",
+              "text": "Credentials, approvals, egress rules, audit logs, quotas, kill switches."
+            }
+          ]
+        },
+        {
+          "type": "callout",
+          "title": "Security takeaway",
+          "text": "Constrain the reachable action space even when model behavior is uncertain. Tool permissions and environment affordances can change practical capability dramatically."
+        }
+      ]
+    },
+    {
+      "id": "replication",
+      "title": "Autonomous replication and adaptive worms",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "METR's 2023 report defines autonomous replication and adaptation (ARA) as a cluster of abilities: acquiring resources, creating copies, and adapting to unfamiliar tasks. Its agents completed easier tasks and made progress on harder ones across 12 tasks; the authors cautioned that these evaluations could not rule out future capability gains.",
+          "sources": [
+            "ara"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Anthropic's October 12, 2026 research note reports that a 9B model got inference running on 8 of 9 hardware types tested, and says models of 30B parameters or less can complete many individual replication steps. Running inference on a device is not the same as end-to-end unauthorized replication, persistence, or uncontrolled spread.",
+          "sources": [
+            "anthropic"
+          ]
+        },
+        {
+          "type": "table",
+          "caption": "ARA decomposition and defensive evidence",
+          "headers": [
+            "Capability",
+            "What must be shown",
+            "Useful evidence"
+          ],
+          "rows": [
+            [
+              "Resource acquisition",
+              "Obtain compute, accounts, or other resources",
+              "Identity and cloud audit logs; quota alerts"
+            ],
+            [
+              "Replication",
+              "Create and launch a functioning copy",
+              "Workload lineage, artifact hashes, deployment records"
+            ],
+            [
+              "Adaptation",
+              "Change strategy after observations",
+              "Versioned action traces and controlled replay"
+            ],
+            [
+              "Persistence",
+              "Remain active across interruptions",
+              "Lifecycle telemetry, lease expiry, revocation tests"
+            ]
+          ],
+          "sources": [
+            "ara",
+            "anthropic"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "The adaptive-worm paper studies agent-generated, target-specific propagation strategies and the use of compromised machines as compute. The conceptual shift is from a fixed exploit strategy to a feedback-driven process, increasing the importance of segmentation, egress controls, identity isolation, and containment.",
+          "sources": [
+            "worms"
+          ]
+        },
+        {
+          "type": "flow",
+          "title": "Defender's propagation-control loop",
+          "steps": [
+            "New host observed",
+            "Local behavior monitored",
+            "Policy blocks unauthorized action",
+            "Telemetry correlated across hosts",
+            "Contain or quarantine",
+            "Validate recovery"
+          ],
+          "note": "Defensive abstraction of the threat model; no exploit construction steps.",
+          "sources": [
+            "worms"
+          ]
+        },
+        {
+          "type": "table",
+          "caption": "Where to break the chain",
+          "headers": [
+            "Layer",
+            "Control objective",
+            "Telemetry / validation"
+          ],
+          "rows": [
+            [
+              "Identity",
+              "Prevent credential reuse and privilege expansion",
+              "Short-lived scoped tokens; privileged sign-in events"
+            ],
+            [
+              "Network",
+              "Limit lateral movement and outbound paths",
+              "East-west flow, DNS, proxy, firewall logs"
+            ],
+            [
+              "Endpoint",
+              "Detect anomalous processes and workloads",
+              "Process lineage, EDR, service creation"
+            ],
+            [
+              "Compute",
+              "Prevent unauthorized workloads",
+              "CPU/memory baselines, image provenance"
+            ],
+            [
+              "Response",
+              "Stop the loop quickly",
+              "Isolation drills, token revocation, egress blocks"
+            ]
+          ],
+          "sources": [
+            "worms"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "exploit-ladder",
+      "title": "ExploitBench: exploitation is a ladder, not a boolean",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "ExploitBench argues that a crash-only benchmark hides the hard transitions between reaching vulnerable code, triggering a bug, building useful primitives, escaping a sandbox, hijacking control flow, and achieving arbitrary code execution. It evaluates 41 V8 bugs using 16 capability flags and deterministic checks.",
+          "sources": [
+            "exploitbench"
+          ]
+        },
+        {
+          "type": "flow",
+          "title": "High-level capability ladder",
+          "steps": [
+            "Coverage: reach target code",
+            "Trigger: reproduce fault",
+            "Engine-local primitive",
+            "General memory primitive",
+            "Control-flow influence",
+            "Arbitrary code execution"
+          ],
+          "note": "Each rung is a distinct outcome. Success at one rung does not prove a higher rung.",
+          "sources": [
+            "exploitbench"
+          ]
+        },
+        {
+          "type": "table",
+          "caption": "What a result actually proves",
+          "headers": [
+            "Outcome",
+            "Supports",
+            "Does not prove"
+          ],
+          "rows": [
+            [
+              "Code coverage",
+              "Test reached a path",
+              "That the bug was triggered"
+            ],
+            [
+              "Crash / trigger",
+              "Fault reproduced",
+              "Reliable control or code execution"
+            ],
+            [
+              "Primitive verified",
+              "Specific operation passed an oracle",
+              "A complete exploit chain"
+            ],
+            [
+              "Control-flow influence",
+              "Execution was measurably altered",
+              "Persistence outside the test process"
+            ],
+            [
+              "Code execution",
+              "Defined execution check passed",
+              "A compromise beyond the evaluated environment"
+            ]
+          ],
+          "sources": [
+            "exploitbench"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "The authors describe randomized challenge-response checks, differential execution against ground-truth binaries, and a signal-handler proof for code execution. Independent deterministic oracles make it harder for an agent to pass by producing plausible-looking artifacts or exploiting weak grading.",
+          "sources": [
+            "exploitbench"
+          ]
+        },
+        {
+          "type": "callout",
+          "title": "Benchmark principle",
+          "text": "Report a capability vector c = (c₁, …, cₖ), with each cᵢ ∈ {0,1} representing an independently verified capability. Preserve target version, mitigations, harness, tool budget, and verifier for reproducibility.",
+          "sources": [
+            "exploitbench"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cybergym",
+      "title": "CyberGym: realistic vulnerability reproduction",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "CyberGym contains 1,507 benchmark instances across 188 software projects. In the primary task, an agent receives a vulnerability description and pre-patch codebase, then generates a proof-of-concept test. Success is checked against vulnerable and patched versions, rather than judging textual plausibility alone.",
+          "sources": [
+            "cybergym"
+          ]
+        },
+        {
+          "type": "cards",
+          "items": [
+            {
+              "title": "1,507",
+              "text": "Benchmark instances derived from real vulnerability history."
+            },
+            {
+              "title": "188",
+              "text": "Software projects represented."
+            },
+            {
+              "title": "Pre-patch / post-patch",
+              "text": "Differential validation checks whether a PoC triggers before a fix and stops triggering after."
+            },
+            {
+              "title": "Open-ended discovery",
+              "text": "Separate experiments scan current codebases and validate candidate crashes."
+            }
+          ]
+        },
+        {
+          "type": "flow",
+          "title": "Vulnerability reproduction pipeline",
+          "steps": [
+            "Task + codebase",
+            "Agent inspects code",
+            "PoC test generated",
+            "Run vulnerable build",
+            "Run patched build",
+            "Oracle compares results"
+          ],
+          "note": "A valid reproduction should trigger on the vulnerable version and not reproduce the same issue on the fixed version. False positives and incomplete fixes require triage.",
+          "sources": [
+            "cybergym"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "CyberGym's website also reports open-ended scans across 431 OSS-Fuzz projects and confirmed zero-days and incomplete patches. Treat those as results of that follow-on methodology and validation process, not as a universal score for every agent. Live leaderboards can change over time.",
+          "sources": [
+            "cybergym"
+          ]
+        },
+        {
+          "type": "callout",
+          "title": "Why differential testing matters",
+          "text": "A single crash is noisy. Comparing vulnerable and patched builds helps distinguish a reproduced vulnerability from an unrelated failure, test-harness issue, or incomplete patch.",
+          "sources": [
+            "cybergym"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "math",
+      "title": "Math for capability and risk analysis",
+      "blocks": [
+        {
+          "type": "cards",
+          "items": [
+            {
+              "title": "Expected loss",
+              "text": "Risk ≈ P(harmful event) × Impact. Condition probability on permissions, reachable assets, run duration, and controls."
+            },
+            {
+              "title": "Chain reliability",
+              "text": "For n independent stages with success probabilities pᵢ: P(chain) = ∏ᵢ pᵢ. Independence is a simplifying assumption."
+            },
+            {
+              "title": "Observed success rate",
+              "text": "p̂ = x / n, where x tasks pass a predefined oracle out of n attempts. Report sample size and task mix."
+            },
+            {
+              "title": "Approximate standard error",
+              "text": "SE(p̂) ≈ √[p̂(1 − p̂) / n] under a simple binomial model. For small samples or extreme rates, consider Wilson intervals."
+            }
+          ]
+        },
+        {
+          "type": "table",
+          "caption": "Illustrative calculations, not reported paper results",
+          "headers": [
+            "Measure",
+            "Calculation",
+            "Interpretation"
+          ],
+          "rows": [
+            [
+              "Observed pass rate",
+              "18 / 100 = 0.18",
+              "18% on this particular test set"
+            ],
+            [
+              "Approx. standard error",
+              "√(0.18 × 0.82 / 100) ≈ 0.038",
+              "About 3.8 percentage points under simple assumptions"
+            ],
+            [
+              "Three-stage chain",
+              "0.8 × 0.5 × 0.2 = 0.08",
+              "8% if these probabilities apply and independence is reasonable"
+            ],
+            [
+              "Expected loss",
+              "0.02 × $5,000,000 = $100,000",
+              "Illustrative only; time horizons must match"
+            ]
+          ]
+        },
+        {
+          "type": "p",
+          "text": "These equations are analytical aids, not empirical laws. Agent stages are often correlated; benchmark tasks vary in difficulty; and stochastic runs may not be independent. A benchmark success rate is not automatically the probability of real-world compromise."
+        },
+        {
+          "type": "callout",
+          "title": "Don't let precision outrun evidence",
+          "text": "Separate measured values, estimates, and illustrative inputs. Always state the task set, denominator, verifier, and uncertainty before comparing model scores."
+        }
+      ]
+    },
+    {
+      "id": "blue-team",
+      "title": "Blue-team controls: constrain, observe, verify, recover",
+      "blocks": [
+        {
+          "type": "table",
+          "caption": "Practical control matrix",
+          "headers": [
+            "Control",
+            "Implementation examples",
+            "Test question"
+          ],
+          "rows": [
+            [
+              "Least privilege",
+              "Dedicated agent identity, narrow scopes, short-lived tokens",
+              "Can it read or change data outside its task?"
+            ],
+            [
+              "Sandboxing",
+              "Ephemeral workers, read-only mounts, restricted egress",
+              "Can it escape its intended filesystem or network zone?"
+            ],
+            [
+              "Approval gates",
+              "Human approval for destructive changes and deployments",
+              "Does the approver receive evidence and have a real veto?"
+            ],
+            [
+              "Observability",
+              "Structured tool logs, correlation IDs, immutable audit storage",
+              "Can responders reconstruct actions and results?"
+            ],
+            [
+              "Resource limits",
+              "Action quotas, CPU/memory ceilings, timeouts, retry caps",
+              "Does it stop predictably when budget is exhausted?"
+            ],
+            [
+              "Independent verification",
+              "Deterministic tests, policy checks, signed artifacts",
+              "Is success checked outside the agent's own narrative?"
+            ],
+            [
+              "Incident response",
+              "Revoke credentials, quarantine workloads, restore known-good state",
+              "Can the team stop the loop and prove recovery?"
+            ]
+          ]
+        },
+        {
+          "type": "flow",
+          "title": "A safe deployment gate",
+          "steps": [
+            "Define allowed task and assets",
+            "Issue scoped identity",
+            "Run in isolation",
+            "Verify output independently",
+            "Log and monitor",
+            "Approve high-impact actions"
+          ],
+          "note": "Fail closed on policy violations. Approval only helps if the approver can understand and reject the proposed action.",
+          "sources": [
+            "anthropic",
+            "worms",
+            "exploitbench",
+            "cybergym"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Map AI-specific guardrails to established enterprise practices: identity governance, EDR, segmentation, vulnerability management, secure SDLC, change management, incident response exercises, and evidence retention. AI policy complements these controls; it does not replace them."
+        }
+      ]
+    },
+    {
+      "id": "synthesis",
+      "title": "How the five papers fit together",
+      "blocks": [
+        {
+          "type": "table",
+          "caption": "Research comparison",
+          "headers": [
+            "Paper",
+            "Core question",
+            "Evidence lens",
+            "Important caveat"
+          ],
+          "rows": [
+            [
+              "METR / ARA (2023)",
+              "Can agents acquire resources, replicate, adapt?",
+              "12 autonomous-task evaluations",
+              "Early task set cannot forecast all future systems."
+            ],
+            [
+              "CyberGym (2026)",
+              "Can agents reproduce real vulnerabilities?",
+              "1,507 tasks / 188 projects",
+              "The oracle defines success."
+            ],
+            [
+              "ExploitBench (2026)",
+              "How far does exploitation progress?",
+              "16 flags / 41 V8 bugs",
+              "Crash and code execution are different outcomes."
+            ],
+            [
+              "Adaptive worms (2026)",
+              "Can agents tailor propagation to hosts?",
+              "Research demonstration across heterogeneous systems",
+              "A demonstration is not proof every network is vulnerable."
+            ],
+            [
+              "Anthropic (2026)",
+              "How close are smaller models to device replication steps?",
+              "Hardware task experiments",
+              "Subtasks do not prove uncontrolled end-to-end spread."
+            ]
+          ],
+          "sources": [
+            "ara",
+            "cybergym",
+            "exploitbench",
+            "worms",
+            "anthropic"
+          ]
+        },
+        {
+          "type": "p",
+          "text": "The shared direction is toward controlled, reproducible evaluations with real environments, independent oracles, and explicit capability tiers. The defensive response is to make dangerous actions unreachable by default, detect unexpected behavior, and preserve telemetry for rapid containment."
+        },
+        {
+          "type": "callout",
+          "title": "The right question",
+          "text": "Capable of which action, against which target, with what permissions, under which mitigations, verified by what oracle, and at what rate across repeated trials?"
+        }
+      ]
+    }
+  ],
+  "glossary": [
+    [
+      "Agent harness",
+      "Software connecting a model to tools, state, budgets, and stopping rules."
+    ],
+    [
+      "ARA",
+      "Autonomous replication and adaptation: resource acquisition, copying, and adapting to unfamiliar situations."
+    ],
+    [
+      "Proof of concept (PoC)",
+      "A test demonstrating a specific vulnerability behavior in a defined environment."
+    ],
+    [
+      "Differential testing",
+      "Comparing behavior across versions or configurations to isolate a change."
+    ],
+    [
+      "Oracle",
+      "An independent verifier for a predefined success condition."
+    ],
+    [
+      "Capability ladder",
+      "A set of increasingly consequential abilities rather than one binary score."
+    ],
+    [
+      "Lateral movement",
+      "Moving from an initially accessed system toward other systems or accounts."
+    ],
+    [
+      "Least privilege",
+      "Granting only the permissions needed for a task."
+    ],
+    [
+      "Sandbox escape",
+      "Crossing the security boundary of an isolated environment."
+    ],
+    [
+      "Egress control",
+      "A policy restricting outbound network connections."
+    ],
+    [
+      "False positive",
+      "An alert or test result that reports a condition that is not actually present."
+    ]
+  ]
+}
