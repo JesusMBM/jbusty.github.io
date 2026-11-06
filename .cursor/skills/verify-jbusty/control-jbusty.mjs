@@ -24,7 +24,7 @@ const NODE_WATCHDOG_MS = 40000
 const EXPECTED_TITLE = "Jesus Bustillos-Molina — AI Systems / Cybersecurity"
 
 // Seven research cards from src/projects.js. Cards 01-06 are same-origin under
-// BASE_URL research/; card 07 (Honeyquest) is an absolute same-origin URL.
+// BASE_URL research/; card 08 is frontier research; card 07 (Honeyquest) is an absolute same-origin URL.
 const RESEARCH_CARDS = [
   { n: "01", title: "How AI agents work", href: "/jbusty.github.io/research/jbm-agent-architecture/" },
   { n: "02", title: "When AI agents cross security boundaries", href: "/jbusty.github.io/research/jbm-agent-sandbox-review/" },
@@ -32,6 +32,7 @@ const RESEARCH_CARDS = [
   { n: "04", title: "What an AI agent actually costs", href: "/jbusty.github.io/research/jbm-harness-economics/" },
   { n: "05", title: "How teams build safer software", href: "/jbusty.github.io/research/jbm-secure-sdlc/" },
   { n: "06", title: "How satellite systems stay secure", href: "/jbusty.github.io/research/jbm-satellite-cyber/" },
+  { n: "08", title: "When AI agents become cyber capabilities", href: "/jbusty.github.io/research/jbm-ai-cybersecurity-frontier/" },
   { n: "07", title: "Can decoys mislead AI attackers?", href: "https://jesusmbm.github.io/jbusty.github.io/honeyquest/" },
 ]
 
@@ -53,7 +54,7 @@ const REQUIRED_MARKERS = [
       const m = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)
       return !!m && /AI systems,\s*examined closely\./.test(stripTags(m[1]))
     } },
-  { id: "research-cards-7", test: (html) => researchCardReport(html).ok },
+  { id: "research-cards-8", test: (html) => researchCardReport(html).ok },
   { id: "contact-mailto", test: (html) => /href=["']mailto:jbustillosmolina@gmail\.com["']/i.test(html) },
 ]
 
@@ -219,14 +220,9 @@ function isLiveHost(url) {
   return hostnameOf(url) === LIVE_HOST
 }
 
-function chromeProfileDir() {
-  const dir = path.join("/tmp", "verify-jbusty-chrome-" + process.pid + "-" + Date.now())
-  fs.mkdirSync(dir, { recursive: true })
-  return dir
-}
-
-function chromeCommonArgs({ createProfile = false } = {}) {
-  const profile = createProfile ? chromeProfileDir() : "/tmp/verify-jbusty-chrome-profile"
+function chromeCommonArgs() {
+  // Omit --user-data-dir: with a profile dir, headless dump-dom/screenshot hang past the
+  // 40s watchdog on this box; the same flags without a profile finish in ~1s.
   return [
     "--headless=new",
     "--no-sandbox",
@@ -235,7 +231,6 @@ function chromeCommonArgs({ createProfile = false } = {}) {
     `--timeout=${CHROME_TIMEOUT_MS}`,
     `--virtual-time-budget=${VIRTUAL_TIME_MS}`,
     `--window-size=${WINDOW}`,
-    `--user-data-dir=${profile}`,
   ]
 }
 
@@ -320,7 +315,7 @@ function stamp(kind) {
 }
 
 function runChrome({ extraArgs, url, stderrName, dryRun }) {
-  const args = [...chromeCommonArgs({ createProfile: !dryRun }), ...extraArgs, url]
+  const args = [...chromeCommonArgs(), ...extraArgs, url]
   if (dryRun) {
     return { dryRun: true, chrome: CHROME_BIN, argv: args, url }
   }
@@ -421,7 +416,7 @@ function refuseOutbound(url, base) {
       reason: "verification stays on live Pages; GitHub, LinkedIn, and other origins must not be followed",
     })
   }
-  // All seven research cards are same-origin (/research/..., /honeyquest/). Stay on the SPA home path.
+  // All eight research cards are same-origin (/research/..., /honeyquest/). Stay on the SPA home path.
   const homePath = normalizePathname(origin.pathname)
   const targetPath = normalizePathname(target.pathname)
   if (targetPath !== homePath) {

@@ -1,6 +1,6 @@
 ---
 name: verify-jbusty
-description: Drive the jbusty portfolio live GitHub Pages web UI at https://jesusmbm.github.io/jbusty.github.io/ to prove the redesigned identity (title, skip link, JBM wordmark, Research/About/Contact nav, "AI systems, examined closely." hero), the seven research cards, about, and contact. Use when verifying the published site, capturing dump-dom/screenshots, or checking App.jsx selectors.
+description: Drive the jbusty portfolio live GitHub Pages web UI at https://jesusmbm.github.io/jbusty.github.io/ to prove the redesigned identity (title, skip link, JBM wordmark, Research/About/Contact nav, "AI systems, examined closely." hero), the eight research cards, about, and contact. Use when verifying the published site, capturing dump-dom/screenshots, or checking App.jsx selectors.
 ---
 
 # Verify jbusty (live GitHub Pages)
@@ -32,7 +32,7 @@ cd .cursor/skills/verify-jbusty
 node control-jbusty.mjs doctor
 ```
 
-Shared instance: never activate mailto, never follow the seven research cards (same-origin /jbusty.github.io/research/... and /honeyquest/), never follow GitHub or LinkedIn.
+Shared instance: never activate mailto, never follow the eight research cards (same-origin /jbusty.github.io/research/... and /honeyquest/), never follow GitHub or LinkedIn.
 
 ## Doctor
 
@@ -54,7 +54,7 @@ Checks:
    - (wordmark-aria-label) a.wordmark href #top, aria-label "Jesus Bustillos-Molina home"
    - (primary-nav) nav#navigation aria-label "Primary" containing #work, #about, #contact
    - (h1-examined-closely) h1 text "AI systems, examined closely."
-   - (research-cards-7) exactly seven a.research-card with the expected title + href + target _blank (see features/work-research.md)
+   - (research-cards-8) exactly eight a.research-card with the expected title + href + target _blank (see features/work-research.md)
    - (contact-mailto) mailto:jbustillosmolina@gmail.com
 4. Fail if any old identity is present (oldIdentity array): old-#hero-id, old-#projects, old-#skills, old-threat-hunt-copy, old-#main-content, old-#approach, old-signal-h1, old-netlify-cards.
 
@@ -70,7 +70,7 @@ Stable handles from live App.jsx (not leftover components):
 - nav#navigation.navigation — aria-label "Primary"; Research #work, About #about, Contact #contact
 - main#main — page landmark
 - section#top.hero — eyebrow "Jesus Bustillos-Molina"; h1 "AI systems, examined closely."; hero-description "I build and study AI agents..."; a.button.primary "Explore research" href #work; a.button "Get in touch" href #contact; figure.system-map "01 / How an AI agent works" (Information → AI agent → Tools, Checks); hero-baseline "AI systems / AI security / Cybersecurity" and "Wichita, Kansas"
-- section#work.research — eyebrow "01 / Selected research"; h2 "Understand the systems you use."; seven a.research-card (first is .featured), all new tab, all same-origin
+- section#work.research — eyebrow "01 / Selected research"; h2 "Understand the systems you use."; eight a.research-card (first is .featured), all new tab, all same-origin
 - section#about.about — eyebrow "02 / About"; h2 "Curiosity, with a security mindset."; Textron Aviation; dl.credentials (Education, Continuing study, Certification); capabilities Build / Check / Protect / Investigate
 - section#contact.contact — eyebrow "03 / Contact"; h2 "Something worth figuring out?"; "Let’s talk" mailto; footer copyright year; GitHub https://github.com/JesusMBM; LinkedIn https://www.linkedin.com/in/jesus-bm/; Back to top href #top
 
@@ -132,6 +132,6 @@ node control-jbusty.mjs click .menu-button
 node control-jbusty.mjs cleanup
 ```
 
-Chrome binary: /usr/bin/google-chrome (override CHROME_PATH). Required flags: --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --timeout=30000 --virtual-time-budget=8000. Screenshot window 1280x800. Stderr always captured to a file under the evidence dir.
+Chrome binary: /usr/bin/google-chrome (override CHROME_PATH). Required flags: --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --timeout=30000 --virtual-time-budget=8000. Do not pass --user-data-dir: with a profile dir, dump-dom/screenshot hang past the watchdog on the maintain box. Screenshot window 1280x800. Stderr always captured to a file under the evidence dir.
 
 Feature map: features/ (hero-nav, work-research, about-profile, contact-footer). Drive one mapped feature end-to-end after doctor; the map lists the rest.
